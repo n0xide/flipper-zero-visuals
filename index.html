@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Flipper Zero curriculum — visual companion</title>
+<style>
+  :root {
+    --bg: #0b0f14;
+    --panel: #131a23;
+    --panel-2: #1a232e;
+    --line: #2a3744;
+    --text: #d6e1ec;
+    --muted: #7a8ca0;
+    --accent: #00d9a0;
+    --accent-2: #5eb6ff;
+    --warn: #ffb547;
+    --danger: #ff5a6e;
+    --purple: #c084fc;
+    --mono: "JetBrains Mono", "Fira Code", Consolas, monospace;
+    --sans: -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.55; }
+  body { max-width: 1180px; margin: 0 auto; padding: 32px 24px 80px; }
+  h1 { font-size: 32px; margin: 0 0 8px; }
+  .subtitle { color: var(--muted); font-size: 15px; margin: 0 0 32px; }
+  h2 { font-size: 22px; margin: 0 0 8px; color: var(--accent); border-left: 3px solid var(--accent); padding-left: 12px; }
+  a { color: var(--accent-2); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .breadcrumb { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 18px; margin: 24px 0; }
+  .phase-card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 22px;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: var(--text);
+    position: relative;
+    overflow: hidden;
+  }
+  .phase-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--accent);
+  }
+  .phase-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    text-decoration: none;
+  }
+  .phase-card.p2::before { background: #ff5a6e; }
+  .phase-card.p3::before { background: #ffb547; }
+  .phase-card.p5::before { background: #5eb6ff; }
+  .phase-card.p6::before { background: #00d9a0; }
+  .phase-card.p7::before { background: #c084fc; }
+
+  .phase-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+  }
+  .phase-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 4px 0 8px;
+    color: var(--text);
+  }
+  .phase-tagline { color: var(--muted); font-size: 13px; margin-bottom: 14px; flex-grow: 0; }
+  .phase-visuals {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex-grow: 1;
+    font-size: 13px;
+  }
+  .phase-visuals li {
+    padding: 4px 0;
+    color: var(--text);
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .phase-visuals li::before {
+    content: '▸';
+    color: var(--accent);
+    font-size: 11px;
+    margin-top: 2px;
+    flex-shrink: 0;
+  }
+  .phase-visuals li.complex::before { color: var(--warn); }
+  .phase-visuals li.complex::after { content: ' interactive'; color: var(--muted); font-size: 11px; }
+
+  .phase-footer {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+  }
+  .phase-link {
+    color: var(--accent-2);
+    font-family: var(--mono);
+  }
+  .visual-count {
+    color: var(--muted);
+    font-family: var(--mono);
+  }
+
+  .intro-panel {
+    background: linear-gradient(135deg, rgba(0,217,160,0.08), rgba(94,182,255,0.05));
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 32px;
+  }
+  .legend-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    background: var(--panel-2);
+    border-radius: 4px;
+    font-size: 11px;
+    font-family: var(--mono);
+    margin-right: 6px;
+  }
+
+  .small-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 13px; }
+  .small-table th, .small-table td { padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--line); }
+  .small-table th { color: var(--muted); font-weight: 500; font-size: 11px; text-transform: uppercase; letter-spacing: 0.6px; }
+
+  .meta-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 16px 0; }
+  .meta-card { background: var(--panel-2); border: 1px solid var(--line); border-radius: 6px; padding: 14px; }
+  .meta-card-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.6px; }
+  .meta-card-value { font-size: 22px; font-family: var(--mono); color: var(--accent); margin-top: 4px; }
+  .meta-card-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  .future { background: rgba(122,140,160,0.06); border: 1px dashed var(--line); border-radius: 8px; padding: 18px 22px; margin-top: 32px; }
+  .future-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-top: 12px; }
+  .future-item { background: var(--panel-2); border: 1px solid var(--line); border-radius: 4px; padding: 10px 12px; }
+  .future-item-title { color: var(--accent-2); font-size: 13px; font-weight: 600; }
+  .future-item-desc { color: var(--muted); font-size: 12px; margin-top: 2px; }
+</style>
+</head>
+<body>
+
+<div class="breadcrumb">
+  <span style="opacity:0.55;cursor:default" title="Source lives in the private workspace">curriculum</span> &nbsp;/&nbsp; visuals
+</div>
+
+<h1>Flipper Zero curriculum — visual companion</h1>
+<p class="subtitle">Interactive HTML visualizations for the topics that are hardest to grok from text alone. Modulation waveforms, MIFARE sector maps, GPIO pinouts, WiFi handshake sequences, attack-chain timelines — every visual that pays off across multiple study sessions lives here.</p>
+
+<div class="intro-panel">
+  <h2 style="margin-top: 0; border: none; padding: 0;">How to use this</h2>
+  <p style="margin-top: 6px;">When a phase markdown sends you to a visual (e.g., "see <a href="#">visuals/phase-2-subghz.html#modulation</a>"), open it in a browser. Click and drag — every visual is interactive. The visuals are deliberately complementary, not replacements: read the phase markdown for theory; use the visuals when your brain wants a picture.</p>
+
+  <div class="meta-grid">
+    <div class="meta-card">
+      <div class="meta-card-label">Phases covered</div>
+      <div class="meta-card-value">5 / 10</div>
+      <div class="meta-card-sub">the visually-dense ones</div>
+    </div>
+    <div class="meta-card">
+      <div class="meta-card-label">Total visualizations</div>
+      <div class="meta-card-value">31</div>
+      <div class="meta-card-sub">interactive + diagrams + tables</div>
+    </div>
+    <div class="meta-card">
+      <div class="meta-card-label">Dependencies</div>
+      <div class="meta-card-value">none</div>
+      <div class="meta-card-sub">vanilla HTML/CSS/JS, single-file pages</div>
+    </div>
+  </div>
+
+  <p style="margin-bottom: 0; font-size: 13px;">
+    <span class="legend-tag" style="color: var(--accent);">▸</span> static diagram &nbsp;
+    <span class="legend-tag" style="color: var(--warn);">▸ interactive</span> click / drag / step through &nbsp;
+  </p>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- PHASE CARDS -->
+<!-- ============================================================ -->
+<div class="grid">
+
+  <!-- Phase 2 -->
+  <a href="phase-2-subghz.html" class="phase-card p2">
+    <div class="phase-num">Phase 02 · RF / sub-GHz</div>
+    <div class="phase-title">Sub-GHz radio</div>
+    <div class="phase-tagline">The deepest single domain. Modulation, encoding, rolling codes, attack mechanics.</div>
+    <ul class="phase-visuals">
+      <li>ISM band spectrum map (315/433/868/915 MHz)</li>
+      <li class="complex">Modulation: ASK/OOK vs 2-FSK waveform</li>
+      <li class="complex">Encoding: NRZ vs Manchester vs PWM</li>
+      <li class="complex">Fixed vs rolling code press comparison</li>
+      <li>KeeLoq packet anatomy (66-bit breakdown)</li>
+      <li class="complex">RollJam attack timeline (7-step animated)</li>
+      <li class="complex">Brute-force math calculator</li>
+    </ul>
+    <div class="phase-footer">
+      <span class="phase-link">phase-2-subghz.html →</span>
+      <span class="visual-count">7 visuals</span>
+    </div>
+  </a>
+
+  <!-- Phase 3 -->
+  <a href="phase-3-cards.html" class="phase-card p3">
+    <div class="phase-num">Phase 03 · LF + HF</div>
+    <div class="phase-title">Card technologies</div>
+    <div class="phase-tagline">LF RFID + HF NFC. From trivial EM4100 to broken MIFARE Classic to unclonable DESFire.</div>
+    <ul class="phase-visuals">
+      <li>LF vs HF physics + capability comparison</li>
+      <li class="complex">EM4100 packet anatomy — every bit</li>
+      <li>NFC tag family tree with security badges</li>
+      <li class="complex">MIFARE Classic memory map — 16 sectors</li>
+      <li>Crypto1 attack ladder decision tree</li>
+      <li>EMV — what Flipper can and can't read</li>
+      <li class="complex">Clone workflow — LF and HF side-by-side</li>
+    </ul>
+    <div class="phase-footer">
+      <span class="phase-link">phase-3-cards.html →</span>
+      <span class="visual-count">7 visuals</span>
+    </div>
+  </a>
+
+  <!-- Phase 5 -->
+  <a href="phase-5-badusb.html" class="phase-card p5">
+    <div class="phase-num">Phase 05 · HID injection</div>
+    <div class="phase-title">Bad USB</div>
+    <div class="phase-tagline">Plug Flipper into USB. Host trusts keyboards. Flipper types the payload. The oldest reliable physical-access attack.</div>
+    <ul class="phase-visuals">
+      <li>HID injection premise — USB enumeration flow</li>
+      <li>Ducky Script anatomy — annotated payload</li>
+      <li class="complex">Stage 1 → Stage 2 chain (animated)</li>
+      <li>Defense onion — 6 layered controls</li>
+      <li class="complex">Keyboard layout footgun — live demo</li>
+    </ul>
+    <div class="phase-footer">
+      <span class="phase-link">phase-5-badusb.html →</span>
+      <span class="visual-count">5 visuals</span>
+    </div>
+  </a>
+
+  <!-- Phase 6 -->
+  <a href="phase-6-wireless.html" class="phase-card p6">
+    <div class="phase-num">Phase 06 · BLE / WiFi / NRF24</div>
+    <div class="phase-title">Wireless extensions</div>
+    <div class="phase-tagline">Three different wireless domains. Privacy implications, deauth mechanics, evil twin, MouseJack.</div>
+    <ul class="phase-visuals">
+      <li class="complex">BLE address types + tracking simulation</li>
+      <li class="complex">WPA2 4-way handshake (step-through)</li>
+      <li>PMF on/off comparison — why deauth works</li>
+      <li>Evil twin attack network diagram</li>
+      <li>MouseJack — keystroke injection at 30 m</li>
+      <li class="complex">PSK crack-time calculator</li>
+    </ul>
+    <div class="phase-footer">
+      <span class="phase-link">phase-6-wireless.html →</span>
+      <span class="visual-count">6 visuals</span>
+    </div>
+  </a>
+
+  <!-- Phase 7 -->
+  <a href="phase-7-hardware.html" class="phase-card p7">
+    <div class="phase-num">Phase 07 · GPIO / bus / SWD</div>
+    <div class="phase-title">Hardware hacking</div>
+    <div class="phase-tagline">Where the Flipper becomes a hardware bench. Pinouts, bus protocols, SOIC-8 flash dumping, the audit chain.</div>
+    <ul class="phase-visuals">
+      <li class="complex">Flipper GPIO header — 18-pin interactive pinout</li>
+      <li class="complex">UART / SPI / I²C — wiring + timing side-by-side</li>
+      <li>SOIC-8 SPI flash + CH341A wiring</li>
+      <li class="complex">8-step hardware attack chain</li>
+      <li>ARM Cortex-M RDP levels comparison</li>
+      <li>Voltage levels — when to level-shift</li>
+    </ul>
+    <div class="phase-footer">
+      <span class="phase-link">phase-7-hardware.html →</span>
+      <span class="visual-count">6 visuals</span>
+    </div>
+  </a>
+
+</div>
+
+
+<!-- ============================================================ -->
+<!-- WHY NOT EVERY PHASE -->
+<!-- ============================================================ -->
+<h2>Why these five phases, not all ten</h2>
+<p style="margin-top: 12px;">Each phase visualization burns ~1500 lines of HTML. To stay valuable, the visuals target topics that are <em>genuinely hard to grok from text</em>. Some phases don't benefit:</p>
+
+<table class="small-table">
+  <thead>
+    <tr><th>Phase</th><th>Status</th><th>Reason</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>00 — Ethics + legal</td><td><span style="color: var(--muted);">no visuals</span></td><td>Pure text policy. A diagram doesn't help.</td></tr>
+    <tr><td>01 — Foundations</td><td><span style="color: var(--muted);">no visuals (yet)</span></td><td>Capability table already in the markdown. Could add an interactive chip layout if Phase 1 hands-on starts.</td></tr>
+    <tr><td>02 — Sub-GHz</td><td><span style="color: var(--accent);">covered ✓</span></td><td>RF modulation, encoding, rolling-code mechanics — densely visual.</td></tr>
+    <tr><td>03 — Card tech</td><td><span style="color: var(--accent);">covered ✓</span></td><td>Packet anatomy, memory layouts, attack trees — densely visual.</td></tr>
+    <tr><td>04 — IR + iButton</td><td><span style="color: var(--muted);">no visuals</span></td><td>Mostly broken-by-design + short. The little visual benefit could be a single IR protocol comparison chart later.</td></tr>
+    <tr><td>05 — Bad USB</td><td><span style="color: var(--accent);">covered ✓</span></td><td>Stage chain + defense layers benefit; keyboard layout demo is uniquely interactive.</td></tr>
+    <tr><td>06 — Wireless ext.</td><td><span style="color: var(--accent);">covered ✓</span></td><td>BLE addresses, WiFi handshake, evil twin — heavy diagrams.</td></tr>
+    <tr><td>07 — Hardware</td><td><span style="color: var(--accent);">covered ✓</span></td><td>The pinout alone is worth the page.</td></tr>
+    <tr><td>08 — Defense</td><td><span style="color: var(--muted);">no visuals (yet)</span></td><td>Cross-references the per-phase defense angles. An "attacks → defenses" matrix could go here.</td></tr>
+    <tr><td>09 — Capstones</td><td><span style="color: var(--muted);">no visuals (yet)</span></td><td>Scenario-based. Could add a "site map" of each capstone scenario when one activates.</td></tr>
+  </tbody>
+</table>
+
+
+<!-- ============================================================ -->
+<!-- FUTURE -->
+<!-- ============================================================ -->
+<div class="future">
+  <h2 style="margin-top: 0; border: none; padding: 0;">Future visuals (add when a session needs them)</h2>
+  <p style="font-size: 13px; color: var(--muted); margin-top: 6px;">Don't pre-build empty stubs. These are candidates to write when a study session hits a specific gap.</p>
+
+  <div class="future-grid">
+    <div class="future-item">
+      <div class="future-item-title">IR protocol comparison</div>
+      <div class="future-item-desc">NEC vs RC5 vs SIRC vs Pronto carrier + bit timing waveforms. Phase 4 trigger.</div>
+    </div>
+    <div class="future-item">
+      <div class="future-item-title">1-Wire iButton timing</div>
+      <div class="future-item-desc">DS1990A read sequence at bus level. Phase 4 trigger.</div>
+    </div>
+    <div class="future-item">
+      <div class="future-item-title">Attack → defense matrix</div>
+      <div class="future-item-desc">Every attack class from Phases 2–7 with its defense rec, sortable. Phase 8 trigger.</div>
+    </div>
+    <div class="future-item">
+      <div class="future-item-title">Capstone site map</div>
+      <div class="future-item-desc">Per-scenario visual map of attack surface for each Phase 9 capstone (home, office, vehicle, IoT, OT).</div>
+    </div>
+    <div class="future-item">
+      <div class="future-item-title">SDR vs Flipper FFT</div>
+      <div class="future-item-desc">Side-by-side spectrogram showing what HackRF/RTL-SDR sees vs what the Flipper's narrowband shows. Phase 2 extension.</div>
+    </div>
+    <div class="future-item">
+      <div class="future-item-title">ChipWhisperer glitch</div>
+      <div class="future-item-desc">Voltage glitch timing relative to clock cycle. Phase 7 advanced (Lab 7.14) trigger.</div>
+    </div>
+  </div>
+</div>
+
+
+<p style="margin-top: 48px; color: var(--muted); font-size: 12px;">
+  Curriculum root: <span style="opacity:0.55;cursor:default" title="Source lives in the private workspace">flipper-zero/README.md</span> · Workspace: <span style="opacity:0.55;cursor:default" title="Source lives in the private workspace">cybersecurity/CONTEXT.md</span>
+</p>
+
+</body>
+</html>

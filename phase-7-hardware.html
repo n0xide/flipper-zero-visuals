@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Phase 7 — GPIO + Hardware Hacking (visuals)</title>
+<style>
+  :root {
+    --bg: #0b0f14;
+    --panel: #131a23;
+    --panel-2: #1a232e;
+    --line: #2a3744;
+    --text: #d6e1ec;
+    --muted: #7a8ca0;
+    --accent: #00d9a0;
+    --accent-2: #5eb6ff;
+    --warn: #ffb547;
+    --danger: #ff5a6e;
+    --purple: #c084fc;
+    --mono: "JetBrains Mono", "Fira Code", Consolas, monospace;
+    --sans: -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.55; }
+  body { max-width: 1180px; margin: 0 auto; padding: 32px 24px 80px; }
+  h1 { font-size: 28px; margin: 0 0 4px; }
+  h2 { font-size: 22px; margin: 0 0 8px; color: var(--accent); border-left: 3px solid var(--accent); padding-left: 12px; }
+  h3 { font-size: 16px; margin: 18px 0 8px; color: var(--accent-2); }
+  p { margin: 8px 0; }
+  a { color: var(--accent-2); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .breadcrumb { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 20px; margin: 16px 0 32px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12px; color: var(--muted); margin: 8px 0; }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .swatch { width: 14px; height: 14px; border-radius: 3px; }
+  .controls { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; padding: 10px 12px; background: var(--panel-2); border-radius: 6px; margin-bottom: 12px; font-size: 13px; }
+  button { background: var(--panel-2); color: var(--text); border: 1px solid var(--line); padding: 6px 14px; border-radius: 5px; cursor: pointer; font-family: var(--sans); font-size: 13px; transition: all 0.15s; }
+  button:hover { border-color: var(--accent); color: var(--accent); }
+  button.primary { background: var(--accent); color: #001a14; border-color: var(--accent); font-weight: 600; }
+  button.active { background: var(--accent-2); color: #001a14; border-color: var(--accent-2); }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-family: var(--mono); margin: 0 2px; }
+  .badge.ok { background: rgba(0,217,160,0.15); color: var(--accent); border: 1px solid var(--accent); }
+  .badge.warn { background: rgba(255,181,71,0.15); color: var(--warn); border: 1px solid var(--warn); }
+  .badge.bad { background: rgba(255,90,110,0.15); color: var(--danger); border: 1px solid var(--danger); }
+  table { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 13px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+  th { color: var(--muted); font-weight: 500; font-size: 11px; text-transform: uppercase; letter-spacing: 0.6px; }
+  td.mono, .mono { font-family: var(--mono); }
+  .caption { font-size: 12px; color: var(--muted); margin-top: 6px; font-style: italic; }
+  .callout { background: rgba(94,182,255,0.08); border-left: 3px solid var(--accent-2); padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; font-size: 13px; }
+  .callout.warn { background: rgba(255,181,71,0.08); border-color: var(--warn); }
+  .callout.danger { background: rgba(255,90,110,0.08); border-color: var(--danger); }
+  svg { display: block; max-width: 100%; }
+  .nav-toc { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px 18px; margin-bottom: 24px; font-size: 14px; }
+  .nav-toc ol { margin: 6px 0 0; padding-left: 24px; }
+  .nav-toc li { margin: 3px 0; }
+  details { margin: 8px 0; }
+  summary { cursor: pointer; color: var(--accent-2); font-size: 13px; user-select: none; }
+  .pin { cursor: pointer; }
+  .pin:hover circle { stroke-width: 3; }
+  /* Pin function colors */
+  .fn-power { fill: #ff5a6e; }
+  .fn-gnd { fill: #7a8ca0; }
+  .fn-uart { fill: #00d9a0; }
+  .fn-spi { fill: #5eb6ff; }
+  .fn-i2c { fill: #ffb547; }
+  .fn-swd { fill: #c084fc; }
+  .fn-gpio { fill: #4a5d72; }
+  canvas { display: block; max-width: 100%; }
+</style>
+</head>
+<body>
+
+<div class="breadcrumb">
+  <a href="index.html">visuals</a> &nbsp;/&nbsp; Phase 7 &nbsp;/&nbsp; GPIO + Hardware Hacking
+</div>
+
+<h1>Phase 7 — GPIO + Hardware Hacking</h1>
+<p style="color: var(--muted); margin: 0 0 24px;">Where the Flipper stops being a contactless multi-tool and starts being a hardware bench in your pocket. Visualizations for the GPIO header, three bus protocols (UART/SPI/I²C), SOIC-8 flash dumping, the audit chain, and ARM RDP levels.</p>
+
+<div class="nav-toc">
+  <strong style="color: var(--accent);">On this page</strong>
+  <ol>
+    <li><a href="#gpio">Flipper GPIO pinout</a> — interactive, click any pin</li>
+    <li><a href="#bus-compare">UART vs SPI vs I²C</a> — wiring + timing side-by-side</li>
+    <li><a href="#flash">SOIC-8 SPI flash dumping</a> — CH341A vs Flipper, clip wiring</li>
+    <li><a href="#attack-chain">Full audit attack chain</a> — 8 steps from PCB to report</li>
+    <li><a href="#rdp">ARM Cortex-M RDP levels</a> — what each blocks</li>
+    <li><a href="#level-shift">Voltage levels + when to level-shift</a></li>
+  </ol>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- 1. FLIPPER GPIO PINOUT -->
+<!-- ============================================================ -->
+<section id="gpio">
+<h2>1. Flipper GPIO header — interactive pinout</h2>
+<p>18 pins on the right side of the Flipper. Click any pin to see what it does, what voltage it runs at, and what you'd hook it to.</p>
+
+<div class="panel">
+  <div class="controls">
+    <strong>Filter by function:</strong>
+    <button class="fn-filter" data-fn="all">all</button>
+    <button class="fn-filter" data-fn="power">power</button>
+    <button class="fn-filter" data-fn="uart">UART</button>
+    <button class="fn-filter" data-fn="spi">SPI</button>
+    <button class="fn-filter" data-fn="i2c">I²C</button>
+    <button class="fn-filter" data-fn="swd">SWD</button>
+    <button class="fn-filter" data-fn="gpio">GPIO</button>
+  </div>
+
+  <svg viewBox="0 0 1100 460" id="gpio-svg">
+    <!-- Flipper body silhouette -->
+    <rect x="40" y="40" width="560" height="380" rx="20" fill="#1a232e" stroke="#2a3744" stroke-width="2"/>
+    <rect x="80" y="90" width="320" height="200" rx="6" fill="#0a0f14" stroke="#2a3744"/>
+    <text x="240" y="195" text-anchor="middle" fill="#7a8ca0" font-size="13" font-family="JetBrains Mono, monospace">Flipper Zero</text>
+    <text x="240" y="215" text-anchor="middle" fill="#7a8ca0" font-size="10">(side view, header right)</text>
+
+    <!-- D-pad + buttons (decorative) -->
+    <circle cx="160" cy="350" r="22" fill="none" stroke="#7a8ca0" stroke-width="1.5"/>
+    <circle cx="160" cy="350" r="8" fill="#7a8ca0"/>
+    <circle cx="280" cy="350" r="14" fill="#ff5a6e"/>
+    <text x="280" y="354" text-anchor="middle" font-size="9" fill="#fff">BACK</text>
+    <circle cx="320" cy="350" r="14" fill="#00d9a0"/>
+    <text x="320" y="354" text-anchor="middle" font-size="9" fill="#001a14">OK</text>
+
+    <!-- Right edge — pin header. 18 pins in two columns -->
+    <!-- Pins drawn as circles with labels -->
+    <g id="pins-group"></g>
+
+    <!-- Selected pin info panel -->
+    <g id="pin-info-panel">
+      <rect x="640" y="40" width="440" height="380" rx="8" fill="#0a0f14" stroke="#2a3744"/>
+      <text x="660" y="65" font-size="14" fill="#d6e1ec" font-weight="bold">Pin details</text>
+      <text x="660" y="90" font-size="11" fill="#7a8ca0">Click a pin on the left to inspect.</text>
+    </g>
+  </svg>
+
+  <div class="legend" style="margin-top: 14px;">
+    <div class="legend-item"><div class="swatch" style="background:#ff5a6e;"></div> Power</div>
+    <div class="legend-item"><div class="swatch" style="background:#7a8ca0;"></div> Ground</div>
+    <div class="legend-item"><div class="swatch" style="background:#00d9a0;"></div> UART</div>
+    <div class="legend-item"><div class="swatch" style="background:#5eb6ff;"></div> SPI</div>
+    <div class="legend-item"><div class="swatch" style="background:#ffb547;"></div> I²C</div>
+    <div class="legend-item"><div class="swatch" style="background:#c084fc;"></div> SWD</div>
+    <div class="legend-item"><div class="swatch" style="background:#4a5d72;"></div> GPIO</div>
+  </div>
+
+  <div class="callout warn" style="margin-top: 16px;">
+    <strong>Power-rail safety:</strong> the Flipper drives at 3.3V logic. Connecting Flipper's 3.3V rail to a target that's already self-powered is the #1 way to fry one or both devices. <strong>Always common-ground first; never share power rails unless intentional.</strong> 5V targets need a level shifter on lines the Flipper drives.
+  </div>
+</div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- 2. UART / SPI / I²C COMPARISON -->
+<!-- ============================================================ -->
+<section id="bus-compare">
+<h2>2. UART vs SPI vs I²C — wiring + timing side-by-side</h2>
+<p>Three protocols you'll meet on every PCB. Click each tab to see wiring topology and what the timing diagram looks like.</p>
+
+<div class="panel">
+  <div class="controls">
+    <button class="bus-tab active" data-bus="uart">UART</button>
+    <button class="bus-tab" data-bus="spi">SPI</button>
+    <button class="bus-tab" data-bus="i2c">I²C</button>
+    <span style="margin-left: auto; color: var(--muted); font-size: 12px;" id="bus-meta"></span>
+  </div>
+
+  <div class="grid-2" style="gap: 24px;">
+    <div>
+      <h3>Wiring topology</h3>
+      <svg viewBox="0 0 480 280" id="bus-wiring"></svg>
+      <div class="caption" id="wiring-caption"></div>
+    </div>
+    <div>
+      <h3>Timing — what the analyzer sees</h3>
+      <canvas id="bus-timing" width="480" height="260"></canvas>
+      <div class="caption" id="timing-caption"></div>
+    </div>
+  </div>
+
+  <h3>Quick comparison table</h3>
+  <table>
+    <thead>
+      <tr><th>Property</th><th>UART</th><th>SPI</th><th>I²C</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Wires</td><td>2 (TX, RX) + GND</td><td>4 (MOSI, MISO, SCK, CS) + GND</td><td>2 (SDA, SCL) + GND</td></tr>
+      <tr><td>Clock</td><td>None (asynchronous, agreed baud)</td><td>Master-driven SCK</td><td>Master-driven SCL</td></tr>
+      <tr><td>Topology</td><td>Point-to-point</td><td>Master + multiple slaves via CS</td><td>Multi-master, slaves addressed (7-bit / 10-bit)</td></tr>
+      <tr><td>Typical rate</td><td>9600 – 921600 bps</td><td>1 – 50+ MHz</td><td>100 kHz / 400 kHz / 1 MHz</td></tr>
+      <tr><td>Pull-ups required</td><td>No</td><td>No (push-pull)</td><td><strong>Yes</strong> (open-drain)</td></tr>
+      <tr><td>Bidirectional per wire</td><td>No (separate TX/RX)</td><td>No (separate MOSI/MISO)</td><td>Yes (SDA shared)</td></tr>
+      <tr><td>Common targets</td><td>Boot consoles, debug headers</td><td>Flash chips, displays, sensors</td><td>EEPROMs, RTCs, IMUs, config storage</td></tr>
+      <tr><td>Flipper-side tool</td><td>UART Terminal FAP</td><td>SPI Flash Reader/Writer FAP</td><td>I²C Tools FAP</td></tr>
+      <tr><td>Frame begins with</td><td>Start bit (low)</td><td>CS asserted low</td><td>START condition (SDA fall while SCL high)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <strong>How to identify which protocol you're looking at on a PCB:</strong> count pins to a chip, look up its datasheet by part number. Most flash chips are SPI (8-pin SOIC). Most config EEPROMs are I²C (8-pin SOIC). Debug headers (3-4 pins, often labeled) are UART. SWD is a 2-pin (+power+gnd) header, sometimes broken out as standardized 10-pin or 20-pin connectors.
+  </div>
+</div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- 3. SOIC-8 FLASH DUMPING -->
+<!-- ============================================================ -->
+<section id="flash">
+<h2>3. SOIC-8 SPI flash dumping — pinout + clip wiring</h2>
+<p>Most embedded firmware lives on a SOIC-8 SPI flash chip (W25Q series, MX25L, AT25, etc.). Two ways to read it.</p>
+
+<div class="panel">
+  <div class="grid-2">
+    <div>
+      <h3>SOIC-8 pinout (standard SPI flash)</h3>
+      <svg viewBox="0 0 460 320" id="soic-svg">
+        <!-- Body of chip -->
+        <rect x="130" y="40" width="200" height="240" rx="10" fill="#1a232e" stroke="#7a8ca0" stroke-width="2"/>
+
+        <!-- Pin 1 indicator (dot) -->
+        <circle cx="160" cy="70" r="6" fill="#ffb547"/>
+        <text x="160" y="73" text-anchor="middle" font-size="9" fill="#0a0f14" font-weight="bold">1</text>
+
+        <!-- Part marking -->
+        <text x="230" y="155" text-anchor="middle" font-size="14" fill="#d6e1ec" font-family="JetBrains Mono, monospace">W25Q128</text>
+        <text x="230" y="172" text-anchor="middle" font-size="10" fill="#7a8ca0">128 Mbit = 16 MByte</text>
+        <text x="230" y="186" text-anchor="middle" font-size="9" fill="#7a8ca0">SPI flash</text>
+
+        <!-- Left pins (1-4 top to bottom) -->
+        <g font-family="JetBrains Mono, monospace" font-size="11">
+          <!-- Pin 1: /CS -->
+          <line x1="130" y1="80" x2="100" y2="80" stroke="#5eb6ff" stroke-width="2"/>
+          <rect x="40" y="68" width="55" height="24" rx="3" fill="#1a232e" stroke="#5eb6ff"/>
+          <text x="67" y="84" text-anchor="middle" fill="#5eb6ff">/CS</text>
+          <text x="38" y="84" text-anchor="end" fill="#7a8ca0">1</text>
+
+          <!-- Pin 2: DO (MISO) -->
+          <line x1="130" y1="130" x2="100" y2="130" stroke="#5eb6ff" stroke-width="2"/>
+          <rect x="40" y="118" width="55" height="24" rx="3" fill="#1a232e" stroke="#5eb6ff"/>
+          <text x="67" y="134" text-anchor="middle" fill="#5eb6ff">DO</text>
+          <text x="38" y="134" text-anchor="end" fill="#7a8ca0">2</text>
+
+          <!-- Pin 3: /WP -->
+          <line x1="130" y1="180" x2="100" y2="180" stroke="#ffb547" stroke-width="2"/>
+          <rect x="40" y="168" width="55" height="24" rx="3" fill="#1a232e" stroke="#ffb547"/>
+          <text x="67" y="184" text-anchor="middle" fill="#ffb547">/WP</text>
+          <text x="38" y="184" text-anchor="end" fill="#7a8ca0">3</text>
+
+          <!-- Pin 4: GND -->
+          <line x1="130" y1="230" x2="100" y2="230" stroke="#7a8ca0" stroke-width="2"/>
+          <rect x="40" y="218" width="55" height="24" rx="3" fill="#1a232e" stroke="#7a8ca0"/>
+          <text x="67" y="234" text-anchor="middle" fill="#7a8ca0">GND</text>
+          <text x="38" y="234" text-anchor="end" fill="#7a8ca0">4</text>
+
+          <!-- Right pins (5-8 bottom to top) -->
+          <!-- Pin 5: DI (MOSI) -->
+          <line x1="330" y1="230" x2="360" y2="230" stroke="#5eb6ff" stroke-width="2"/>
+          <rect x="365" y="218" width="55" height="24" rx="3" fill="#1a232e" stroke="#5eb6ff"/>
+          <text x="392" y="234" text-anchor="middle" fill="#5eb6ff">DI</text>
+          <text x="425" y="234" fill="#7a8ca0">5</text>
+
+          <!-- Pin 6: CLK -->
+          <line x1="330" y1="180" x2="360" y2="180" stroke="#5eb6ff" stroke-width="2"/>
+          <rect x="365" y="168" width="55" height="24" rx="3" fill="#1a232e" stroke="#5eb6ff"/>
+          <text x="392" y="184" text-anchor="middle" fill="#5eb6ff">CLK</text>
+          <text x="425" y="184" fill="#7a8ca0">6</text>
+
+          <!-- Pin 7: /HOLD -->
+          <line x1="330" y1="130" x2="360" y2="130" stroke="#ffb547" stroke-width="2"/>
+          <rect x="365" y="118" width="55" height="24" rx="3" fill="#1a232e" stroke="#ffb547"/>
+          <text x="392" y="134" text-anchor="middle" fill="#ffb547">/HOLD</text>
+          <text x="425" y="134" fill="#7a8ca0">7</text>
+
+          <!-- Pin 8: VCC -->
+          <line x1="330" y1="80" x2="360" y2="80" stroke="#ff5a6e" stroke-width="2"/>
+          <rect x="365" y="68" width="55" height="24" rx="3" fill="#1a232e" stroke="#ff5a6e"/>
+          <text x="392" y="84" text-anchor="middle" fill="#ff5a6e">VCC</text>
+          <text x="425" y="84" fill="#7a8ca0">8</text>
+        </g>
+
+        <text x="230" y="305" text-anchor="middle" font-size="10" fill="#7a8ca0">Pin 1 = dot/notch indicator. Identify before clipping.</text>
+      </svg>
+    </div>
+
+    <div>
+      <h3>CH341A clip wiring (in-circuit dump)</h3>
+      <svg viewBox="0 0 460 320" id="ch341a-svg">
+        <!-- Target PCB -->
+        <rect x="20" y="200" width="420" height="80" rx="4" fill="#0a2a1a" stroke="#00d9a0"/>
+        <text x="230" y="225" text-anchor="middle" font-size="11" fill="#00d9a0">Target PCB (UNPOWERED)</text>
+        <!-- Flash chip on PCB -->
+        <rect x="180" y="235" width="80" height="30" rx="3" fill="#1a232e" stroke="#7a8ca0"/>
+        <circle cx="187" cy="242" r="2" fill="#ffb547"/>
+        <text x="220" y="255" text-anchor="middle" font-size="9" fill="#d6e1ec" font-family="JetBrains Mono, monospace">W25Q128</text>
+
+        <!-- SOIC-8 clip on top of chip -->
+        <g opacity="0.9">
+          <rect x="170" y="225" width="100" height="50" rx="4" fill="none" stroke="#ff5a6e" stroke-width="2" stroke-dasharray="4,2"/>
+          <text x="220" y="290" text-anchor="middle" font-size="9" fill="#ff5a6e" font-family="JetBrains Mono, monospace">SOIC-8 clip ($10)</text>
+        </g>
+
+        <!-- Wires up to CH341A -->
+        <g stroke="#7a8ca0" stroke-width="1" fill="none">
+          <path d="M 180 225 Q 150 150, 120 110"/>
+          <path d="M 190 225 Q 170 160, 150 110"/>
+          <path d="M 200 225 Q 200 165, 200 110"/>
+          <path d="M 210 225 Q 220 170, 230 110"/>
+          <path d="M 230 225 Q 250 170, 260 110"/>
+          <path d="M 240 225 Q 270 165, 290 110"/>
+          <path d="M 250 225 Q 290 160, 320 110"/>
+          <path d="M 260 225 Q 320 150, 350 110"/>
+        </g>
+
+        <!-- CH341A board -->
+        <rect x="80" y="40" width="300" height="80" rx="6" fill="#3a2a0a" stroke="#ffb547"/>
+        <text x="230" y="64" text-anchor="middle" font-size="13" fill="#ffb547" font-weight="bold">CH341A USB programmer</text>
+        <text x="230" y="80" text-anchor="middle" font-size="10" fill="#d6e1ec">~$5 on Amazon</text>
+        <text x="230" y="95" text-anchor="middle" font-size="9" fill="#d6e1ec" font-family="JetBrains Mono, monospace">flashrom -p ch341a_spi -r dump.bin</text>
+
+        <!-- USB -->
+        <rect x="380" y="65" width="20" height="20" fill="#7a8ca0"/>
+        <text x="395" y="105" font-size="8" fill="#7a8ca0">USB</text>
+      </svg>
+
+      <div class="caption">
+        Faster than Flipper, supports more chip families via <code>flashrom</code>, works on any laptop. The Flipper alternative exists (SPI Flash Reader FAP) but the CH341A is the deeper-stack tool.
+      </div>
+    </div>
+  </div>
+
+  <h3>What's in a dumped firmware image</h3>
+  <svg viewBox="0 0 1080 80" style="margin-top: 8px;">
+    <!-- Bar showing memory regions -->
+    <g>
+      <rect x="10" y="20" width="80" height="40" fill="#5eb6ff" stroke="#0a0f14"/>
+      <text x="50" y="42" text-anchor="middle" font-size="11" fill="#001a14" font-weight="bold">Bootloader</text>
+      <text x="50" y="74" text-anchor="middle" font-size="9" fill="#7a8ca0">U-Boot</text>
+
+      <rect x="90" y="20" width="180" height="40" fill="#00d9a0" stroke="#0a0f14"/>
+      <text x="180" y="42" text-anchor="middle" font-size="11" fill="#001a14" font-weight="bold">Kernel (Linux)</text>
+      <text x="180" y="74" text-anchor="middle" font-size="9" fill="#7a8ca0">uImage / Image</text>
+
+      <rect x="270" y="20" width="500" height="40" fill="#ffb547" stroke="#0a0f14"/>
+      <text x="520" y="42" text-anchor="middle" font-size="11" fill="#001a14" font-weight="bold">Root filesystem (SquashFS)</text>
+      <text x="520" y="74" text-anchor="middle" font-size="9" fill="#7a8ca0">binaries, configs, web UI, secrets</text>
+
+      <rect x="770" y="20" width="200" height="40" fill="#c084fc" stroke="#0a0f14"/>
+      <text x="870" y="42" text-anchor="middle" font-size="11" fill="#001a14" font-weight="bold">Overlay / data</text>
+      <text x="870" y="74" text-anchor="middle" font-size="9" fill="#7a8ca0">user state</text>
+
+      <rect x="970" y="20" width="100" height="40" fill="#ff5a6e" stroke="#0a0f14"/>
+      <text x="1020" y="42" text-anchor="middle" font-size="11" fill="#001a14" font-weight="bold">NVRAM</text>
+      <text x="1020" y="74" text-anchor="middle" font-size="9" fill="#7a8ca0">env, certs, keys</text>
+    </g>
+  </svg>
+
+  <div class="callout">
+    <strong>The recipe after dump:</strong> <code>binwalk dump.bin</code> identifies the structures · <code>binwalk -e dump.bin</code> extracts · mount the SquashFS (<code>mount -o loop ...</code>) · <code>grep -r "password" .</code>, <code>find . -name "*.pem"</code>, <code>grep -r "BEGIN.*PRIVATE KEY" .</code>. Most consumer IoT findings live in <code>/etc/</code>, <code>/var/</code>, and the web-UI directory.
+  </div>
+</div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- 4. ATTACK CHAIN -->
+<!-- ============================================================ -->
+<section id="attack-chain">
+<h2>4. End-to-end audit attack chain</h2>
+<p>The canonical pattern against a consumer IoT device. Click each step.</p>
+
+<div class="panel">
+  <div id="chain-flow"></div>
+
+  <div class="callout" style="margin-top: 16px;">
+    <strong>Why this chain repeats:</strong> consumer IoT manufacturers ship the same dev practices across product lines. Once you've owned two devices end-to-end, the third takes a fraction of the time. The <em>findings</em> change; the <em>methodology</em> is stable.
+  </div>
+</div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- 5. ARM RDP LEVELS -->
+<!-- ============================================================ -->
+<section id="rdp">
+<h2>5. ARM Cortex-M Read-Out Protection (RDP) levels</h2>
+<p>STM32 family example. Levels 0/1/2 trade convenience for security; level 2 is irreversible. Same idea on other ARM vendors (NXP CRP, Nordic APPROTECT, etc.).</p>
+
+<div class="panel">
+  <table style="font-size: 12px;">
+    <thead>
+      <tr><th>Capability</th><th>RDP Level 0 (off)</th><th>RDP Level 1</th><th>RDP Level 2 (irreversible)</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Read flash via SWD/JTAG</td>
+        <td><span class="badge bad">✓ wide open</span></td>
+        <td><span class="badge ok">✗ blocked</span></td>
+        <td><span class="badge ok">✗ blocked</span></td>
+      </tr>
+      <tr>
+        <td>Read RAM via SWD/JTAG</td>
+        <td><span class="badge bad">✓ wide open</span></td>
+        <td><span class="badge bad">✓ readable</span></td>
+        <td><span class="badge ok">✗ blocked</span></td>
+      </tr>
+      <tr>
+        <td>Reflash via SWD/JTAG</td>
+        <td><span class="badge bad">✓ allowed</span></td>
+        <td><span class="badge warn">✓ but erases flash first</span></td>
+        <td><span class="badge ok">✗ blocked</span></td>
+      </tr>
+      <tr>
+        <td>Halt + step CPU</td>
+        <td><span class="badge bad">✓ debugger attaches</span></td>
+        <td><span class="badge bad">✓ debugger attaches</span></td>
+        <td><span class="badge ok">✗ debugger refused</span></td>
+      </tr>
+      <tr>
+        <td>Downgrade to lower level</td>
+        <td>—</td>
+        <td><span class="badge warn">✓ via mass-erase</span></td>
+        <td><span class="badge ok">✗ NEVER (option byte fused)</span></td>
+      </tr>
+      <tr>
+        <td>What an attacker can do</td>
+        <td>Full dump in seconds</td>
+        <td>Erase + reflash own firmware (but original lost)</td>
+        <td>Glitch attack or physical decap only</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="grid-2" style="margin-top: 16px;">
+    <div class="panel" style="margin: 0; background: rgba(255,90,110,0.05); border-color: var(--danger);">
+      <h3 style="color: var(--danger); margin-top: 0;">Reality check — what you'll see</h3>
+      <ul style="font-size: 13px; padding-left: 18px;">
+        <li><strong>Hobby / consumer dev boards:</strong> almost always RDP 0. Trivial dump.</li>
+        <li><strong>Cheap IoT products:</strong> often RDP 0 (cost-cutting, dev convenience).</li>
+        <li><strong>Mid-tier consumer:</strong> usually RDP 1. Original firmware safe; chip is bricked from your perspective.</li>
+        <li><strong>Payment terminals, medical, automotive:</strong> RDP 2 + secure elements + glitch detection.</li>
+      </ul>
+    </div>
+    <div class="panel" style="margin: 0; background: rgba(0,217,160,0.05); border-color: var(--accent);">
+      <h3 style="color: var(--accent); margin-top: 0;">When SWD is locked: glitching</h3>
+      <p style="font-size: 13px;">RDP-level checks happen at specific clock cycles. A precisely-timed voltage glitch (drop Vcc for ~50 ns) during that check can cause the CPU to misread the option byte and skip protection. <strong>ChipWhisperer</strong> is the canonical hobbyist platform. Multi-week learning curve, but it's the door that opens when SWD won't.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- 6. VOLTAGE LEVELS -->
+<!-- ============================================================ -->
+<section id="level-shift">
+<h2>6. Voltage levels — when to level-shift</h2>
+<p>The Flipper drives 3.3V logic. Targets aren't always 3.3V. The decision matrix:</p>
+
+<div class="panel">
+  <svg viewBox="0 0 1080 280" style="margin-bottom: 16px;">
+    <!-- Voltage scale -->
+    <line x1="40" y1="40" x2="40" y2="240" stroke="#7a8ca0" stroke-width="2"/>
+    <g font-family="JetBrains Mono, monospace" font-size="11" fill="#7a8ca0">
+      <line x1="35" y1="60" x2="45" y2="60" stroke="#7a8ca0"/>
+      <text x="30" y="64" text-anchor="end">5.0 V</text>
+      <line x1="35" y1="100" x2="45" y2="100" stroke="#7a8ca0"/>
+      <text x="30" y="104" text-anchor="end">3.3 V</text>
+      <line x1="35" y1="140" x2="45" y2="140" stroke="#7a8ca0"/>
+      <text x="30" y="144" text-anchor="end">2.5 V</text>
+      <line x1="35" y1="180" x2="45" y2="180" stroke="#7a8ca0"/>
+      <text x="30" y="184" text-anchor="end">1.8 V</text>
+      <line x1="35" y1="220" x2="45" y2="220" stroke="#7a8ca0"/>
+      <text x="30" y="224" text-anchor="end">0 V</text>
+    </g>
+
+    <!-- Flipper TX level -->
+    <rect x="100" y="100" width="100" height="120" fill="rgba(0,217,160,0.2)" stroke="#00d9a0"/>
+    <text x="150" y="92" text-anchor="middle" font-size="12" fill="#00d9a0" font-weight="bold">Flipper TX</text>
+    <text x="150" y="160" text-anchor="middle" font-size="11" fill="#d6e1ec">3.3 V high</text>
+    <text x="150" y="180" text-anchor="middle" font-size="11" fill="#d6e1ec">0 V low</text>
+
+    <!-- 5V Target -->
+    <rect x="250" y="60" width="100" height="160" fill="rgba(255,90,110,0.2)" stroke="#ff5a6e"/>
+    <text x="300" y="52" text-anchor="middle" font-size="12" fill="#ff5a6e" font-weight="bold">5V target</text>
+    <text x="300" y="120" text-anchor="middle" font-size="10" fill="#d6e1ec">VIH min ≈ 3.5V</text>
+    <text x="300" y="135" text-anchor="middle" font-size="10" fill="#d6e1ec">VIL max ≈ 1.0V</text>
+    <text x="300" y="165" text-anchor="middle" font-size="10" fill="#ffb547">3.3V can be</text>
+    <text x="300" y="178" text-anchor="middle" font-size="10" fill="#ffb547">ambiguous!</text>
+
+    <!-- Arrow + level shifter -->
+    <line x1="200" y1="160" x2="245" y2="160" stroke="#ffb547" stroke-width="2" marker-end="url(#vs-arrow)"/>
+    <defs>
+      <marker id="vs-arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#ffb547"/></marker>
+    </defs>
+
+    <text x="475" y="52" text-anchor="middle" font-size="12" fill="#ffb547" font-weight="bold">Solution: level shifter</text>
+    <rect x="400" y="60" width="150" height="160" rx="6" fill="#3a2a0a" stroke="#ffb547"/>
+    <text x="475" y="100" text-anchor="middle" font-size="11" fill="#d6e1ec">Bidirectional MOSFET</text>
+    <text x="475" y="115" text-anchor="middle" font-size="11" fill="#d6e1ec">level shifter</text>
+    <text x="475" y="140" text-anchor="middle" font-size="10" fill="#ffb547" font-family="JetBrains Mono, monospace">VccA = 3.3V</text>
+    <text x="475" y="155" text-anchor="middle" font-size="10" fill="#ffb547" font-family="JetBrains Mono, monospace">VccB = 5V</text>
+    <text x="475" y="180" text-anchor="middle" font-size="10" fill="#7a8ca0">~$2 on Amazon</text>
+    <text x="475" y="195" text-anchor="middle" font-size="10" fill="#7a8ca0">e.g. BSS138 4-ch</text>
+
+    <!-- Direct connect (1.8V) -->
+    <text x="725" y="52" text-anchor="middle" font-size="12" fill="#c084fc" font-weight="bold">1.8V target — special</text>
+    <rect x="650" y="180" width="150" height="40" fill="rgba(192,132,252,0.2)" stroke="#c084fc"/>
+    <text x="725" y="200" text-anchor="middle" font-size="11" fill="#c084fc">1.8V target logic</text>
+    <text x="725" y="245" text-anchor="middle" font-size="10" fill="#d6e1ec">Flipper 3.3V destroys 1.8V inputs.</text>
+    <text x="725" y="260" text-anchor="middle" font-size="10" fill="#d6e1ec">Use a 1.8V↔3.3V level shifter.</text>
+
+    <!-- 3.3V target -->
+    <rect x="850" y="100" width="100" height="120" fill="rgba(0,217,160,0.2)" stroke="#00d9a0"/>
+    <text x="900" y="92" text-anchor="middle" font-size="12" fill="#00d9a0" font-weight="bold">3.3V target</text>
+    <text x="900" y="160" text-anchor="middle" font-size="11" fill="#d6e1ec">Direct connect</text>
+    <text x="900" y="180" text-anchor="middle" font-size="11" fill="#00d9a0">✓ no shifter needed</text>
+  </svg>
+
+  <table>
+    <thead>
+      <tr><th>Target Vcc</th><th>Connect Flipper directly?</th><th>What you need</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>3.3 V</td><td><span class="badge ok">YES</span></td><td>Just wire. Common ground.</td></tr>
+      <tr><td>5.0 V</td><td><span class="badge warn">Usually works for RX, breaks for TX over time</span></td><td>BSS138-based bidirectional shifter ($2)</td></tr>
+      <tr><td>1.8 V</td><td><span class="badge bad">NO — fries target</span></td><td>1.8V↔3.3V shifter (TXS0108E or similar)</td></tr>
+      <tr><td>2.5 V</td><td><span class="badge bad">NO — marginal</span></td><td>Adjustable shifter or design-specific</td></tr>
+    </tbody>
+  </table>
+</div>
+</section>
+
+
+<p style="margin-top: 48px; color: var(--muted); font-size: 12px;">
+  Curriculum source: <span style="opacity:0.55;cursor:default" title="Source lives in the private workspace">07-gpio-hardware-hacking.md</span> · Back to <a href="index.html">visuals hub</a> · <span style="opacity:0.55;cursor:default" title="Source lives in the private workspace">phase index</span>
+</p>
+
+
+<!-- ============================================================ -->
+<!-- SCRIPTS -->
+<!-- ============================================================ -->
+<script>
+// ============== 1. GPIO PINOUT ==============
+const PINS = [
+  {n: 1, label: '+5V', alt: 'USB pass-through', fn: 'power', color: '#ff5a6e', desc: 'USB power passthrough, 500 mA max. Use to power small targets if (and only if) your USB host supplies enough.', tip: 'Useful for powering 5V dev boards from the Flipper. NEVER connect to a target that has its own power.'},
+  {n: 2, label: 'A7', alt: 'SPI MOSI / ADC / PWM', fn: 'spi', color: '#5eb6ff', desc: 'Multi-function. Primary: SPI MOSI (master-out). Also: ADC input, PWM output, GPIO.', tip: 'SPI flash dumping: this is the data line to the target chip.'},
+  {n: 3, label: 'A6', alt: 'SPI MISO', fn: 'spi', color: '#5eb6ff', desc: 'SPI master-in / GPIO.', tip: 'SPI flash dumping: target chip drives this back to the Flipper.'},
+  {n: 4, label: 'A4', alt: 'SPI CS / GPIO', fn: 'spi', color: '#5eb6ff', desc: 'SPI chip-select (active low) / GPIO.', tip: 'Drives the /CS pin of a SPI flash. Idle high, pulled low for transaction.'},
+  {n: 5, label: 'B3', alt: 'SPI SCK', fn: 'spi', color: '#5eb6ff', desc: 'SPI clock / GPIO.', tip: 'Master-driven clock. Flipper as SPI master generates this.'},
+  {n: 6, label: 'B2', alt: 'GPIO / PWM', fn: 'gpio', color: '#4a5d72', desc: 'General-purpose I/O, PWM-capable.', tip: 'Free pin — wire to anything.'},
+  {n: 7, label: 'C3', alt: 'GPIO', fn: 'gpio', color: '#4a5d72', desc: 'General-purpose I/O.', tip: 'Free pin — wire to anything.'},
+  {n: 8, label: '+3.3V', alt: 'regulated rail', fn: 'power', color: '#ff5a6e', desc: '3.3V regulated rail. Output. Up to ~~50 mA safely.', tip: 'Power small sensors / level shifter Vcc-A side.'},
+  {n: 9, label: '+3.3V', alt: 'regulated rail (also)', fn: 'power', color: '#ff5a6e', desc: 'Same 3.3V rail as pin 8 — provided in two locations for routing convenience.', tip: 'Identical to pin 8.'},
+  {n: 10, label: 'SWCLK', alt: 'SWD clock / A14', fn: 'swd', color: '#c084fc', desc: 'Serial Wire Debug clock. Drives the SWD probe interface on ARM Cortex-M targets.', tip: 'Pair with SWDIO (pin 12) to debug a Cortex-M chip.'},
+  {n: 11, label: 'GND', alt: 'ground', fn: 'gnd', color: '#7a8ca0', desc: 'Common ground. THE most important pin.', tip: 'Connect FIRST when wiring any target. Floating ground = weird intermittent behavior.'},
+  {n: 12, label: 'SWDIO', alt: 'SWD data / A13', fn: 'swd', color: '#c084fc', desc: 'Serial Wire Debug data (bidirectional). Pair with SWCLK.', tip: 'Use BlackMagic Probe FAP or external J-Link for serious debugging.'},
+  {n: 13, label: 'TX', alt: 'USART1 TX / B6', fn: 'uart', color: '#00d9a0', desc: 'UART transmit (Flipper → target). Idles HIGH.', tip: 'Connects to target\'s RX. Flipper TX → target RX.'},
+  {n: 14, label: 'RX', alt: 'USART1 RX / B7', fn: 'uart', color: '#00d9a0', desc: 'UART receive (target → Flipper). Idles HIGH.', tip: 'Connects to target\'s TX. Most common scan baud: 115200.'},
+  {n: 15, label: 'A15', alt: 'GPIO / I²C SDA (alt)', fn: 'gpio', color: '#4a5d72', desc: 'GPIO; on some firmwares serves as alternate I²C SDA.', tip: 'Verify against your firmware pinout — function varies.'},
+  {n: 16, label: 'A0', alt: 'GPIO', fn: 'gpio', color: '#4a5d72', desc: 'General-purpose I/O.', tip: 'Free pin.'},
+  {n: 17, label: 'C1', alt: 'I²C SCL', fn: 'i2c', color: '#ffb547', desc: 'I²C clock (master-driven). Open-drain — needs pull-up.', tip: 'For I²C EEPROM reads. Target board usually has pull-ups already.'},
+  {n: 18, label: 'C0', alt: 'I²C SDA', fn: 'i2c', color: '#ffb547', desc: 'I²C data (bidirectional, open-drain).', tip: 'Pair with SCL (pin 17). I²C Tools FAP scans the bus for devices.'},
+];
+
+let activeFilter = 'all';
+
+function renderPins() {
+  const g = document.getElementById('pins-group');
+  g.innerHTML = '';
+  // Layout: pins along the right edge of the Flipper, two columns
+  // Left column = odd pins (1,3,5...17), right column = even pins (2,4...18)
+  const startY = 60;
+  const stepY = 20;
+  PINS.forEach((p, i) => {
+    const isLeft = (p.n % 2 === 1);
+    const col = isLeft ? 425 : 470;
+    const labelCol = isLeft ? 395 : 500;
+    const labelAnchor = isLeft ? 'end' : 'start';
+    const row = Math.floor(i / 2);
+    const y = startY + row * stepY;
+
+    const active = activeFilter === 'all' || p.fn === activeFilter;
+    const opacity = active ? 1 : 0.15;
+
+    g.innerHTML += `
+      <g class="pin" data-pin="${p.n}" style="opacity: ${opacity};">
+        <circle cx="${col}" cy="${y}" r="8" fill="${p.color}" stroke="#0a0f14" stroke-width="2"/>
+        <text x="${col}" y="${y+3}" text-anchor="middle" font-size="9" fill="#0a0f14" font-weight="bold" font-family="JetBrains Mono, monospace">${p.n}</text>
+        <text x="${labelCol}" y="${y+4}" text-anchor="${labelAnchor}" font-size="10" fill="#d6e1ec" font-family="JetBrains Mono, monospace">${p.label}</text>
+      </g>
+    `;
+  });
+
+  // Add click handlers
+  setTimeout(() => {
+    document.querySelectorAll('.pin').forEach(el => {
+      el.addEventListener('click', () => {
+        const pn = parseInt(el.dataset.pin);
+        showPinInfo(PINS.find(p => p.n === pn));
+      });
+    });
+  }, 0);
+}
+
+function showPinInfo(p) {
+  document.getElementById('pin-info-panel').innerHTML = `
+    <rect x="640" y="40" width="440" height="380" rx="8" fill="#0a0f14" stroke="${p.color}" stroke-width="2"/>
+    <text x="660" y="65" font-size="16" fill="${p.color}" font-weight="bold">Pin ${p.n} — ${p.label}</text>
+    <text x="660" y="85" font-size="11" fill="#7a8ca0">${p.alt}</text>
+    <text x="660" y="105" font-size="11" fill="#d6e1ec">Function: <tspan fill="${p.color}" font-weight="bold">${p.fn.toUpperCase()}</tspan></text>
+
+    <foreignObject x="660" y="125" width="400" height="280">
+      <div xmlns="http://www.w3.org/1999/xhtml" style="color: #d6e1ec; font-family: -apple-system, sans-serif; font-size: 12px; line-height: 1.5;">
+        <p style="margin: 0 0 12px;"><strong style="color: #d6e1ec;">What it does:</strong><br/>${p.desc}</p>
+        <p style="margin: 0; padding: 10px 12px; background: rgba(94,182,255,0.08); border-left: 3px solid #5eb6ff; border-radius: 0 4px 4px 0;"><strong style="color: #5eb6ff;">Practical tip:</strong><br/>${p.tip}</p>
+      </div>
+    </foreignObject>
+  `;
+}
+
+document.querySelectorAll('.fn-filter').forEach(b => {
+  b.onclick = () => {
+    activeFilter = b.dataset.fn;
+    document.querySelectorAll('.fn-filter').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    renderPins();
+  };
+});
+renderPins();
+
+
+// ============== 2. BUS COMPARISON ==============
+const BUSES = {
+  uart: {
+    meta: '2 wires (TX+RX), asynchronous, ~115,200 baud typical',
+    drawWiring: drawUartWiring,
+    drawTiming: drawUartTiming,
+    wiringCaption: 'Point-to-point. Flipper TX → target RX. Flipper RX ← target TX. No clock — both ends must agree on baud rate.',
+    timingCaption: 'Frame = start bit (low) + 8 data bits (LSB first) + stop bit (high). Baud rate = bits per second. Idle line is HIGH.'
+  },
+  spi: {
+    meta: '4 wires, synchronous, MHz range, master-slave',
+    drawWiring: drawSpiWiring,
+    drawTiming: drawSpiTiming,
+    wiringCaption: 'Master drives SCK and CS. Data flows MOSI (master→slave) and MISO (slave→master) simultaneously. Multiple slaves: one CS line per slave.',
+    timingCaption: 'CS asserts low to start frame. SCK pulses 8 (or 16) times per byte. Data sampled on clock edge (mode 0: rising edge sample, idle low).'
+  },
+  i2c: {
+    meta: '2 wires (SDA+SCL), open-drain, 100kHz–1MHz, multi-drop',
+    drawWiring: drawI2cWiring,
+    drawTiming: drawI2cTiming,
+    wiringCaption: 'Shared bus. SDA + SCL go to every device. Both lines are open-drain — pull-up resistors (typically 4.7kΩ to 3.3V) are mandatory. Each slave has a 7-bit address.',
+    timingCaption: 'START condition (SDA falls while SCL high) → 7-bit address + R/W bit → ACK from addressed slave → data bytes (each followed by ACK) → STOP condition (SDA rises while SCL high).'
+  }
+};
+
+function drawUartWiring() {
+  return `
+    <rect x="20" y="80" width="120" height="120" rx="8" fill="#3a2a0a" stroke="#ffb547"/>
+    <text x="80" y="110" text-anchor="middle" font-size="13" fill="#ffb547" font-weight="bold">Flipper</text>
+    <circle cx="140" cy="140" r="4" fill="#00d9a0"/>
+    <text x="135" y="143" text-anchor="end" font-size="10" fill="#00d9a0" font-family="JetBrains Mono, monospace">TX</text>
+    <circle cx="140" cy="170" r="4" fill="#00d9a0"/>
+    <text x="135" y="173" text-anchor="end" font-size="10" fill="#00d9a0" font-family="JetBrains Mono, monospace">RX</text>
+    <circle cx="140" cy="195" r="4" fill="#7a8ca0"/>
+    <text x="135" y="198" text-anchor="end" font-size="10" fill="#7a8ca0" font-family="JetBrains Mono, monospace">GND</text>
+
+    <rect x="340" y="80" width="120" height="120" rx="8" fill="#0a2a1a" stroke="#00d9a0"/>
+    <text x="400" y="110" text-anchor="middle" font-size="13" fill="#00d9a0" font-weight="bold">Target</text>
+    <circle cx="340" cy="140" r="4" fill="#00d9a0"/>
+    <text x="345" y="143" font-size="10" fill="#00d9a0" font-family="JetBrains Mono, monospace">RX</text>
+    <circle cx="340" cy="170" r="4" fill="#00d9a0"/>
+    <text x="345" y="173" font-size="10" fill="#00d9a0" font-family="JetBrains Mono, monospace">TX</text>
+    <circle cx="340" cy="195" r="4" fill="#7a8ca0"/>
+    <text x="345" y="198" font-size="10" fill="#7a8ca0" font-family="JetBrains Mono, monospace">GND</text>
+
+    <line x1="140" y1="140" x2="340" y2="140" stroke="#00d9a0" stroke-width="2"/>
+    <line x1="140" y1="170" x2="340" y2="170" stroke="#00d9a0" stroke-width="2"/>
+    <line x1="140" y1="195" x2="340" y2="195" stroke="#7a8ca0" stroke-width="2"/>
+
+    <text x="240" y="135" text-anchor="middle" font-size="9" fill="#00d9a0">crossover</text>
+    <text x="240" y="50" text-anchor="middle" font-size="11" fill="#7a8ca0">UART wiring (NOTE the crossover)</text>
+  `;
+}
+
+function drawSpiWiring() {
+  return `
+    <rect x="20" y="40" width="120" height="200" rx="8" fill="#3a2a0a" stroke="#ffb547"/>
+    <text x="80" y="65" text-anchor="middle" font-size="13" fill="#ffb547" font-weight="bold">Flipper</text>
+    <text x="80" y="80" text-anchor="middle" font-size="9" fill="#7a8ca0">(master)</text>
+
+    ${['MOSI', 'MISO', 'SCK', 'CS', 'GND'].map((lbl, i) => {
+      const y = 105 + i * 27;
+      const c = lbl === 'GND' ? '#7a8ca0' : '#5eb6ff';
+      return `<circle cx="140" cy="${y}" r="4" fill="${c}"/><text x="135" y="${y+3}" text-anchor="end" font-size="10" fill="${c}" font-family="JetBrains Mono, monospace">${lbl}</text>`;
+    }).join('')}
+
+    <rect x="340" y="40" width="120" height="200" rx="8" fill="#0a2a1a" stroke="#00d9a0"/>
+    <text x="400" y="65" text-anchor="middle" font-size="13" fill="#00d9a0" font-weight="bold">Target</text>
+    <text x="400" y="80" text-anchor="middle" font-size="9" fill="#7a8ca0">(slave)</text>
+
+    ${['DI', 'DO', 'CLK', '/CS', 'GND'].map((lbl, i) => {
+      const y = 105 + i * 27;
+      const c = lbl === 'GND' ? '#7a8ca0' : '#5eb6ff';
+      return `<circle cx="340" cy="${y}" r="4" fill="${c}"/><text x="345" y="${y+3}" font-size="10" fill="${c}" font-family="JetBrains Mono, monospace">${lbl}</text>`;
+    }).join('')}
+
+    ${[0,1,2,3,4].map(i => {
+      const y = 105 + i * 27;
+      const c = i === 4 ? '#7a8ca0' : '#5eb6ff';
+      return `<line x1="140" y1="${y}" x2="340" y2="${y}" stroke="${c}" stroke-width="2"/>`;
+    }).join('')}
+
+    <text x="240" y="30" text-anchor="middle" font-size="11" fill="#7a8ca0">SPI wiring (4-wire + GND)</text>
+  `;
+}
+
+function drawI2cWiring() {
+  return `
+    <rect x="20" y="80" width="100" height="120" rx="8" fill="#3a2a0a" stroke="#ffb547"/>
+    <text x="70" y="105" text-anchor="middle" font-size="13" fill="#ffb547" font-weight="bold">Flipper</text>
+    <text x="70" y="120" text-anchor="middle" font-size="9" fill="#7a8ca0">(master)</text>
+    <circle cx="120" cy="155" r="4" fill="#ffb547"/>
+    <text x="115" y="158" text-anchor="end" font-size="10" fill="#ffb547" font-family="JetBrains Mono, monospace">SDA</text>
+    <circle cx="120" cy="180" r="4" fill="#ffb547"/>
+    <text x="115" y="183" text-anchor="end" font-size="10" fill="#ffb547" font-family="JetBrains Mono, monospace">SCL</text>
+
+    <!-- Shared bus -->
+    <line x1="120" y1="155" x2="450" y2="155" stroke="#ffb547" stroke-width="2"/>
+    <line x1="120" y1="180" x2="450" y2="180" stroke="#ffb547" stroke-width="2"/>
+
+    <!-- Pull-ups -->
+    <line x1="160" y1="155" x2="160" y2="100" stroke="#ff5a6e" stroke-width="1.5"/>
+    <line x1="180" y1="180" x2="180" y2="100" stroke="#ff5a6e" stroke-width="1.5"/>
+    <line x1="155" y1="100" x2="185" y2="100" stroke="#ff5a6e" stroke-width="1.5"/>
+    <text x="190" y="98" font-size="9" fill="#ff5a6e" font-family="JetBrains Mono, monospace">+3.3V</text>
+    <rect x="155" y="125" width="10" height="22" fill="#1a232e" stroke="#ff5a6e"/>
+    <text x="170" y="139" font-size="9" fill="#ff5a6e">4.7kΩ</text>
+    <rect x="175" y="135" width="10" height="22" fill="#1a232e" stroke="#ff5a6e"/>
+    <text x="190" y="149" font-size="9" fill="#ff5a6e">4.7kΩ</text>
+
+    <!-- Multiple slaves -->
+    <rect x="240" y="60" width="80" height="50" rx="4" fill="#0a2a1a" stroke="#00d9a0"/>
+    <text x="280" y="80" text-anchor="middle" font-size="10" fill="#00d9a0" font-family="JetBrains Mono, monospace">EEPROM</text>
+    <text x="280" y="95" text-anchor="middle" font-size="9" fill="#7a8ca0">addr 0x50</text>
+    <line x1="280" y1="110" x2="280" y2="155" stroke="#ffb547" stroke-width="1"/>
+    <line x1="290" y1="110" x2="290" y2="180" stroke="#ffb547" stroke-width="1"/>
+
+    <rect x="340" y="60" width="80" height="50" rx="4" fill="#0a2a1a" stroke="#00d9a0"/>
+    <text x="380" y="80" text-anchor="middle" font-size="10" fill="#00d9a0" font-family="JetBrains Mono, monospace">RTC</text>
+    <text x="380" y="95" text-anchor="middle" font-size="9" fill="#7a8ca0">addr 0x68</text>
+    <line x1="380" y1="110" x2="380" y2="155" stroke="#ffb547" stroke-width="1"/>
+    <line x1="390" y1="110" x2="390" y2="180" stroke="#ffb547" stroke-width="1"/>
+
+    <rect x="240" y="210" width="180" height="50" rx="4" fill="#0a2a1a" stroke="#00d9a0"/>
+    <text x="330" y="232" text-anchor="middle" font-size="10" fill="#00d9a0" font-family="JetBrains Mono, monospace">IMU sensor</text>
+    <text x="330" y="248" text-anchor="middle" font-size="9" fill="#7a8ca0">addr 0x68 (conflict! see datasheet)</text>
+
+    <text x="240" y="35" text-anchor="middle" font-size="11" fill="#7a8ca0">I²C wiring — bus + pull-ups + multiple slaves</text>
+  `;
+}
+
+function drawUartTiming() {
+  const c = document.getElementById('bus-timing');
+  const ctx = c.getContext('2d');
+  const W = c.width, H = c.height;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle = '#0a0f14';
+  ctx.fillRect(0,0,W,H);
+
+  // Draw a UART frame: idle high, start (low), 8 bits = 0x4A (01001010), stop high
+  // 0x4A = 0100 1010, LSB first = 01010010 in transmission order
+  const tx = [1, 0, /*start*/ 0,1,0,1,0,0,1,0, /*stop*/ 1, 1]; // idle, start, 8 data, stop, idle
+  const labels = ['idle', 'START', 'b0', 'b1', 'b2', 'b3', 'b4', 'b5', 'b6', 'b7', 'STOP', ''];
+  const bitWidth = (W - 60) / tx.length;
+  const high = 50, low = 150;
+
+  ctx.strokeStyle = '#00d9a0';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  let started = false;
+  let prevY = null;
+  for (let i = 0; i < tx.length; i++) {
+    const y = tx[i] === 1 ? high : low;
+    const x1 = 40 + i * bitWidth;
+    const x2 = 40 + (i + 1) * bitWidth;
+    if (!started) { ctx.moveTo(x1, y); started = true; prevY = y; }
+    if (y !== prevY) ctx.lineTo(x1, prevY);
+    ctx.lineTo(x1, y);
+    ctx.lineTo(x2, y);
+    prevY = y;
+  }
+  ctx.stroke();
+
+  // labels
+  ctx.fillStyle = '#7a8ca0';
+  ctx.font = '10px JetBrains Mono, monospace';
+  ctx.textAlign = 'center';
+  for (let i = 0; i < tx.length; i++) {
+    ctx.fillText(labels[i], 40 + (i + 0.5) * bitWidth, 175);
+  }
+  ctx.fillStyle = '#d6e1ec';
+  ctx.font = '11px -apple-system';
+  ctx.textAlign = 'left';
+  ctx.fillText('TX line: 0x4A "J" (LSB first)', 40, 30);
+  ctx.fillStyle = '#7a8ca0';
+  ctx.font = '10px JetBrains Mono, monospace';
+  ctx.textAlign = 'right';
+  ctx.fillText('HIGH', 35, high + 3);
+  ctx.fillText('LOW', 35, low + 3);
+
+  ctx.fillStyle = '#7a8ca0';
+  ctx.font = '10px -apple-system';
+  ctx.textAlign = 'left';
+  ctx.fillText('1 bit period = 1/baud (e.g. 1/115200 ≈ 8.7 μs)', 40, 215);
+  ctx.fillText('No clock line — both sides must agree on baud beforehand.', 40, 232);
+  ctx.fillText('Frame is self-synchronizing via start bit (high→low transition).', 40, 249);
+}
+
+function drawSpiTiming() {
+  const c = document.getElementById('bus-timing');
+  const ctx = c.getContext('2d');
+  const W = c.width, H = c.height;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle = '#0a0f14';
+  ctx.fillRect(0,0,W,H);
+
+  // SPI mode 0: CS low, SCK 8 pulses, MOSI = 0xA5, MISO = 0x3C
+  const mosi = [1,0,1,0,0,1,0,1]; // 0xA5 MSB-first
+  const miso = [0,0,1,1,1,1,0,0]; // 0x3C
+  const startX = 60, endX = W - 30;
+  const innerW = endX - startX - 30;
+  const csStart = startX + 10;
+  const csEnd = endX - 10;
+  const sckCycles = 8;
+  const cycleW = (csEnd - csStart - 20) / sckCycles;
+
+  // CS line — drops low at csStart, rises at csEnd
+  ctx.strokeStyle = '#c084fc';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(startX, 50);
+  ctx.lineTo(csStart, 50);
+  ctx.lineTo(csStart, 70);
+  ctx.lineTo(csEnd, 70);
+  ctx.lineTo(csEnd, 50);
+  ctx.lineTo(endX, 50);
+  ctx.stroke();
+  ctx.fillStyle = '#c084fc';
+  ctx.font = '10px JetBrains Mono, monospace';
+  ctx.textAlign = 'right';
+  ctx.fillText('CS', 55, 64);
+
+  // SCK clock pulses
+  ctx.strokeStyle = '#5eb6ff';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(startX, 110);
+  ctx.lineTo(csStart + 10, 110);
+  for (let i = 0; i < sckCycles; i++) {
+    const x0 = csStart + 10 + i * cycleW;
+    ctx.lineTo(x0, 110);
+    ctx.lineTo(x0, 90);
+    ctx.lineTo(x0 + cycleW/2, 90);
+    ctx.lineTo(x0 + cycleW/2, 110);
+    ctx.lineTo(x0 + cycleW, 110);
+  }
+  ctx.lineTo(endX, 110);
+  ctx.stroke();
+  ctx.fillStyle = '#5eb6ff';
+  ctx.fillText('SCK', 55, 105);
+
+  // MOSI: sampled on rising SCK edge (mode 0)
+  ctx.strokeStyle = '#00d9a0';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  let prevY = mosi[0] === 1 ? 130 : 150;
+  ctx.moveTo(startX, prevY);
+  for (let i = 0; i < sckCycles; i++) {
+    const x0 = csStart + 10 + i * cycleW;
+    const y = mosi[i] === 1 ? 130 : 150;
+    if (y !== prevY) {
+      ctx.lineTo(x0 - 2, prevY);
+      ctx.lineTo(x0 - 2, y);
+    }
+    ctx.lineTo(x0 + cycleW - 2, y);
+    prevY = y;
+  }
+  ctx.lineTo(endX, prevY);
+  ctx.stroke();
+  ctx.fillStyle = '#00d9a0';
+  ctx.fillText('MOSI', 55, 145);
+
+  // MISO
+  ctx.strokeStyle = '#ffb547';
+  ctx.beginPath();
+  prevY = miso[0] === 1 ? 170 : 190;
+  ctx.moveTo(startX, prevY);
+  for (let i = 0; i < sckCycles; i++) {
+    const x0 = csStart + 10 + i * cycleW;
+    const y = miso[i] === 1 ? 170 : 190;
+    if (y !== prevY) {
+      ctx.lineTo(x0 - 2, prevY);
+      ctx.lineTo(x0 - 2, y);
+    }
+    ctx.lineTo(x0 + cycleW - 2, y);
+    prevY = y;
+  }
+  ctx.lineTo(endX, prevY);
+  ctx.stroke();
+  ctx.fillStyle = '#ffb547';
+  ctx.fillText('MISO', 55, 185);
+
+  // Annotations
+  ctx.fillStyle = '#d6e1ec';
+  ctx.textAlign = 'left';
+  ctx.font = '11px -apple-system';
+  ctx.fillText('SPI mode 0: CS asserted low, 8 clock cycles, full-duplex.', 30, 30);
+  ctx.fillStyle = '#7a8ca0';
+  ctx.font = '10px -apple-system';
+  ctx.fillText('MOSI: master sends 0xA5 (10100101) MSB-first. MISO: slave returns 0x3C simultaneously.', 30, 215);
+  ctx.fillText('Data sampled on RISING SCK edge (mode 0). CPOL=0, CPHA=0.', 30, 232);
+  ctx.fillText('At 1 MHz SCK, one byte transfers in 8 μs. Flash chips run 50+ MHz.', 30, 249);
+}
+
+function drawI2cTiming() {
+  const c = document.getElementById('bus-timing');
+  const ctx = c.getContext('2d');
+  const W = c.width, H = c.height;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle = '#0a0f14';
+  ctx.fillRect(0,0,W,H);
+
+  // I²C: START, addr 0x50 + W, ACK, data byte, ACK, STOP
+  // Bits to send: addr 0x50 << 1 = 0xA0, then ACK, then 0x42, then ACK, then STOP
+  // Sequence: START, 1,0,1,0,0,0,0,0 (addr+W), ACK(0), 0,1,0,0,0,0,1,0 (0x42), ACK(0), STOP
+  const events = [
+    {label: 'START', sda: [1, 0], scl: [1, 1]},
+    {label: 'A6=1', sda: [1], scl: [0,1,0]},
+    {label: 'A5=0', sda: [0], scl: [0,1,0]},
+    {label: 'A4=1', sda: [1], scl: [0,1,0]},
+    {label: 'A3=0', sda: [0], scl: [0,1,0]},
+    {label: 'A2=0', sda: [0], scl: [0,1,0]},
+    {label: 'A1=0', sda: [0], scl: [0,1,0]},
+    {label: 'A0=0', sda: [0], scl: [0,1,0]},
+    {label: 'R/W=0', sda: [0], scl: [0,1,0]},
+    {label: 'ACK', sda: [0], scl: [0,1,0]},
+    {label: 'STOP', sda: [0, 1], scl: [1, 1]}
+  ];
+
+  const startX = 60;
+  const segW = (W - 80) / 11;
+  let x = startX;
+  const sdaHigh = 80, sdaLow = 120;
+  const sclHigh = 150, sclLow = 190;
+
+  // Draw the lines simplified
+  ctx.strokeStyle = '#ffb547';
+  ctx.lineWidth = 2;
+  // SDA
+  ctx.beginPath();
+  ctx.moveTo(startX, sdaHigh);
+  ctx.lineTo(startX + 20, sdaHigh);
+  ctx.lineTo(startX + 25, sdaLow); // START
+  // 7-bit addr 0xA0 = 1010 0000, then R/W=0, then ACK=0
+  // bit pattern: 1,0,1,0,0,0,0,0,0
+  const bitPattern = [1,0,1,0,0,0,0,0,0]; // 7 addr + R/W + ACK
+  let bitX = startX + 30;
+  for (let i = 0; i < bitPattern.length; i++) {
+    const bw = (segW * 9) / 9;
+    const y = bitPattern[i] === 1 ? sdaHigh : sdaLow;
+    ctx.lineTo(bitX, y);
+    ctx.lineTo(bitX + bw - 5, y);
+    bitX += bw;
+  }
+  // STOP: SDA goes low (already low) then high while SCL high
+  ctx.lineTo(bitX, sdaLow);
+  ctx.lineTo(bitX + 10, sdaLow);
+  ctx.lineTo(bitX + 15, sdaHigh);
+  ctx.lineTo(W - 15, sdaHigh);
+  ctx.stroke();
+
+  ctx.fillStyle = '#ffb547';
+  ctx.font = '10px JetBrains Mono, monospace';
+  ctx.textAlign = 'right';
+  ctx.fillText('SDA', 55, sdaHigh + 25);
+
+  // SCL — pulses for each bit + STOP/START transitions
+  ctx.strokeStyle = '#5eb6ff';
+  ctx.beginPath();
+  ctx.moveTo(startX, sclHigh);
+  ctx.lineTo(startX + 30, sclHigh);
+  // 9 pulses
+  bitX = startX + 30;
+  for (let i = 0; i < 9; i++) {
+    const bw = (segW * 9) / 9;
+    ctx.lineTo(bitX, sclHigh);
+    ctx.lineTo(bitX + 2, sclLow);
+    ctx.lineTo(bitX + bw / 2 - 2, sclLow);
+    ctx.lineTo(bitX + bw / 2, sclHigh);
+    ctx.lineTo(bitX + bw - 5, sclHigh);
+    bitX += bw;
+  }
+  ctx.lineTo(W - 15, sclHigh);
+  ctx.stroke();
+
+  ctx.fillStyle = '#5eb6ff';
+  ctx.fillText('SCL', 55, sclHigh + 25);
+
+  // Annotations
+  ctx.fillStyle = '#d6e1ec';
+  ctx.textAlign = 'left';
+  ctx.font = '11px -apple-system';
+  ctx.fillText('I²C frame: addr=0x50 (EEPROM) + W bit + ACK + STOP', 30, 30);
+
+  // Mark START/STOP
+  ctx.fillStyle = '#00d9a0';
+  ctx.font = 'bold 9px JetBrains Mono, monospace';
+  ctx.fillText('START', startX + 18, 60);
+  ctx.fillText('STOP', W - 60, 60);
+
+  // Address bits
+  ctx.fillStyle = '#7a8ca0';
+  ctx.font = '9px JetBrains Mono, monospace';
+  ctx.textAlign = 'center';
+  const addrLabels = ['A6=1', 'A5=0', 'A4=1', 'A3=0', 'A2=0', 'A1=0', 'A0=0', 'R/W=0', 'ACK'];
+  for (let i = 0; i < 9; i++) {
+    const cx = startX + 30 + (i + 0.5) * ((segW * 9) / 9);
+    ctx.fillText(addrLabels[i], cx, 220);
+  }
+
+  ctx.textAlign = 'left';
+  ctx.font = '10px -apple-system';
+  ctx.fillText('START: SDA falls while SCL high. STOP: SDA rises while SCL high.', 30, 240);
+  ctx.fillText('After address, slave at 0x50 pulls SDA low for ACK during clock pulse 9.', 30, 254);
+}
+
+function switchBus(busName) {
+  const bus = BUSES[busName];
+  document.getElementById('bus-meta').textContent = bus.meta;
+  document.getElementById('bus-wiring').innerHTML = bus.drawWiring();
+  bus.drawTiming();
+  document.getElementById('wiring-caption').textContent = bus.wiringCaption;
+  document.getElementById('timing-caption').textContent = bus.timingCaption;
+  document.querySelectorAll('.bus-tab').forEach(t => t.classList.toggle('active', t.dataset.bus === busName));
+}
+document.querySelectorAll('.bus-tab').forEach(t => {
+  t.onclick = () => switchBus(t.dataset.bus);
+});
+switchBus('uart');
+
+
+// ============== 4. ATTACK CHAIN ==============
+const CHAIN_STEPS = [
+  { num: 1, title: 'Physical recon', desc: 'Open the case. Photograph PCB. Identify SoC, flash chip, debug headers, test points.', payoff: 'Inventory: SoC family, flash chip part number, presence of UART/SWD headers.', tools: 'screwdriver, magnifier, camera' },
+  { num: 2, title: 'UART discovery', desc: 'Find TX/RX/GND on the PCB (multimeter to identify which is which). Connect Flipper UART terminal at common baud (115200 → 9600 → 38400).', payoff: 'Boot log — firmware version, kernel version, often default creds.', tools: 'Flipper UART FAP, multimeter' },
+  { num: 3, title: 'U-Boot interrupt', desc: 'Power-cycle target with terminal active. Hit Enter rapidly during the ~1s autoboot countdown.', payoff: 'Bootloader prompt. printenv reveals partitions, env vars, debug flags.', tools: 'Flipper UART' },
+  { num: 4, title: 'Boot env modification', desc: 'In U-Boot: setenv bootargs init=/bin/sh, boot. If Linux honors it, you get root shell without password.', payoff: 'Pre-auth root shell on the running device.', tools: 'Flipper UART' },
+  { num: 5, title: 'SPI flash dump', desc: 'Identify the SOIC-8 flash chip. Power off target. Clip on with SOIC-8 clip. Read with CH341A + flashrom.', payoff: 'Full firmware image — bootloader + kernel + filesystem + NVRAM.', tools: 'CH341A ($5), SOIC-8 clip ($10), flashrom' },
+  { num: 6, title: 'Firmware analysis', desc: 'binwalk -e dump.bin extracts. Mount SquashFS. grep -r for credentials, keys, hardcoded API URLs.', payoff: 'Hardcoded secrets — found in ~90% of consumer IoT.', tools: 'binwalk, ghidra, grep, strings' },
+  { num: 7, title: 'Network attack surface', desc: 'Leverage findings: default creds work on every device in this model? Hardcoded API endpoint can be queried? Use first-device findings to attack second device on the network.', payoff: 'Multi-device compromise via shared vulnerabilities.', tools: 'nmap, curl, custom scripts' },
+  { num: 8, title: 'Audit report', desc: 'Rank findings: critical (hardcoded keys), high (UART/SWD access, default creds), medium (verbose boot log), low (case opens without tools).', payoff: 'Deliverable to client or vendor with concrete recommendations.', tools: 'Markdown, screenshots' }
+];
+
+function renderChain() {
+  const container = document.getElementById('chain-flow');
+  container.innerHTML = '';
+  CHAIN_STEPS.forEach(step => {
+    const card = document.createElement('div');
+    card.style.cssText = 'background: var(--panel-2); border: 1px solid var(--line); padding: 12px 16px; margin-bottom: 8px; border-radius: 6px; cursor: pointer; transition: all 0.15s; display: flex; gap: 14px;';
+    card.innerHTML = `
+      <div style="background: var(--accent); color: #001a14; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; flex-shrink: 0;">${step.num}</div>
+      <div style="flex: 1;">
+        <div style="color: var(--accent-2); font-weight: 600; font-size: 14px;">${step.title}</div>
+        <div style="color: var(--text); font-size: 13px; margin-top: 4px;">${step.desc}</div>
+        <div class="chain-detail" style="display: none; margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--line);">
+          <div style="font-size: 12px; color: var(--accent); margin-bottom: 4px;"><strong>Payoff:</strong> ${step.payoff}</div>
+          <div style="font-size: 12px; color: var(--muted);"><strong>Tools:</strong> ${step.tools}</div>
+        </div>
+      </div>
+      <div style="color: var(--muted); font-size: 12px; align-self: flex-start;">▼</div>
+    `;
+    card.onclick = () => {
+      const d = card.querySelector('.chain-detail');
+      d.style.display = d.style.display === 'block' ? 'none' : 'block';
+    };
+    container.appendChild(card);
+  });
+}
+renderChain();
+</script>
+
+</body>
+</html>

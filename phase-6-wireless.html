@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Phase 6 — Wireless Extensions (visuals)</title>
+<style>
+  :root {
+    --bg: #0b0f14;
+    --panel: #131a23;
+    --panel-2: #1a232e;
+    --line: #2a3744;
+    --text: #d6e1ec;
+    --muted: #7a8ca0;
+    --accent: #00d9a0;
+    --accent-2: #5eb6ff;
+    --warn: #ffb547;
+    --danger: #ff5a6e;
+    --purple: #c084fc;
+    --mono: "JetBrains Mono", "Fira Code", Consolas, monospace;
+    --sans: -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.55; }
+  body { max-width: 1180px; margin: 0 auto; padding: 32px 24px 80px; }
+  h1 { font-size: 28px; margin: 0 0 4px; }
+  h2 { font-size: 22px; margin: 0 0 8px; color: var(--accent); border-left: 3px solid var(--accent); padding-left: 12px; }
+  h3 { font-size: 16px; margin: 18px 0 8px; color: var(--accent-2); }
+  p { margin: 8px 0; }
+  a { color: var(--accent-2); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .breadcrumb { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 20px; margin: 16px 0 32px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12px; color: var(--muted); margin: 8px 0; }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .swatch { width: 14px; height: 14px; border-radius: 3px; }
+  .controls { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; padding: 10px 12px; background: var(--panel-2); border-radius: 6px; margin-bottom: 12px; font-size: 13px; }
+  button { background: var(--panel-2); color: var(--text); border: 1px solid var(--line); padding: 6px 14px; border-radius: 5px; cursor: pointer; font-family: var(--sans); font-size: 13px; transition: all 0.15s; }
+  button:hover { border-color: var(--accent); color: var(--accent); }
+  button.primary { background: var(--accent); color: #001a14; border-color: var(--accent); font-weight: 600; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-family: var(--mono); margin: 0 2px; }
+  .badge.ok { background: rgba(0,217,160,0.15); color: var(--accent); border: 1px solid var(--accent); }
+  .badge.warn { background: rgba(255,181,71,0.15); color: var(--warn); border: 1px solid var(--warn); }
+  .badge.bad { background: rgba(255,90,110,0.15); color: var(--danger); border: 1px solid var(--danger); }
+  table { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 13px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+  th { color: var(--muted); font-weight: 500; font-size: 11px; text-transform: uppercase; letter-spacing: 0.6px; }
+  td.mono, .mono { font-family: var(--mono); }
+  .caption { font-size: 12px; color: var(--muted); margin-top: 6px; font-style: italic; }
+  .callout { background: rgba(94,182,255,0.08); border-left: 3px solid var(--accent-2); padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; font-size: 13px; }
+  .callout.warn { background: rgba(255,181,71,0.08); border-color: var(--warn); }
+  .callout.danger { background: rgba(255,90,110,0.08); border-color: var(--danger); }
+  svg { display: block; max-width: 100%; }
+  .nav-toc { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px 18px; margin-bottom: 24px; font-size: 14px; }
+  .nav-toc ol { margin: 6px 0 0; padding-left: 24px; }
+  .nav-toc li { margin: 3px 0; }
+  .addr-card { background: var(--panel-2); border: 1px solid var(--line); border-radius: 6px; padding: 14px; transition: all 0.15s; }
+  .addr-card.tracking { border-color: var(--danger); }
+  .addr-card.safe { border-color: var(--accent); }
+  .addr-card.medium { border-color: var(--warn); }
+</style>
+</head>
+<body>
+
+<div class="breadcrumb">
+  <a href="index.html">visuals</a> &nbsp;/&nbsp; Phase 6 &nbsp;/&nbsp; Wireless Extensions
+</div>
+
+<h1>Phase 6 — Wireless Extensions (BLE / WiFi / NRF24)</h1>
+<p style="color: var(--muted); margin: 0 0 24px;">Three different wireless domains, each requiring different hardware. The legal landscape is sharper here than earlier phases — read Phase 0 again before any of these labs.</p>
+
+<div class="nav-toc">
+  <strong style="color: var(--accent);">On this page</strong>
+  <ol>
+    <li><a href="#ble-addresses">BLE address types</a> — public, random static, RPA, NRPA</li>
+    <li><a href="#wifi-handshake">WiFi 4-way handshake</a> — animated sequence</li>
+    <li><a href="#pmf">PMF on vs off</a> — why deauth still works on most networks</li>
+    <li><a href="#evil-twin">Evil twin attack</a> — network diagram</li>
+    <li><a href="#mousejack">MouseJack / NRF24 attack</a> — keystroke injection at 30 m</li>
+    <li><a href="#wifi-chart">PSK crack-time chart</a> — why 12 random chars matter</li>
+  </ol>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- 1. BLE ADDRESS TYPES -->
+<!-- ============================================================ -->
+<section id="ble-addresses">
+<h2>1. BLE address types — privacy implications</h2>
+<p>Every BLE advertisement contains a 48-bit address. Which kind of address determines whether the device can be tracked. Click any card to see what an attacker scanning over 24 hours actually sees.</p>
+
+<div class="panel">
+  <div class="grid-4">
+    <div class="addr-card tracking" onclick="showTracking('public')">
+      <div style="color: var(--danger); font-weight: bold; font-size: 14px;">Public</div>
+      <div style="color: var(--muted); font-size: 11px;">Manufacturer-assigned</div>
+      <div class="mono" style="margin: 10px 0; font-size: 13px; color: var(--danger);">AC:DE:48:00:11:22</div>
+      <div style="font-size: 11px; color: var(--muted); margin-bottom: 6px;">Vendor prefix · permanent</div>
+      <span class="badge bad">tracking risk: HIGH</span>
+    </div>
+    <div class="addr-card medium" onclick="showTracking('random-static')">
+      <div style="color: var(--warn); font-weight: bold; font-size: 14px;">Random Static</div>
+      <div style="color: var(--muted); font-size: 11px;">Random at boot, fixed for session</div>
+      <div class="mono" style="margin: 10px 0; font-size: 13px; color: var(--warn);">D7:14:E8:5C:2A:91</div>
+      <div style="font-size: 11px; color: var(--muted); margin-bottom: 6px;">High 2 bits = 11 · per-boot</div>
+      <span class="badge warn">tracking risk: MEDIUM</span>
+    </div>
+    <div class="addr-card safe" onclick="showTracking('rpa')">
+      <div style="color: var(--accent); font-weight: bold; font-size: 14px;">Resolvable Private (RPA)</div>
+      <div style="color: var(--muted); font-size: 11px;">Rotates every ~15 min</div>
+      <div class="mono" style="margin: 10px 0; font-size: 13px; color: var(--accent);">5F:A3:11:B2:08:42</div>
+      <div style="font-size: 11px; color: var(--muted); margin-bottom: 6px;">High 2 bits = 01 · IRK-derived</div>
+      <span class="badge ok">tracking risk: LOW</span>
+    </div>
+    <div class="addr-card safe" onclick="showTracking('nrpa')">
+      <div style="color: var(--accent); font-weight: bold; font-size: 14px;">Non-Resolvable Private</div>
+      <div style="color: var(--muted); font-size: 11px;">Random, irresolvable</div>
+      <div class="mono" style="margin: 10px 0; font-size: 13px; color: var(--accent);">22:9F:31:0B:E7:14</div>
+      <div style="font-size: 11px; color: var(--muted); margin-bottom: 6px;">High 2 bits = 00 · ephemeral</div>
+      <span class="badge ok">tracking risk: VERY LOW</span>
+    </div>
+  </div>
+
+  <h3 style="margin-top: 24px;">What an attacker scanning over 24 hours sees</h3>
+  <svg viewBox="0 0 1100 220" id="tracking-svg">
+    <!-- Time axis -->
+    <line x1="60" y1="180" x2="1040" y2="180" stroke="#7a8ca0" stroke-width="1.5"/>
+    <g font-family="JetBrains Mono, monospace" font-size="10" fill="#7a8ca0">
+      <text x="60" y="200" text-anchor="middle">0h</text>
+      <text x="186" y="200" text-anchor="middle">3h</text>
+      <text x="313" y="200" text-anchor="middle">6h</text>
+      <text x="440" y="200" text-anchor="middle">9h</text>
+      <text x="566" y="200" text-anchor="middle">12h</text>
+      <text x="693" y="200" text-anchor="middle">15h</text>
+      <text x="820" y="200" text-anchor="middle">18h</text>
+      <text x="946" y="200" text-anchor="middle">21h</text>
+      <text x="1040" y="200" text-anchor="middle">24h</text>
+    </g>
+    <text x="550" y="216" text-anchor="middle" font-size="11" fill="#7a8ca0">Time → tracking via address persistence</text>
+    <text x="20" y="60" text-anchor="middle" font-size="11" fill="#d6e1ec" transform="rotate(-90, 20, 60)">scan events</text>
+
+    <!-- Addresses seen over time — populated by JS -->
+    <g id="tracking-events"></g>
+  </svg>
+
+  <div id="tracking-summary" class="callout" style="min-height: 50px;">
+    <strong style="color: var(--accent);">Click an address type above</strong> to simulate what a passive scanner would record over 24 hours.
+  </div>
+
+  <div class="callout warn">
+    <strong>Why this matters for an audit:</strong> recommend devices that use RPA <em>and have it enabled</em>. Some devices support RPA but ship with it off. Some wearables (cheap fitness trackers, hearing aids, older smartwatches) use public or static-random addresses, making the wearer trackable across cities by anyone with a $20 scanner.
+  </div>
+</div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- 2. WIFI 4-WAY HANDSHAKE -->
+<!-- ============================================================ -->
+<section id="wifi-handshake">
+<h2>2. WiFi WPA2 4-way handshake — what you capture and crack</h2>
+<p>Every time a client joins a WPA2 network, four management frames are exchanged. They contain enough material to crack the PSK offline if you have a wordlist that contains it.</p>
+
+<div class="panel">
+  <div class="controls">
+    <button id="hs-prev">◀ prev</button>
+    <button id="hs-next" class="primary">next ▶</button>
+    <button id="hs-reset">reset</button>
+    <span style="margin-left: auto; color: var(--muted); font-size: 12px;">Step <span id="hs-step">0</span> / 6</span>
+  </div>
+
+  <svg viewBox="0 0 1100 360" id="hs-svg">
+    <!-- Two actor lanes -->
+    <!-- AP -->
+    <rect x="40" y="20" width="200" height="320" rx="8" fill="#0a0f14" stroke="#5eb6ff" stroke-width="2"/>
+    <text x="140" y="45" text-anchor="middle" font-size="14" fill="#5eb6ff" font-weight="bold">Access Point</text>
+    <text x="140" y="62" text-anchor="middle" font-size="10" fill="#7a8ca0">knows PMK (from PSK)</text>
+
+    <!-- Client -->
+    <rect x="860" y="20" width="200" height="320" rx="8" fill="#0a0f14" stroke="#00d9a0" stroke-width="2"/>
+    <text x="960" y="45" text-anchor="middle" font-size="14" fill="#00d9a0" font-weight="bold">Client (laptop/phone)</text>
+    <text x="960" y="62" text-anchor="middle" font-size="10" fill="#7a8ca0">knows PSK (passphrase)</text>
+
+    <!-- Attacker (passive sniffer) -->
+    <rect x="430" y="290" width="240" height="50" rx="6" fill="#3a1a2a" stroke="#ff5a6e"/>
+    <text x="550" y="310" text-anchor="middle" font-size="12" fill="#ff5a6e" font-weight="bold">Attacker — passive sniffer</text>
+    <text x="550" y="328" text-anchor="middle" font-size="10" fill="#d6e1ec">captures everything in the air</text>
+
+    <!-- Step messages (populated by JS) -->
+    <g id="hs-messages"></g>
+  </svg>
+
+  <div id="hs-narration" class="callout" style="min-height: 60px;">
+    <strong style="color: var(--accent);">Step 0:</strong> Initial state. AP has the PMK derived from the network's PSK + SSID. Client knows the PSK (the passphrase the user typed). They've never talked. Attacker is sitting nearby with a card in monitor mode.
+  </div>
+
+  <div class="callout warn">
+    <strong>The crack:</strong> after capturing all 4 frames, the attacker has Anonce, Snonce, both MAC addresses, and the MIC. Run <code>hashcat -m 22000 capture.hccapx wordlist.txt</code> — for each candidate passphrase, derive the PMK, compute the PTK, recompute MIC. Match = PSK found. Speed depends on PSK strength (see §6).
+  </div>
+</div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- 3. PMF ON/OFF -->
+<!-- ============================================================ -->
+<section id="pmf">
+<h2>3. Why deauth still works — PMF on vs off</h2>
+<p>Protected Management Frames (PMF) was added in 802.11w (2009) to fix the gaping hole that management frames had no authentication. WPA3 mandates PMF. WPA2 makes it optional. Most home networks: optional, often off.</p>
+
+<div class="panel">
+  <div class="grid-2">
+    <div>
+      <h3 style="color: var(--danger);">PMF disabled (WPA2 default on many networks)</h3>
+      <svg viewBox="0 0 480 240" style="background:#0a0f14; border-radius: 6px;">
+        <!-- AP -->
+        <circle cx="80" cy="120" r="30" fill="#1a232e" stroke="#5eb6ff"/>
+        <text x="80" y="125" text-anchor="middle" font-size="11" fill="#5eb6ff">AP</text>
+        <!-- Client -->
+        <circle cx="400" cy="120" r="30" fill="#1a232e" stroke="#00d9a0"/>
+        <text x="400" y="125" text-anchor="middle" font-size="11" fill="#00d9a0">client</text>
+        <!-- Attacker -->
+        <circle cx="240" cy="50" r="22" fill="#3a1a2a" stroke="#ff5a6e"/>
+        <text x="240" y="55" text-anchor="middle" font-size="10" fill="#ff5a6e">ATK</text>
+
+        <!-- Normal connection (dashed) -->
+        <line x1="110" y1="120" x2="370" y2="120" stroke="#00d9a0" stroke-width="1" stroke-dasharray="4,3"/>
+        <text x="240" y="115" text-anchor="middle" font-size="9" fill="#00d9a0">established session</text>
+
+        <!-- Spoofed deauth from attacker (spoofing AP's MAC) -->
+        <line x1="245" y1="70" x2="395" y2="100" stroke="#ff5a6e" stroke-width="2" marker-end="url(#deauth-end)"/>
+        <text x="320" y="80" text-anchor="middle" font-size="9" fill="#ff5a6e" font-family="JetBrains Mono, monospace">DEAUTH (spoofed AP MAC)</text>
+
+        <text x="240" y="200" text-anchor="middle" font-size="11" fill="#ff5a6e">✗ Client believes the deauth → disconnects</text>
+        <text x="240" y="215" text-anchor="middle" font-size="10" fill="#7a8ca0">Repeated deauth = sustained DoS</text>
+
+        <defs><marker id="deauth-end" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#ff5a6e"/></marker></defs>
+      </svg>
+      <div class="callout danger">
+        <strong>Why this works:</strong> deauth/disassoc frames pre-PMF are unauthenticated. Any device can spoof the AP's MAC and send "you are deauthenticated" to any client. Client has no way to verify it came from the real AP.
+      </div>
+    </div>
+
+    <div>
+      <h3 style="color: var(--accent);">PMF enabled (WPA3 mandatory, WPA2 opt-in)</h3>
+      <svg viewBox="0 0 480 240" style="background:#0a0f14; border-radius: 6px;">
+        <circle cx="80" cy="120" r="30" fill="#1a232e" stroke="#5eb6ff"/>
+        <text x="80" y="125" text-anchor="middle" font-size="11" fill="#5eb6ff">AP</text>
+        <circle cx="400" cy="120" r="30" fill="#1a232e" stroke="#00d9a0"/>
+        <text x="400" y="125" text-anchor="middle" font-size="11" fill="#00d9a0">client</text>
+        <circle cx="240" cy="50" r="22" fill="#3a1a2a" stroke="#ff5a6e"/>
+        <text x="240" y="55" text-anchor="middle" font-size="10" fill="#ff5a6e">ATK</text>
+
+        <line x1="110" y1="120" x2="370" y2="120" stroke="#00d9a0" stroke-width="1" stroke-dasharray="4,3"/>
+        <text x="240" y="115" text-anchor="middle" font-size="9" fill="#00d9a0">established + PMF-protected</text>
+
+        <line x1="245" y1="70" x2="395" y2="100" stroke="#ff5a6e" stroke-width="2" stroke-dasharray="6,3" marker-end="url(#deauth-end2)"/>
+        <text x="320" y="80" text-anchor="middle" font-size="9" fill="#ff5a6e" font-family="JetBrains Mono, monospace">DEAUTH (no valid MIC)</text>
+
+        <!-- X over the path to client -->
+        <text x="383" y="110" font-size="20" fill="#ff5a6e" font-weight="bold">✗</text>
+
+        <text x="240" y="200" text-anchor="middle" font-size="11" fill="#00d9a0">✓ Client validates MIC → drops the frame</text>
+        <text x="240" y="215" text-anchor="middle" font-size="10" fill="#7a8ca0">Session continues uninterrupted</text>
+
+        <defs><marker id="deauth-end2" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#ff5a6e"/></marker></defs>
+      </svg>
+      <div class="callout">
+        <strong>PMF adds a MIC</strong> (Message Integrity Code) computed with the session keys to management frames. Attacker doesn't have the session keys, so spoofed deauths fail validation. <strong>Recommendation in any audit: enable PMF, prefer WPA3.</strong>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- 4. EVIL TWIN -->
+<!-- ============================================================ -->
+<section id="evil-twin">
+<h2>4. Evil twin / rogue AP attack</h2>
+<p>Stand up an AP with the same SSID as a target network. Clients with that SSID in their preferred network list will (often) auto-connect to whichever has stronger signal.</p>
+
+<div class="panel">
+  <svg viewBox="0 0 1100 380">
+    <!-- Real AP -->
+    <g transform="translate(80, 100)">
+      <rect x="0" y="0" width="120" height="80" rx="8" fill="#1a232e" stroke="#5eb6ff" stroke-width="2"/>
+      <text x="60" y="25" text-anchor="middle" font-size="12" fill="#5eb6ff" font-weight="bold">Real AP</text>
+      <text x="60" y="42" text-anchor="middle" font-size="10" fill="#d6e1ec" font-family="JetBrains Mono, monospace">SSID: Office-WiFi</text>
+      <text x="60" y="58" text-anchor="middle" font-size="9" fill="#d6e1ec">WPA2-PSK</text>
+      <text x="60" y="72" text-anchor="middle" font-size="9" fill="#7a8ca0">signal: -55 dBm</text>
+    </g>
+
+    <!-- Evil twin -->
+    <g transform="translate(80, 240)">
+      <rect x="0" y="0" width="120" height="80" rx="8" fill="#3a1a2a" stroke="#ff5a6e" stroke-width="2"/>
+      <text x="60" y="25" text-anchor="middle" font-size="12" fill="#ff5a6e" font-weight="bold">Evil twin AP</text>
+      <text x="60" y="42" text-anchor="middle" font-size="10" fill="#d6e1ec" font-family="JetBrains Mono, monospace">SSID: Office-WiFi</text>
+      <text x="60" y="58" text-anchor="middle" font-size="9" fill="#ff5a6e">open + portal</text>
+      <text x="60" y="72" text-anchor="middle" font-size="9" fill="#ff5a6e" font-weight="bold">signal: -32 dBm</text>
+    </g>
+
+    <!-- Marauder dev board (annotation) -->
+    <g transform="translate(20, 340)">
+      <text x="100" y="14" text-anchor="middle" font-size="10" fill="#ff5a6e" font-family="JetBrains Mono, monospace">↑ Flipper + ESP32 Marauder dev board</text>
+    </g>
+
+    <!-- Client laptop -->
+    <g transform="translate(700, 170)">
+      <rect x="0" y="0" width="140" height="80" rx="8" fill="#0a2a1a" stroke="#00d9a0" stroke-width="2"/>
+      <text x="70" y="25" text-anchor="middle" font-size="12" fill="#00d9a0" font-weight="bold">Victim laptop</text>
+      <text x="70" y="42" text-anchor="middle" font-size="9" fill="#d6e1ec">PNL contains:</text>
+      <text x="70" y="56" text-anchor="middle" font-size="9" fill="#ffb547" font-family="JetBrains Mono, monospace">"Office-WiFi"</text>
+      <text x="70" y="70" text-anchor="middle" font-size="9" fill="#7a8ca0">auto-join: on</text>
+    </g>
+
+    <!-- Decision: client picks strongest -->
+    <g stroke="#7a8ca0" stroke-width="1.5" fill="none">
+      <!-- Weak signal to real -->
+      <path d="M 200 140 Q 450 100, 700 200" stroke="#5eb6ff" stroke-width="1.5" stroke-dasharray="3,3"/>
+      <!-- Strong signal to evil -->
+      <path d="M 200 280 Q 450 250, 700 220" stroke="#ff5a6e" stroke-width="3"/>
+    </g>
+    <text x="450" y="95" text-anchor="middle" font-size="10" fill="#5eb6ff">-55 dBm (weaker)</text>
+    <text x="450" y="270" text-anchor="middle" font-size="10" fill="#ff5a6e" font-weight="bold">-32 dBm (stronger) ← client picks this</text>
+
+    <!-- Captive portal output -->
+    <g transform="translate(880, 170)">
+      <rect x="0" y="0" width="180" height="80" rx="8" fill="#0a0f14" stroke="#ff5a6e" stroke-width="2"/>
+      <text x="90" y="22" text-anchor="middle" font-size="11" fill="#ff5a6e" font-weight="bold">Fake captive portal</text>
+      <text x="90" y="40" text-anchor="middle" font-size="9" fill="#d6e1ec">"Please re-authenticate"</text>
+      <text x="90" y="55" text-anchor="middle" font-size="9" fill="#d6e1ec">[ user@email.com   ]</text>
+      <text x="90" y="68" text-anchor="middle" font-size="9" fill="#d6e1ec">[ ********         ]</text>
+    </g>
+
+    <line x1="840" y1="210" x2="880" y2="210" stroke="#ff5a6e" stroke-width="2" marker-end="url(#ev-arrow)"/>
+    <text x="860" y="200" text-anchor="middle" font-size="9" fill="#ff5a6e">redirect</text>
+    <defs><marker id="ev-arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#ff5a6e"/></marker></defs>
+
+    <!-- Defenses callout -->
+    <text x="100" y="30" font-size="13" fill="#d6e1ec" font-weight="bold">Evil twin = stronger signal + matching SSID</text>
+    <text x="100" y="50" font-size="11" fill="#7a8ca0">Client OS prefers strongest signal in PNL. ESP32 hits ~+20 dBm; consumer routers cap at ~+15.</text>
+  </svg>
+
+  <div class="grid-2">
+    <div class="callout">
+      <strong>What this gets the attacker:</strong> any traffic the client sends post-association. Captive portal phishing for creds. DNS spoofing for follow-on. SSL stripping where TLS isn't enforced. Note: modern browsers / HSTS-preloaded sites mitigate the SSL strip path.
+    </div>
+    <div class="callout warn">
+      <strong>Defense:</strong> WPA2-Enterprise with EAP-TLS (client validates RADIUS server's certificate — defeats evil twin). For PSK networks: PMF + client OS that flags "weaker security" mismatches. User training: "if the network shows as open after you joined a WPA one, that's not your network."
+    </div>
+  </div>
+</div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- 5. MOUSEJACK -->
+<!-- ============================================================ -->
+<section id="mousejack">
+<h2>5. MouseJack — wireless keystroke injection at 30 m</h2>
+<p>Marc Newlin's 2016 attack class. Many cheap 2.4 GHz mice/keyboards use the NRF24 chip with unencrypted, unauthenticated keyboard payloads. A nearby attacker injects keystrokes into the USB receiver from across the office.</p>
+
+<div class="panel">
+  <svg viewBox="0 0 1100 360">
+    <!-- Layout: Attacker (NRF24) ---- USB receiver ---- Computer -->
+
+    <!-- Attacker -->
+    <g transform="translate(50, 130)">
+      <rect x="0" y="0" width="180" height="100" rx="8" fill="#3a1a2a" stroke="#ff5a6e" stroke-width="2"/>
+      <text x="90" y="25" text-anchor="middle" font-size="13" fill="#ff5a6e" font-weight="bold">Attacker</text>
+      <text x="90" y="45" text-anchor="middle" font-size="10" fill="#d6e1ec">Flipper + NRF24 module</text>
+      <text x="90" y="60" text-anchor="middle" font-size="10" fill="#d6e1ec">(or HackRF, Crazyradio)</text>
+      <text x="90" y="80" text-anchor="middle" font-size="10" fill="#ff5a6e" font-family="JetBrains Mono, monospace">~$5 NRF24 + adapter</text>
+      <text x="90" y="92" text-anchor="middle" font-size="9" fill="#7a8ca0">range: 10–30 m</text>
+    </g>
+
+    <!-- Injected keystrokes RF -->
+    <g>
+      <line x1="230" y1="180" x2="650" y2="180" stroke="#ff5a6e" stroke-width="2.5" marker-end="url(#mj-arrow)"/>
+      <text x="440" y="165" text-anchor="middle" font-size="11" fill="#ff5a6e" font-family="JetBrains Mono, monospace">2.4 GHz frames — spoof legitimate keyboard's address</text>
+      <text x="440" y="200" text-anchor="middle" font-size="10" fill="#7a8ca0">"GUI r" + "powershell -nop -c IEX(...)" + ENTER</text>
+      <defs><marker id="mj-arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#ff5a6e"/></marker></defs>
+    </g>
+
+    <!-- USB Receiver -->
+    <g transform="translate(670, 130)">
+      <rect x="0" y="0" width="160" height="100" rx="8" fill="#3a2a0a" stroke="#ffb547" stroke-width="2"/>
+      <text x="80" y="25" text-anchor="middle" font-size="13" fill="#ffb547" font-weight="bold">USB receiver</text>
+      <text x="80" y="45" text-anchor="middle" font-size="10" fill="#d6e1ec">Logitech Unifying</text>
+      <text x="80" y="60" text-anchor="middle" font-size="10" fill="#d6e1ec">/ MS / Lenovo</text>
+      <text x="80" y="80" text-anchor="middle" font-size="9" fill="#ffb547">accepts unsigned</text>
+      <text x="80" y="92" text-anchor="middle" font-size="9" fill="#ffb547">unencrypted frames</text>
+    </g>
+
+    <!-- Computer -->
+    <g transform="translate(870, 130)">
+      <rect x="0" y="0" width="180" height="100" rx="8" fill="#0a2a1a" stroke="#00d9a0" stroke-width="2"/>
+      <text x="90" y="25" text-anchor="middle" font-size="13" fill="#00d9a0" font-weight="bold">Victim PC</text>
+      <text x="90" y="45" text-anchor="middle" font-size="10" fill="#d6e1ec">sees standard USB HID</text>
+      <text x="90" y="60" text-anchor="middle" font-size="10" fill="#d6e1ec">"keyboard typed X"</text>
+      <text x="90" y="80" text-anchor="middle" font-size="9" fill="#00d9a0">→ executes code as user</text>
+      <text x="90" y="92" text-anchor="middle" font-size="9" fill="#7a8ca0">no distinction from real KB</text>
+    </g>
+
+    <!-- USB cable -->
+    <line x1="830" y1="180" x2="870" y2="180" stroke="#7a8ca0" stroke-width="3"/>
+    <text x="850" y="170" text-anchor="middle" font-size="9" fill="#7a8ca0">USB</text>
+
+    <!-- Legit keyboard (annotation, far away) -->
+    <g transform="translate(540, 280)">
+      <rect x="0" y="0" width="120" height="50" rx="6" fill="#1a232e" stroke="#7a8ca0" stroke-dasharray="3,3"/>
+      <text x="60" y="20" text-anchor="middle" font-size="10" fill="#7a8ca0">Legitimate keyboard</text>
+      <text x="60" y="36" text-anchor="middle" font-size="9" fill="#7a8ca0">(may not even be present)</text>
+    </g>
+
+    <!-- Bad USB equivalence note -->
+    <text x="550" y="50" text-anchor="middle" font-size="14" fill="#d6e1ec">= <strong>Bad USB at 30 m range</strong>, no line of sight required</text>
+    <text x="550" y="68" text-anchor="middle" font-size="11" fill="#7a8ca0">Same payload as Phase 5; different delivery mechanism.</text>
+  </svg>
+
+  <table style="margin-top: 16px;">
+    <thead>
+      <tr><th>Vendor</th><th>Pre-2016 status</th><th>Post-firmware-patch</th><th>Action</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Logitech (Unifying receivers)</td><td><span class="badge bad">vulnerable</span></td><td><span class="badge ok">patched (most)</span></td><td>Use Logitech update tool. Old receivers ship unpatched, persist for years.</td></tr>
+      <tr><td>Microsoft</td><td><span class="badge bad">vulnerable</span></td><td><span class="badge warn">mostly patched</span></td><td>Firmware updates pushed through Windows Update.</td></tr>
+      <tr><td>Lenovo</td><td><span class="badge bad">vulnerable</span></td><td><span class="badge warn">case-by-case</span></td><td>Check Lenovo support pages by exact part number.</td></tr>
+      <tr><td>Cheap unbranded</td><td><span class="badge bad">vulnerable</span></td><td><span class="badge bad">no patches</span></td><td>Replace with Bluetooth or wired.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout warn">
+    <strong>Defense:</strong> firmware-update the receiver where possible; replace with wired or Bluetooth for high-security workstations. In SCIF / classified environments: no wireless input devices, full stop.
+  </div>
+</div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- 6. PSK CRACK TIME -->
+<!-- ============================================================ -->
+<section id="wifi-chart">
+<h2>6. WPA2 PSK crack-time — why 12 random characters matter</h2>
+<p>Once you have a captured handshake, time-to-crack depends entirely on PSK entropy. Modern hashcat on consumer GPUs does ~500,000 PMK derivations per second.</p>
+
+<div class="panel">
+  <div class="controls">
+    <label>PSK length: <strong id="psk-len-label">8</strong> chars</label>
+    <input type="range" id="psk-len" min="6" max="20" value="8" style="width: 200px;">
+    <label>Charset:</label>
+    <select id="psk-charset" style="background: var(--panel-2); border: 1px solid var(--line); color: var(--text); padding: 6px 10px; border-radius: 4px; font-size: 13px;">
+      <option value="26">lowercase only (a–z) — 26 chars</option>
+      <option value="36">+ digits (a–z0–9) — 36 chars</option>
+      <option value="52">mixed case (a–zA–Z) — 52 chars</option>
+      <option value="62" selected>+ digits + case (a–zA–Z0–9) — 62 chars</option>
+      <option value="94">+ symbols (full ASCII printable) — 94 chars</option>
+      <option value="dict">dictionary word (~50k common)</option>
+    </select>
+    <label>GPU rate (Mh/s): <strong id="gpu-rate-label">0.5</strong></label>
+    <input type="range" id="gpu-rate" min="0.1" max="10" step="0.1" value="0.5" style="width: 150px;">
+  </div>
+
+  <div class="grid-2">
+    <div class="panel" style="margin: 0; background: var(--panel-2);">
+      <div style="color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.6px;">Keyspace</div>
+      <div class="mono" style="font-size: 22px; color: var(--accent); margin-top: 4px;" id="psk-space">218 trillion</div>
+      <div class="caption" id="psk-entropy">~48 bits of entropy</div>
+    </div>
+    <div class="panel" style="margin: 0; background: var(--panel-2);">
+      <div style="color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.6px;">Time to brute-force (worst case)</div>
+      <div class="mono" style="font-size: 22px; color: var(--warn); margin-top: 4px;" id="psk-time">~14 years</div>
+      <div class="caption" id="psk-verdict">borderline impractical</div>
+    </div>
+  </div>
+
+  <h3>The decision boundary</h3>
+  <table>
+    <thead><tr><th>PSK style</th><th>Example</th><th>~Entropy</th><th>Time @ 0.5 Mh/s</th><th>Verdict</th></tr></thead>
+    <tbody>
+      <tr><td>Pet name + year</td><td class="mono">Sparky2019</td><td>~25 bits</td><td>67 sec</td><td><span class="badge bad">trivial</span></td></tr>
+      <tr><td>Common dictionary</td><td class="mono">password123</td><td>~17 bits</td><td>&lt;1 sec</td><td><span class="badge bad">instant</span></td></tr>
+      <tr><td>Address + number</td><td class="mono">1342Maple</td><td>~30 bits</td><td>35 min</td><td><span class="badge bad">overnight job</span></td></tr>
+      <tr><td>Two random words</td><td class="mono">brick.tunnel</td><td>~28 bits</td><td>9 min</td><td><span class="badge bad">trivial</span></td></tr>
+      <tr><td>8 random alphanumerics</td><td class="mono">x7Kp9mQa</td><td>~48 bits</td><td>~17 years</td><td><span class="badge warn">borderline</span></td></tr>
+      <tr><td>12 random alphanumerics</td><td class="mono">x7K9pQm2nVbZ</td><td>~71 bits</td><td>~145 trillion years</td><td><span class="badge ok">cryptographic</span></td></tr>
+      <tr><td>16-char diceware</td><td class="mono">battery.horse.staple</td><td>~64 bits</td><td>~1 billion years</td><td><span class="badge ok">cryptographic</span></td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <strong>The number that matters: 12 random alphanumerics.</strong> Anything less, assume a determined attacker with a single consumer GPU cracks you in days at most. Anything 12+ and random, you're safe against everything short of nation-state compute clusters. <strong>Length beats complexity.</strong>
+  </div>
+</div>
+</section>
+
+
+<p style="margin-top: 48px; color: var(--muted); font-size: 12px;">
+  Curriculum source: <span style="opacity:0.55;cursor:default" title="Source lives in the private workspace">06-wireless-extensions.md</span> · Back to <a href="index.html">visuals hub</a> · <span style="opacity:0.55;cursor:default" title="Source lives in the private workspace">phase index</span>
+</p>
+
+
+<!-- ============================================================ -->
+<!-- SCRIPTS -->
+<!-- ============================================================ -->
+<script>
+// ============== 1. TRACKING SIMULATION ==============
+const TRACKING_SCENARIOS = {
+  'public': {
+    desc: 'PUBLIC address — manufacturer-assigned, permanent. Same 48 bits appear on every advertisement for the life of the device.',
+    points: Array.from({length: 24}, (_, h) => ({h, addr: 'AC:DE:48:00:11:22', color: '#ff5a6e'})),
+    verdict: '<strong style="color: var(--danger);">Trackable everywhere.</strong> Anyone with a scanner saw "the same device" for 24 hours straight. Easy to correlate to a person via co-location with other identifiers.'
+  },
+  'random-static': {
+    desc: 'RANDOM STATIC — chosen at boot, fixed until next reboot/disconnect cycle.',
+    points: [...Array(13).fill(null).map((_, h) => ({h, addr: 'D7:14:E8:5C:2A:91', color: '#ffb547'})),
+             ...Array(11).fill(null).map((_, h) => ({h: h + 13, addr: 'F2:91:0B:E7:14:55', color: '#ffb547'}))],
+    verdict: '<strong style="color: var(--warn);">Mostly trackable.</strong> If the device stays on, the address is static for the whole day. A reboot creates a new address — attacker briefly loses the trail but you carry the same physical device.'
+  },
+  'rpa': {
+    desc: 'RESOLVABLE PRIVATE — rotates every ~15 min (default per BT spec). Resolvable by paired devices via IRK; opaque to attackers.',
+    points: Array.from({length: 96}, (_, i) => {
+      const h = (i / 4);
+      const addrs = ['5F:A3:11:B2:08:42', '7B:E2:33:08:11:94', '6C:F1:22:99:0A:31', '4A:D5:88:12:E1:77', '5E:A2:71:04:B5:23'];
+      return {h, addr: addrs[Math.floor(Math.random() * addrs.length)], color: '#00d9a0'};
+    }),
+    verdict: '<strong style="color: var(--accent);">Untrackable to a passive scanner.</strong> Every ~15 min a different address. Each looks like a different device. Attacker sees "many short-lived devices" rather than "one persistent device."'
+  },
+  'nrpa': {
+    desc: 'NON-RESOLVABLE PRIVATE — fully random, not resolvable even by paired devices (used for one-shot advertising).',
+    points: Array.from({length: 240}, (_, i) => {
+      const h = i / 10;
+      const a = Array.from({length: 6}, () => Math.floor(Math.random() * 256).toString(16).padStart(2, '0').toUpperCase()).join(':');
+      return {h, addr: a, color: '#00d9a0'};
+    }),
+    verdict: '<strong style="color: var(--accent);">Maximum unlinkability.</strong> Every advertisement uses a new address. Only useful for connectionless advertising — paired connections require RPA.'
+  }
+};
+
+function showTracking(type) {
+  const s = TRACKING_SCENARIOS[type];
+  const g = document.getElementById('tracking-events');
+  g.innerHTML = '';
+  // Plot points along time axis. Group by unique address for color emphasis.
+  const seen = {};
+  s.points.forEach((p, i) => {
+    const x = 60 + (p.h / 24) * 980;
+    if (!seen[p.addr]) seen[p.addr] = Object.keys(seen).length;
+    const y = 80 + (seen[p.addr] % 6) * 14;
+    g.innerHTML += `<circle cx="${x}" cy="${y}" r="3" fill="${p.color}" opacity="0.7"/>`;
+  });
+  // Add unique address count
+  g.innerHTML += `<text x="60" y="60" font-family="JetBrains Mono, monospace" font-size="11" fill="#d6e1ec">${Object.keys(seen).length} unique address${Object.keys(seen).length === 1 ? '' : 'es'} observed over 24 hours</text>`;
+  document.getElementById('tracking-summary').innerHTML = `<strong>${type.toUpperCase()}:</strong> ${s.desc}<br><br>${s.verdict}`;
+}
+
+
+// ============== 2. WIFI HANDSHAKE ==============
+const HS_STEPS = [
+  {
+    title: 'Step 0 — Initial state',
+    text: 'AP has the PMK (derived from PSK + SSID via PBKDF2). Client has the PSK. They have not yet talked. Attacker is passively sniffing.'
+  },
+  {
+    title: 'Step 1 — AP → Client: Anonce',
+    text: 'AP picks a random 32-byte nonce (Anonce) and sends it in the clear. This is EAPOL frame #1.',
+    msg: {from: 'ap', to: 'client', label: 'EAPOL #1: Anonce (32 bytes random)', y: 90, color: '#5eb6ff'}
+  },
+  {
+    title: 'Step 2 — Client computes PTK locally',
+    text: 'Client picks its own random Snonce. Client derives PTK = PRF(PMK, Anonce, Snonce, AP_MAC, Client_MAC). Then computes a MIC over its EAPOL #2 frame using the new PTK.',
+    msg: {from: 'client', to: 'client', label: 'derive PTK + MIC locally', y: 130, color: '#00d9a0'}
+  },
+  {
+    title: 'Step 3 — Client → AP: Snonce + MIC',
+    text: 'Client sends Snonce and the MIC. EAPOL #2. Attacker now has: Anonce, Snonce, AP_MAC, Client_MAC, MIC. EVERYTHING needed to crack offline if PSK is weak.',
+    msg: {from: 'client', to: 'ap', label: 'EAPOL #2: Snonce + MIC', y: 170, color: '#00d9a0'}
+  },
+  {
+    title: 'Step 4 — AP verifies + sends GTK',
+    text: 'AP computes PTK with same inputs, verifies MIC matches. Sends GTK (Group Temporal Key for broadcast) encrypted with PTK. EAPOL #3.',
+    msg: {from: 'ap', to: 'client', label: 'EAPOL #3: GTK (encrypted) + MIC', y: 210, color: '#5eb6ff'}
+  },
+  {
+    title: 'Step 5 — Client confirms',
+    text: 'Client ACKs. EAPOL #4. Session keys are now both sides; data encryption begins.',
+    msg: {from: 'client', to: 'ap', label: 'EAPOL #4: ACK + MIC', y: 250, color: '#00d9a0'}
+  },
+  {
+    title: 'Step 6 — Attacker has the full handshake',
+    text: 'After steps 1–4, attacker has captured the 4 EAPOL frames. Offline crack: for each candidate passphrase → derive PMK → derive PTK → compute MIC → check match. Hashcat does this at ~500 kh/s on a single GPU.',
+    highlight: 'attacker'
+  }
+];
+
+let hsStep = 0;
+
+function updateHS() {
+  const s = HS_STEPS[hsStep];
+  document.getElementById('hs-step').textContent = hsStep;
+  document.getElementById('hs-narration').innerHTML = '<strong style="color: var(--accent);">' + s.title + '</strong><br>' + s.text;
+
+  // Draw cumulative messages
+  const g = document.getElementById('hs-messages');
+  g.innerHTML = '';
+  for (let i = 1; i <= hsStep; i++) {
+    const stp = HS_STEPS[i];
+    if (!stp.msg) continue;
+    const m = stp.msg;
+    const apX = 240, clientX = 860;
+    let x1, x2;
+    if (m.from === 'ap' && m.to === 'client') { x1 = apX; x2 = clientX; }
+    else if (m.from === 'client' && m.to === 'ap') { x1 = clientX; x2 = apX; }
+    else { x1 = clientX; x2 = clientX; } // local
+    if (m.from === m.to) {
+      // self-loop
+      g.innerHTML += `
+        <rect x="${x1 - 80}" y="${m.y - 12}" width="160" height="24" rx="12" fill="#0a2a1a" stroke="${m.color}"/>
+        <text x="${x1}" y="${m.y + 4}" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="${m.color}">${m.label}</text>
+      `;
+    } else {
+      g.innerHTML += `
+        <line x1="${x1}" y1="${m.y}" x2="${x2}" y2="${m.y}" stroke="${m.color}" stroke-width="2" marker-end="url(#hs-arrow-${i})"/>
+        <text x="${(x1+x2)/2}" y="${m.y - 6}" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="${m.color}">${m.label}</text>
+        <defs><marker id="hs-arrow-${i}" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="${m.color}"/></marker></defs>
+      `;
+    }
+  }
+  // Show attacker capture lines after step 3
+  if (hsStep >= 3) {
+    g.innerHTML += `
+      <line x1="500" y1="90" x2="500" y2="290" stroke="#ff5a6e" stroke-width="1" stroke-dasharray="3,3" opacity="0.7"/>
+      <line x1="600" y1="170" x2="600" y2="290" stroke="#ff5a6e" stroke-width="1" stroke-dasharray="3,3" opacity="0.7"/>
+      <text x="550" y="285" text-anchor="middle" font-size="9" fill="#ff5a6e">↓ captured ↓</text>
+    `;
+  }
+}
+
+document.getElementById('hs-next').onclick = () => { if (hsStep < HS_STEPS.length - 1) { hsStep++; updateHS(); } };
+document.getElementById('hs-prev').onclick = () => { if (hsStep > 0) { hsStep--; updateHS(); } };
+document.getElementById('hs-reset').onclick = () => { hsStep = 0; updateHS(); };
+updateHS();
+
+
+// ============== 6. PSK CRACK TIME ==============
+function fmtTime(seconds) {
+  if (seconds < 1) return (seconds * 1000).toFixed(1) + ' ms';
+  if (seconds < 60) return seconds.toFixed(1) + ' s';
+  if (seconds < 3600) return (seconds / 60).toFixed(1) + ' min';
+  if (seconds < 86400) return (seconds / 3600).toFixed(1) + ' hr';
+  if (seconds < 31557600) return (seconds / 86400).toFixed(1) + ' days';
+  if (seconds < 31557600 * 1e3) return (seconds / 31557600).toFixed(1) + ' yr';
+  if (seconds < 31557600 * 1e6) return (seconds / (31557600 * 1e3)).toFixed(2) + 'k yr';
+  if (seconds < 31557600 * 1e9) return (seconds / (31557600 * 1e6)).toFixed(2) + 'M yr';
+  if (seconds < 31557600 * 1e12) return (seconds / (31557600 * 1e9)).toFixed(2) + 'B yr';
+  return (seconds / (31557600 * 1e9)).toExponential(2) + ' B yr';
+}
+
+function fmtBig(n) {
+  if (n < 1e6) return Math.round(n).toLocaleString();
+  if (n < 1e9) return (n / 1e6).toFixed(2) + ' million';
+  if (n < 1e12) return (n / 1e9).toFixed(2) + ' billion';
+  if (n < 1e15) return (n / 1e12).toFixed(2) + ' trillion';
+  return n.toExponential(2);
+}
+
+function updatePSK() {
+  const len = parseInt(document.getElementById('psk-len').value);
+  const charset = document.getElementById('psk-charset').value;
+  const rate = parseFloat(document.getElementById('gpu-rate').value) * 1e6;
+
+  let space, entropy;
+  if (charset === 'dict') {
+    space = 50000;
+    entropy = Math.log2(space);
+    document.getElementById('psk-len').disabled = true;
+  } else {
+    document.getElementById('psk-len').disabled = false;
+    const cs = parseInt(charset);
+    space = Math.pow(cs, len);
+    entropy = len * Math.log2(cs);
+  }
+  const meanS = space / rate / 2;
+  const worstS = space / rate;
+
+  document.getElementById('psk-len-label').textContent = len;
+  document.getElementById('gpu-rate-label').textContent = rate / 1e6;
+  document.getElementById('psk-space').textContent = fmtBig(space);
+  document.getElementById('psk-entropy').textContent = `~${entropy.toFixed(0)} bits of entropy`;
+  document.getElementById('psk-time').textContent = fmtTime(worstS);
+
+  let verdict;
+  if (worstS < 60) verdict = '<span style="color: var(--danger);">trivially cracked</span>';
+  else if (worstS < 3600) verdict = '<span style="color: var(--danger);">cracked within an hour</span>';
+  else if (worstS < 86400) verdict = '<span style="color: var(--warn);">overnight job — vulnerable</span>';
+  else if (worstS < 86400 * 365) verdict = '<span style="color: var(--warn);">weeks–months — borderline</span>';
+  else if (worstS < 86400 * 365 * 1000) verdict = '<span style="color: var(--accent);">years — safe</span>';
+  else verdict = '<span style="color: var(--accent);">cryptographic — safe</span>';
+  document.getElementById('psk-verdict').innerHTML = verdict;
+}
+document.getElementById('psk-len').oninput = updatePSK;
+document.getElementById('psk-charset').onchange = updatePSK;
+document.getElementById('gpu-rate').oninput = updatePSK;
+updatePSK();
+</script>
+
+</body>
+</html>

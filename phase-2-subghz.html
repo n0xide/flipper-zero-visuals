@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Phase 2 — Sub-GHz Radio (visuals)</title>
+<style>
+  :root {
+    --bg: #0b0f14;
+    --panel: #131a23;
+    --panel-2: #1a232e;
+    --line: #2a3744;
+    --text: #d6e1ec;
+    --muted: #7a8ca0;
+    --accent: #00d9a0;
+    --accent-2: #5eb6ff;
+    --warn: #ffb547;
+    --danger: #ff5a6e;
+    --carrier: #5eb6ff;
+    --data: #00d9a0;
+    --mono: "JetBrains Mono", "Fira Code", Consolas, monospace;
+    --sans: -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: var(--sans); }
+  body { max-width: 1180px; margin: 0 auto; padding: 32px 24px 80px; line-height: 1.55; }
+  h1 { font-size: 28px; margin: 0 0 4px; }
+  h2 { font-size: 22px; margin: 0 0 8px; color: var(--accent); border-left: 3px solid var(--accent); padding-left: 12px; }
+  h3 { font-size: 16px; margin: 18px 0 8px; color: var(--accent-2); }
+  p { margin: 8px 0; }
+  a { color: var(--accent-2); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .breadcrumb { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 20px; margin: 16px 0 32px; }
+  .panel-tight { padding: 16px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 13px; color: var(--muted); margin: 8px 0; }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .swatch { width: 14px; height: 14px; border-radius: 3px; }
+  .controls { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; padding: 10px 12px; background: var(--panel-2); border-radius: 6px; margin-bottom: 12px; font-size: 13px; }
+  button { background: var(--panel-2); color: var(--text); border: 1px solid var(--line); padding: 6px 14px; border-radius: 5px; cursor: pointer; font-family: var(--sans); font-size: 13px; transition: all 0.15s; }
+  button:hover { border-color: var(--accent); color: var(--accent); }
+  button.primary { background: var(--accent); color: #001a14; border-color: var(--accent); font-weight: 600; }
+  button.primary:hover { background: #00f5b3; color: #001a14; }
+  button.danger:hover { border-color: var(--danger); color: var(--danger); }
+  input[type="range"] { accent-color: var(--accent); }
+  .bit { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; background: var(--panel-2); border: 1px solid var(--line); margin: 2px; cursor: pointer; font-family: var(--mono); font-weight: 600; user-select: none; border-radius: 4px; transition: all 0.1s; }
+  .bit.on { background: var(--accent); color: #001a14; border-color: var(--accent); }
+  .bit:hover { border-color: var(--accent-2); }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-family: var(--mono); margin: 0 2px; }
+  .badge.ok { background: rgba(0,217,160,0.15); color: var(--accent); border: 1px solid var(--accent); }
+  .badge.warn { background: rgba(255,181,71,0.15); color: var(--warn); border: 1px solid var(--warn); }
+  .badge.bad { background: rgba(255,90,110,0.15); color: var(--danger); border: 1px solid var(--danger); }
+  table { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 13px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+  th { color: var(--muted); font-weight: 500; font-size: 11px; text-transform: uppercase; letter-spacing: 0.6px; }
+  td.mono, .mono { font-family: var(--mono); }
+  .caption { font-size: 12px; color: var(--muted); margin-top: 6px; font-style: italic; }
+  .callout { background: rgba(94,182,255,0.08); border-left: 3px solid var(--accent-2); padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; font-size: 13px; }
+  .callout.warn { background: rgba(255,181,71,0.08); border-color: var(--warn); }
+  svg { display: block; max-width: 100%; }
+  .nav-toc { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px 18px; margin-bottom: 24px; font-size: 14px; }
+  .nav-toc ol { margin: 6px 0 0; padding-left: 24px; }
+  .nav-toc li { margin: 3px 0; }
+  details { margin: 8px 0; }
+  summary { cursor: pointer; color: var(--accent-2); font-size: 13px; user-select: none; }
+  .frame-display { background: #000; border-radius: 6px; padding: 10px; font-family: var(--mono); font-size: 14px; color: var(--accent); border: 1px solid var(--line); min-height: 28px; }
+  canvas { display: block; max-width: 100%; }
+  .pill { display: inline-block; background: var(--panel-2); border: 1px solid var(--line); padding: 3px 10px; border-radius: 12px; font-size: 11px; font-family: var(--mono); margin: 0 4px 4px 0; }
+  .actor-lane { display: flex; align-items: center; gap: 10px; margin: 6px 0; font-size: 13px; }
+  .actor-label { width: 90px; color: var(--muted); font-family: var(--mono); font-size: 11px; text-align: right; }
+  .actor-bar { flex: 1; height: 32px; background: var(--panel-2); border-radius: 4px; position: relative; overflow: hidden; }
+</style>
+</head>
+<body>
+
+<div class="breadcrumb">
+  <a href="index.html">visuals</a> &nbsp;/&nbsp; Phase 2 &nbsp;/&nbsp; Sub-GHz Radio
+</div>
+
+<h1>Phase 2 — Sub-GHz Radio</h1>
+<p style="color: var(--muted); margin: 0 0 24px;">Interactive visualizations for the deepest single domain in the Flipper curriculum: modulation, encoding, fixed vs rolling codes, RollJam mechanics, and brute-force math.</p>
+
+<div class="nav-toc">
+  <strong style="color: var(--accent);">On this page</strong>
+  <ol>
+    <li><a href="#bands">ISM band spectrum map</a> — where the action happens</li>
+    <li><a href="#modulation">Modulation: ASK/OOK vs 2-FSK</a> — interactive waveform</li>
+    <li><a href="#encoding">Encoding: NRZ vs Manchester vs PWM</a> — same bits, different waveforms</li>
+    <li><a href="#fixed-vs-rolling">Fixed-code vs rolling-code remote</a> — animated press comparison</li>
+    <li><a href="#keeloq">KeeLoq packet anatomy</a> — what's actually transmitted</li>
+    <li><a href="#rolljam">RollJam attack timeline</a> — step-by-step sequence</li>
+    <li><a href="#brute-force">Brute force math calculator</a> — why it doesn't work</li>
+  </ol>
+</div>
+
+<!-- ============================================================ -->
+<!-- 1. ISM BAND SPECTRUM MAP -->
+<!-- ============================================================ -->
+<section id="bands">
+<h2>1. The sub-GHz band — where transmissions live</h2>
+<p>The Flipper's CC1101 can transmit/receive on three sub-bands. Most consumer hardware clusters at four specific frequencies. Hover any marker to see what uses it.</p>
+
+<div class="panel">
+  <svg viewBox="0 0 1100 280" id="band-map" style="background:#0a0f14;">
+    <defs>
+      <linearGradient id="band-grad" x1="0" x2="1">
+        <stop offset="0%" stop-color="#1a232e"/>
+        <stop offset="50%" stop-color="#243140"/>
+        <stop offset="100%" stop-color="#1a232e"/>
+      </linearGradient>
+    </defs>
+
+    <!-- Frequency axis -->
+    <line x1="60" y1="220" x2="1040" y2="220" stroke="#5eb6ff" stroke-width="2"/>
+    <!-- Ticks: 300, 400, 500, 600, 700, 800, 900, 1000 MHz -->
+    <g font-family="JetBrains Mono, monospace" font-size="11" fill="#7a8ca0">
+      <g transform="translate(60,220)"><line y2="6" stroke="#5eb6ff"/><text y="22" text-anchor="middle">300</text></g>
+      <g transform="translate(200,220)"><line y2="6" stroke="#5eb6ff"/><text y="22" text-anchor="middle">400</text></g>
+      <g transform="translate(340,220)"><line y2="6" stroke="#5eb6ff"/><text y="22" text-anchor="middle">500</text></g>
+      <g transform="translate(480,220)"><line y2="6" stroke="#5eb6ff"/><text y="22" text-anchor="middle">600</text></g>
+      <g transform="translate(620,220)"><line y2="6" stroke="#5eb6ff"/><text y="22" text-anchor="middle">700</text></g>
+      <g transform="translate(760,220)"><line y2="6" stroke="#5eb6ff"/><text y="22" text-anchor="middle">800</text></g>
+      <g transform="translate(900,220)"><line y2="6" stroke="#5eb6ff"/><text y="22" text-anchor="middle">900</text></g>
+      <g transform="translate(1040,220)"><line y2="6" stroke="#5eb6ff"/><text y="22" text-anchor="middle">1000</text></g>
+      <text x="550" y="252" text-anchor="middle" font-size="12" fill="#7a8ca0">Frequency (MHz)</text>
+    </g>
+
+    <!-- CC1101 supported bands (as wide rectangles) -->
+    <g opacity="0.18">
+      <rect x="60" y="40" width="68" height="180" fill="#00d9a0"/>
+      <rect x="182" y="40" width="124" height="180" fill="#00d9a0"/>
+      <rect x="691" y="40" width="209" height="180" fill="#00d9a0"/>
+    </g>
+    <g font-family="JetBrains Mono, monospace" font-size="10" fill="#00d9a0">
+      <text x="94" y="60" text-anchor="middle">300–348</text>
+      <text x="244" y="60" text-anchor="middle">387–464</text>
+      <text x="795" y="60" text-anchor="middle">779–928</text>
+    </g>
+
+    <!-- Marker: 315 MHz -->
+    <g class="band-marker" data-info="315 MHz — Older US key fobs, US garage remotes, some industrial telemetry. Region 2 + parts of Asia." style="cursor:pointer;">
+      <line x1="81" y1="100" x2="81" y2="220" stroke="#ffb547" stroke-width="2"/>
+      <circle cx="81" cy="100" r="6" fill="#ffb547"/>
+      <text x="81" y="92" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" fill="#ffb547">315</text>
+      <text x="81" y="120" text-anchor="middle" font-size="10" fill="#d6e1ec">US fobs</text>
+    </g>
+
+    <!-- Marker: 433.92 MHz -->
+    <g class="band-marker" data-info="433.92 MHz — The global ISM band. Cheap consumer junk lives here: PT2262/EV1527 remotes, weather stations, doorbells, garage openers, wireless thermometers. Cheapest RF target on Earth." style="cursor:pointer;">
+      <line x1="227" y1="80" x2="227" y2="220" stroke="#ff5a6e" stroke-width="3"/>
+      <circle cx="227" cy="80" r="8" fill="#ff5a6e"/>
+      <text x="227" y="72" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="12" fill="#ff5a6e" font-weight="bold">433.92</text>
+      <text x="227" y="102" text-anchor="middle" font-size="10" fill="#d6e1ec">global ISM</text>
+      <text x="227" y="116" text-anchor="middle" font-size="9" fill="#7a8ca0">remotes / doorbells</text>
+      <text x="227" y="128" text-anchor="middle" font-size="9" fill="#7a8ca0">weather / fobs</text>
+    </g>
+
+    <!-- Marker: 868 MHz -->
+    <g class="band-marker" data-info="868 MHz — EU LoRa, EU smart meters, EU 868 MHz garage openers. Region 1." style="cursor:pointer;">
+      <line x1="775" y1="100" x2="775" y2="220" stroke="#5eb6ff" stroke-width="2"/>
+      <circle cx="775" cy="100" r="6" fill="#5eb6ff"/>
+      <text x="775" y="92" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" fill="#5eb6ff">868</text>
+      <text x="775" y="120" text-anchor="middle" font-size="10" fill="#d6e1ec">EU LoRa</text>
+    </g>
+
+    <!-- Marker: 915 MHz -->
+    <g class="band-marker" data-info="915 MHz — US LoRa. Z-Wave US uses 908.42 MHz specifically. Industrial telemetry." style="cursor:pointer;">
+      <line x1="841" y1="80" x2="841" y2="220" stroke="#00d9a0" stroke-width="3"/>
+      <circle cx="841" cy="80" r="8" fill="#00d9a0"/>
+      <text x="841" y="72" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="12" fill="#00d9a0" font-weight="bold">915</text>
+      <text x="841" y="102" text-anchor="middle" font-size="10" fill="#d6e1ec">US LoRa</text>
+      <text x="841" y="116" text-anchor="middle" font-size="9" fill="#7a8ca0">Z-Wave: 908.42</text>
+    </g>
+
+    <!-- Marker: 908.42 (Z-Wave US) — small tick -->
+    <g class="band-marker" data-info="908.42 MHz — Z-Wave US specifically. Different protocol, same band." style="cursor:pointer;">
+      <line x1="832" y1="170" x2="832" y2="220" stroke="#7a8ca0" stroke-width="1" stroke-dasharray="3,2"/>
+      <circle cx="832" cy="170" r="3" fill="#7a8ca0"/>
+    </g>
+
+    <!-- Title at top -->
+    <text x="550" y="25" text-anchor="middle" font-size="14" fill="#d6e1ec" font-family="-apple-system, sans-serif">CC1101 supported bands (green) and common frequencies in the wild</text>
+  </svg>
+
+  <div id="band-info" class="callout" style="margin-top:14px; min-height: 50px;">
+    <strong style="color: var(--accent);">Hover or click a marker</strong> to see what uses that frequency.
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><div class="swatch" style="background:rgba(0,217,160,0.4);"></div> CC1101 sub-band</div>
+    <div class="legend-item"><div class="swatch" style="background:#ff5a6e;"></div> 433.92 — biggest consumer target</div>
+    <div class="legend-item"><div class="swatch" style="background:#00d9a0;"></div> 915 — US LoRa / Z-Wave region</div>
+    <div class="legend-item"><div class="swatch" style="background:#ffb547;"></div> 315 — US legacy fobs</div>
+    <div class="legend-item"><div class="swatch" style="background:#5eb6ff;"></div> 868 — EU LoRa</div>
+  </div>
+</div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- 2. MODULATION VISUALIZER -->
+<!-- ============================================================ -->
+<section id="modulation">
+<h2>2. Modulation — ASK/OOK vs 2-FSK</h2>
+<p>Both diagrams below transmit <strong>the exact same bits</strong>. The difference is how those bits are pressed onto the carrier wave. Click bits to flip them.</p>
+
+<div class="panel">
+  <div class="controls">
+    <strong>Bit pattern:</strong>
+    <div id="mod-bits" style="display:inline-flex;"></div>
+    <button id="mod-randomize">randomize</button>
+    <button id="mod-clear">all zeros</button>
+    <button id="mod-set">all ones</button>
+    <span style="margin-left:auto; color: var(--muted); font-size: 12px;">8 bits, MSB-first</span>
+  </div>
+
+  <h3>ASK / OOK — "carrier on or off"</h3>
+  <p style="font-size: 13px; color: var(--muted); margin-top: 0;">A <strong>1</strong> turns the carrier on; a <strong>0</strong> turns it off. Cheapest possible scheme. Most $5 433 MHz remotes use this. Vulnerable to amplitude noise.</p>
+  <canvas id="ook-canvas" width="1100" height="160"></canvas>
+
+  <h3 style="margin-top: 24px;">2-FSK — "two carriers, switch between them"</h3>
+  <p style="font-size: 13px; color: var(--muted); margin-top: 0;">A <strong>1</strong> is a slightly higher carrier frequency; a <strong>0</strong> is a slightly lower one. Robust against amplitude noise. Used by Z-Wave, KeeLoq FSK variants, Hörmann.</p>
+  <canvas id="fsk-canvas" width="1100" height="160"></canvas>
+
+  <div class="callout">
+    <strong>Watch this:</strong> in OOK the wave amplitude is the signal — flat means 0. In FSK the wave is always there but its frequency carries the bit. A noise spike that confuses OOK barely affects FSK.
+  </div>
+</div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- 3. ENCODING VISUALIZER -->
+<!-- ============================================================ -->
+<section id="encoding">
+<h2>3. Encoding — NRZ vs Manchester vs PWM</h2>
+<p>Modulation is <em>how the carrier carries bits</em>. Encoding is <em>how bits are laid out as a waveform shape</em>. The two are orthogonal — you can have OOK with any of these encodings. Same input bits below produce three totally different waveforms.</p>
+
+<div class="panel">
+  <div class="controls">
+    <strong>Data bits:</strong>
+    <div id="enc-bits" style="display:inline-flex;"></div>
+    <button id="enc-randomize">randomize</button>
+    <button id="enc-pattern">01010101</button>
+    <button id="enc-pattern2">11110000</button>
+  </div>
+
+  <h3>NRZ — Non-Return-to-Zero</h3>
+  <p style="font-size: 13px; color: var(--muted); margin-top: 0;">A 1 is high; a 0 is low. <strong>Problem:</strong> a run of identical bits looks like a flat line — receiver loses clock sync. <strong>DC bias</strong> on long runs.</p>
+  <canvas id="nrz-canvas" width="1100" height="100"></canvas>
+
+  <h3 style="margin-top: 18px;">Manchester</h3>
+  <p style="font-size: 13px; color: var(--muted); margin-top: 0;">Every bit is a <em>transition</em>: a 1 is high-then-low; a 0 is low-then-high (IEEE convention). <strong>Self-clocking</strong> — there's always a transition mid-bit. Used by Princeton/PT2240 and most fixed-code remotes.</p>
+  <canvas id="manchester-canvas" width="1100" height="100"></canvas>
+
+  <h3 style="margin-top: 18px;">PWM — Pulse Width Modulation</h3>
+  <p style="font-size: 13px; color: var(--muted); margin-top: 0;">A 1 is a long pulse + short gap; a 0 is a short pulse + long gap. The "TE" (timing element) is the base unit. Common in OOK remotes.</p>
+  <canvas id="pwm-canvas" width="1100" height="100"></canvas>
+
+  <div class="callout warn">
+    <strong>Pitfall:</strong> "OOK and Manchester are the same" — they're not. OOK is the modulation (how the carrier is keyed). Manchester is the encoding (how bits become a waveform shape). A remote can be OOK + NRZ <em>or</em> OOK + Manchester. Different waveforms on the air.
+  </div>
+</div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- 4. FIXED VS ROLLING CODE -->
+<!-- ============================================================ -->
+<section id="fixed-vs-rolling">
+<h2>4. Fixed-code vs rolling-code remote</h2>
+<p>Press the same button twice. Compare the captures. If identical → fixed-code, trivially clonable. If different → rolling-code, cryptographically protected.</p>
+
+<div class="panel">
+  <div class="controls">
+    <button id="press-fixed" class="primary">Press fixed-code remote</button>
+    <button id="press-rolling" class="primary">Press rolling-code remote</button>
+    <button id="reset-codes">reset both</button>
+    <span style="color: var(--muted); margin-left: auto; font-size: 12px;">Each press appends one line.</span>
+  </div>
+
+  <div class="grid-2">
+    <div>
+      <h3 style="color: var(--danger);"><span class="badge bad">BROKEN</span> Fixed-code (PT2262 / Princeton)</h3>
+      <p style="font-size: 13px; color: var(--muted); margin-top: 0;">24-bit address+data. Same bits every press.</p>
+      <div id="fixed-log" class="frame-display" style="min-height: 220px;">
+        <span style="color: var(--muted);">No presses yet. Click "Press fixed-code remote".</span>
+      </div>
+      <p class="caption">Capture once → replay forever. The address is hardcoded by DIP switches inside the remote.</p>
+    </div>
+    <div>
+      <h3 style="color: var(--accent);"><span class="badge ok">SAFE</span> Rolling-code (KeeLoq HCS301)</h3>
+      <p style="font-size: 13px; color: var(--muted); margin-top: 0;">66 bits: 32-bit cipher (counter + button bits + discriminator) + 28-bit serial + 4-bit button + 2-bit status. Cipher block changes every press.</p>
+      <div id="rolling-log" class="frame-display" style="min-height: 220px;">
+        <span style="color: var(--muted);">No presses yet. Click "Press rolling-code remote".</span>
+      </div>
+      <p class="caption">Counter increments each press → totally different ciphertext. Receiver tracks last counter, rejects replays.</p>
+    </div>
+  </div>
+
+  <div class="callout" style="margin-top: 16px;">
+    <strong>Lab 2.3 takeaway:</strong> the two-press comparison is the cheapest possible diagnostic. If you can't tell which class you're looking at, you can't reason about whether replay attacks will work.
+  </div>
+</div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- 5. KEELOQ PACKET ANATOMY -->
+<!-- ============================================================ -->
+<section id="keeloq">
+<h2>5. KeeLoq packet anatomy — what's actually transmitted</h2>
+<p>The 66 bits on the air every time you press a rolling-code button. Hover a section to see what it is.</p>
+
+<div class="panel">
+  <svg viewBox="0 0 1100 380" id="keeloq-svg">
+    <!-- Title -->
+    <text x="550" y="20" text-anchor="middle" font-size="14" fill="#d6e1ec">HCS301 KeeLoq transmission — 66 bits per press</text>
+
+    <!-- Top-row: ingredients -->
+    <g font-family="JetBrains Mono, monospace" font-size="11">
+      <!-- Counter -->
+      <rect x="40" y="60" width="160" height="60" rx="6" fill="#1a232e" stroke="#ffb547"/>
+      <text x="120" y="82" text-anchor="middle" fill="#ffb547" font-weight="bold">16-bit counter</text>
+      <text x="120" y="100" text-anchor="middle" fill="#d6e1ec" font-size="10">increments each press</text>
+      <text x="120" y="112" text-anchor="middle" fill="#7a8ca0" font-size="9">e.g. 0x0042 → 0x0043</text>
+
+      <!-- Button bits -->
+      <rect x="220" y="60" width="140" height="60" rx="6" fill="#1a232e" stroke="#5eb6ff"/>
+      <text x="290" y="82" text-anchor="middle" fill="#5eb6ff" font-weight="bold">4 button bits</text>
+      <text x="290" y="100" text-anchor="middle" fill="#d6e1ec" font-size="10">which key pressed</text>
+      <text x="290" y="112" text-anchor="middle" fill="#7a8ca0" font-size="9">S0, S1, S2, S3</text>
+
+      <!-- Discriminator -->
+      <rect x="380" y="60" width="160" height="60" rx="6" fill="#1a232e" stroke="#00d9a0"/>
+      <text x="460" y="82" text-anchor="middle" fill="#00d9a0" font-weight="bold">12-bit discriminator</text>
+      <text x="460" y="100" text-anchor="middle" fill="#d6e1ec" font-size="10">low 12 bits of serial</text>
+      <text x="460" y="112" text-anchor="middle" fill="#7a8ca0" font-size="9">"is this for me?" check</text>
+    </g>
+
+    <!-- Arrows down to cipher -->
+    <g stroke="#7a8ca0" stroke-width="1.5" fill="none" marker-end="url(#arrow)">
+      <line x1="120" y1="120" x2="120" y2="155"/>
+      <line x1="290" y1="120" x2="290" y2="155"/>
+      <line x1="460" y1="120" x2="460" y2="155"/>
+    </g>
+    <defs>
+      <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+        <path d="M0,0 L0,6 L9,3 z" fill="#7a8ca0"/>
+      </marker>
+    </defs>
+
+    <!-- KeeLoq block cipher -->
+    <rect x="40" y="160" width="500" height="60" rx="8" fill="#3a1a2a" stroke="#ff5a6e" stroke-width="2"/>
+    <text x="290" y="184" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="13" fill="#ff5a6e" font-weight="bold">KeeLoq block cipher</text>
+    <text x="290" y="204" text-anchor="middle" font-size="11" fill="#d6e1ec">32-bit Feistel-like, 528 rounds, NLFSR</text>
+
+    <!-- Key into cipher (from side) -->
+    <rect x="580" y="160" width="180" height="60" rx="6" fill="#1a232e" stroke="#ff5a6e"/>
+    <text x="670" y="184" text-anchor="middle" fill="#ff5a6e" font-family="JetBrains Mono, monospace" font-weight="bold">64-bit secret key</text>
+    <text x="670" y="200" text-anchor="middle" fill="#d6e1ec" font-size="10">derived from master + serial</text>
+    <text x="670" y="212" text-anchor="middle" fill="#7a8ca0" font-size="9">shared with receiver</text>
+    <g stroke="#ff5a6e" stroke-width="1.5" fill="none" marker-end="url(#arrow-red)">
+      <line x1="580" y1="190" x2="545" y2="190"/>
+    </g>
+    <defs>
+      <marker id="arrow-red" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+        <path d="M0,0 L0,6 L9,3 z" fill="#ff5a6e"/>
+      </marker>
+    </defs>
+
+    <!-- Arrow down to ciphertext -->
+    <line x1="290" y1="220" x2="290" y2="255" stroke="#7a8ca0" stroke-width="1.5" marker-end="url(#arrow)" fill="none"/>
+
+    <!-- Ciphertext -->
+    <rect x="40" y="260" width="500" height="50" rx="6" fill="#1a232e" stroke="#ff5a6e"/>
+    <text x="290" y="282" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="12" fill="#ff5a6e" font-weight="bold">32-bit ciphertext (encrypted)</text>
+    <text x="290" y="300" text-anchor="middle" fill="#7a8ca0" font-size="10">no two presses look alike</text>
+
+    <!-- Plus serial + button + status -->
+    <rect x="555" y="260" width="120" height="50" rx="6" fill="#1a232e" stroke="#00d9a0"/>
+    <text x="615" y="280" text-anchor="middle" fill="#00d9a0" font-size="11" font-weight="bold">28-bit serial</text>
+    <text x="615" y="296" text-anchor="middle" fill="#7a8ca0" font-size="9">(plaintext)</text>
+
+    <rect x="690" y="260" width="60" height="50" rx="6" fill="#1a232e" stroke="#5eb6ff"/>
+    <text x="720" y="280" text-anchor="middle" fill="#5eb6ff" font-size="10" font-weight="bold">4-bit btn</text>
+    <text x="720" y="296" text-anchor="middle" fill="#7a8ca0" font-size="9">(plain)</text>
+
+    <rect x="765" y="260" width="55" height="50" rx="6" fill="#1a232e" stroke="#ffb547"/>
+    <text x="792" y="280" text-anchor="middle" fill="#ffb547" font-size="10" font-weight="bold">2 status</text>
+    <text x="792" y="296" text-anchor="middle" fill="#7a8ca0" font-size="9">VLOW/RPT</text>
+
+    <!-- Final packet -->
+    <text x="550" y="335" text-anchor="middle" font-size="12" fill="#d6e1ec">↓</text>
+    <rect x="40" y="345" width="780" height="30" rx="4" fill="#0a0f14" stroke="#00d9a0" stroke-width="2"/>
+    <text x="430" y="365" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" fill="#00d9a0">66-bit OOK or FSK transmission @ ~433 / 315 MHz</text>
+  </svg>
+
+  <div class="callout warn">
+    <strong>Why replay fails:</strong> the ciphertext is bound to the counter, which only goes up. The receiver tracks the highest counter it has ever accepted and rejects anything ≤ that. A captured packet, replayed, is rejected before its plaintext is even unpacked.
+  </div>
+
+  <details>
+    <summary>Side note — KeeLoq's historical break (Eisenbarth et al., 2008)</summary>
+    <p style="font-size: 13px;">Academic teams extracted the <em>manufacturer master key</em> from a single receiver via differential power analysis (a side-channel attack on the receiver, not the cipher itself). With the master key + a serial number from a captured packet, you can derive any remote's 64-bit secret in that brand's ecosystem and clone arbitrarily. Patched in modern variants by using per-deployment masters rather than a globally-shared master.</p>
+  </details>
+</div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- 6. ROLLJAM ATTACK TIMELINE -->
+<!-- ============================================================ -->
+<section id="rolljam">
+<h2>6. RollJam — the only practical attack on naive rolling codes</h2>
+<p>Samy Kamkar's 2015 attack against rolling-code remotes that lack timestamps. Step through the sequence below.</p>
+
+<div class="panel">
+  <div class="controls">
+    <button id="rolljam-prev">◀ prev step</button>
+    <button id="rolljam-next" class="primary">next step ▶</button>
+    <button id="rolljam-reset">reset</button>
+    <span style="margin-left:auto; color: var(--muted); font-size: 12px;">Step <span id="rolljam-step-num">0</span> / 7</span>
+  </div>
+
+  <svg viewBox="0 0 1100 320" id="rolljam-svg">
+    <!-- Three actor lanes -->
+    <g font-family="JetBrains Mono, monospace" font-size="11">
+      <!-- User (Remote) -->
+      <rect x="20" y="20" width="120" height="280" rx="6" fill="#0a0f14" stroke="#5eb6ff" stroke-width="1"/>
+      <text x="80" y="40" text-anchor="middle" fill="#5eb6ff" font-weight="bold">User + Remote</text>
+      <text x="80" y="55" text-anchor="middle" fill="#7a8ca0" font-size="10">target</text>
+
+      <!-- Attacker (RollJam device) -->
+      <rect x="480" y="20" width="140" height="280" rx="6" fill="#0a0f14" stroke="#ff5a6e" stroke-width="1"/>
+      <text x="550" y="40" text-anchor="middle" fill="#ff5a6e" font-weight="bold">Attacker (RollJam)</text>
+      <text x="550" y="55" text-anchor="middle" fill="#7a8ca0" font-size="10">jammer + capture</text>
+
+      <!-- Receiver -->
+      <rect x="960" y="20" width="120" height="280" rx="6" fill="#0a0f14" stroke="#00d9a0" stroke-width="1"/>
+      <text x="1020" y="40" text-anchor="middle" fill="#00d9a0" font-weight="bold">Receiver</text>
+      <text x="1020" y="55" text-anchor="middle" fill="#7a8ca0" font-size="10">garage / car</text>
+    </g>
+
+    <!-- Step messages — controlled by JS -->
+    <g id="rolljam-actions"></g>
+
+    <!-- Counter state display -->
+    <text x="80" y="280" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#5eb6ff">remote counter: <tspan id="counter-remote">42</tspan></text>
+    <text x="550" y="280" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#ff5a6e">stash: <tspan id="counter-stash">[empty]</tspan></text>
+    <text x="1020" y="280" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#00d9a0">last accepted: <tspan id="counter-rx">41</tspan></text>
+  </svg>
+
+  <div id="rolljam-narration" class="callout" style="min-height: 60px;">
+    <strong style="color: var(--accent);">Step 0:</strong> Initial state. Remote counter at 42 (next press will transmit). Receiver has accepted up through counter 41. Attacker has nothing.
+  </div>
+
+  <div class="callout warn">
+    <strong>Defense against RollJam:</strong> (1) <strong>two-way protocols</strong> — the receiver responds, the remote knows whether the press took effect; (2) <strong>tight resync windows</strong> — drop a counter older than N seconds; (3) <strong>timestamps in the payload</strong> — packet expires after a few seconds. Modern Chamberlain Security+ 2.0, Hörmann BiSecur, and most post-2018 systems use one or more of these.
+  </div>
+</div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- 7. BRUTE FORCE MATH -->
+<!-- ============================================================ -->
+<section id="brute-force">
+<h2>7. Brute-force math — why it never works for RF</h2>
+<p>People intuit "computers are fast, just try all codes." For RF, the limit isn't compute — it's TX duty cycle. Each code takes ~100 ms to transmit and wait for receiver acknowledgement. Slide the bits to see why Lab 2.7 ends in failure by design.</p>
+
+<div class="panel">
+  <div class="controls">
+    <label>Keyspace (bits): <strong id="bf-bits-label">24</strong></label>
+    <input type="range" id="bf-bits" min="8" max="64" value="24" style="width: 250px;">
+    <label>TX rate (codes/sec): <strong id="bf-rate-label">10</strong></label>
+    <input type="range" id="bf-rate" min="1" max="1000" value="10" style="width: 200px;">
+  </div>
+
+  <div class="grid-3">
+    <div class="panel panel-tight" style="margin: 0;">
+      <div style="color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.6px;">Total codes</div>
+      <div class="mono" style="font-size: 22px; color: var(--accent); margin-top: 4px;" id="bf-total">16,777,216</div>
+      <div class="caption">2<sup id="bf-exp">24</sup></div>
+    </div>
+    <div class="panel panel-tight" style="margin: 0;">
+      <div style="color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.6px;">Time to enumerate (mean)</div>
+      <div class="mono" style="font-size: 22px; color: var(--warn); margin-top: 4px;" id="bf-time">19.4 days</div>
+      <div class="caption">at <span id="bf-rate-caption">10</span> codes/sec, halfway through keyspace</div>
+    </div>
+    <div class="panel panel-tight" style="margin: 0;">
+      <div style="color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.6px;">Realistic verdict</div>
+      <div style="font-size: 14px; margin-top: 4px;" id="bf-verdict">⚠️ Long. Probably not in one session.</div>
+    </div>
+  </div>
+
+  <table style="margin-top: 24px;">
+    <thead>
+      <tr><th>Real-world keyspace</th><th>Bits</th><th>Codes</th><th>Time @ 10/s</th><th>Verdict</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>PT2262 with 3-state pins</td><td>~13</td><td>~8,192</td><td>~14 min</td><td><span class="badge warn">borderline</span></td></tr>
+      <tr><td>Holtek HT12 (12-bit address)</td><td>12</td><td>4,096</td><td>~7 min</td><td><span class="badge bad">trivial</span></td></tr>
+      <tr><td>HID Prox 26-bit (with known facility)</td><td>16</td><td>65,536</td><td>~1.8 hr</td><td><span class="badge warn">feasible</span></td></tr>
+      <tr><td>EM4100 40-bit serial</td><td>40</td><td>1.1 × 10¹²</td><td>~3,500 years</td><td><span class="badge ok">impractical</span></td></tr>
+      <tr><td>Princeton 24-bit raw</td><td>24</td><td>16.7 M</td><td>~19 days</td><td><span class="badge ok">infeasible in session</span></td></tr>
+      <tr><td>KeeLoq 64-bit key</td><td>64</td><td>1.8 × 10¹⁹</td><td>~58 billion years</td><td><span class="badge ok">heat death of universe</span></td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <strong>The realistic attack on fixed-code remotes</strong> is not brute force — it's <strong>pattern targeting</strong>. The Sub-GHz Bruteforcer FAP iterates known DIP-switch patterns, common factory-default addresses, and the small subset of codes a given installer batch was likely to use. That cuts 24-bit keyspaces from "weeks" to "minutes" for plausible cases. Generic brute force remains useless.
+  </div>
+</div>
+</section>
+
+
+<p style="margin-top: 48px; color: var(--muted); font-size: 12px;">
+  Curriculum source: <span style="opacity:0.55;cursor:default" title="Source lives in the private workspace">02-sub-ghz.md</span> · Back to <a href="index.html">visuals hub</a> · <span style="opacity:0.55;cursor:default" title="Source lives in the private workspace">phase index</span>
+</p>
+
+
+<!-- ============================================================ -->
+<!-- SCRIPTS -->
+<!-- ============================================================ -->
+<script>
+// ============== 1. BAND MAP ==============
+document.querySelectorAll('.band-marker').forEach(m => {
+  m.addEventListener('mouseenter', () => {
+    document.getElementById('band-info').innerHTML = '<strong style="color: var(--accent);">' + m.dataset.info.split(' — ')[0] + '</strong> — ' + m.dataset.info.split(' — ').slice(1).join(' — ');
+  });
+});
+
+// ============== 2. MODULATION ==============
+const MOD_BITS = 8;
+let modBits = [1,0,1,1,0,1,0,0];
+
+function renderModBits() {
+  const container = document.getElementById('mod-bits');
+  container.innerHTML = '';
+  modBits.forEach((b, i) => {
+    const el = document.createElement('div');
+    el.className = 'bit ' + (b ? 'on' : '');
+    el.textContent = b;
+    el.onclick = () => { modBits[i] = 1 - modBits[i]; renderModBits(); drawMod(); };
+    container.appendChild(el);
+  });
+}
+
+function drawMod() {
+  drawOOK();
+  drawFSK();
+}
+
+function drawOOK() {
+  const c = document.getElementById('ook-canvas');
+  const ctx = c.getContext('2d');
+  const W = c.width, H = c.height;
+  ctx.clearRect(0,0,W,H);
+  // background grid
+  ctx.fillStyle = '#0a0f14';
+  ctx.fillRect(0,0,W,H);
+
+  const bitWidth = (W - 80) / MOD_BITS;
+  const baseline = H / 2;
+  const amplitude = H * 0.35;
+  const cyclesPerBit = 8;
+
+  // bit boundaries
+  ctx.strokeStyle = '#243140';
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= MOD_BITS; i++) {
+    ctx.beginPath();
+    ctx.moveTo(40 + i * bitWidth, 10);
+    ctx.lineTo(40 + i * bitWidth, H - 30);
+    ctx.stroke();
+  }
+
+  // baseline
+  ctx.strokeStyle = '#2a3744';
+  ctx.beginPath();
+  ctx.moveTo(40, baseline);
+  ctx.lineTo(W - 40, baseline);
+  ctx.stroke();
+
+  // waveform
+  ctx.strokeStyle = '#00d9a0';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  let started = false;
+  for (let x = 0; x <= W - 80; x++) {
+    const bitIdx = Math.floor(x / bitWidth);
+    const bit = modBits[bitIdx];
+    const phase = (x / bitWidth) * cyclesPerBit * Math.PI * 2;
+    let y;
+    if (bit === 1) {
+      y = baseline - amplitude * Math.sin(phase);
+    } else {
+      y = baseline;
+    }
+    if (!started) { ctx.moveTo(40 + x, y); started = true; }
+    else ctx.lineTo(40 + x, y);
+  }
+  ctx.stroke();
+
+  // bit labels
+  ctx.fillStyle = '#7a8ca0';
+  ctx.font = '11px JetBrains Mono, monospace';
+  ctx.textAlign = 'center';
+  for (let i = 0; i < MOD_BITS; i++) {
+    ctx.fillStyle = modBits[i] ? '#00d9a0' : '#7a8ca0';
+    ctx.fillText(modBits[i], 40 + (i + 0.5) * bitWidth, H - 10);
+  }
+  ctx.fillStyle = '#7a8ca0';
+  ctx.textAlign = 'left';
+  ctx.fillText('TX:', 8, baseline + 4);
+}
+
+function drawFSK() {
+  const c = document.getElementById('fsk-canvas');
+  const ctx = c.getContext('2d');
+  const W = c.width, H = c.height;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle = '#0a0f14';
+  ctx.fillRect(0,0,W,H);
+
+  const bitWidth = (W - 80) / MOD_BITS;
+  const baseline = H / 2;
+  const amplitude = H * 0.35;
+
+  // bit boundaries
+  ctx.strokeStyle = '#243140';
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= MOD_BITS; i++) {
+    ctx.beginPath();
+    ctx.moveTo(40 + i * bitWidth, 10);
+    ctx.lineTo(40 + i * bitWidth, H - 30);
+    ctx.stroke();
+  }
+
+  // baseline
+  ctx.strokeStyle = '#2a3744';
+  ctx.beginPath();
+  ctx.moveTo(40, baseline);
+  ctx.lineTo(W - 40, baseline);
+  ctx.stroke();
+
+  // waveform — phase-continuous FSK
+  ctx.strokeStyle = '#5eb6ff';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  let phase = 0;
+  let started = false;
+  const f1 = 12, f0 = 6; // cycles per bit
+  for (let x = 0; x <= W - 80; x++) {
+    const bitIdx = Math.floor(x / bitWidth);
+    const bit = modBits[bitIdx];
+    const freq = bit === 1 ? f1 : f0;
+    const dPhase = (freq / bitWidth) * Math.PI * 2;
+    phase += dPhase;
+    const y = baseline - amplitude * Math.sin(phase);
+    if (!started) { ctx.moveTo(40 + x, y); started = true; }
+    else ctx.lineTo(40 + x, y);
+  }
+  ctx.stroke();
+
+  // bit labels
+  ctx.font = '11px JetBrains Mono, monospace';
+  ctx.textAlign = 'center';
+  for (let i = 0; i < MOD_BITS; i++) {
+    ctx.fillStyle = modBits[i] ? '#5eb6ff' : '#7a8ca0';
+    ctx.fillText(modBits[i], 40 + (i + 0.5) * bitWidth, H - 10);
+  }
+  ctx.fillStyle = '#7a8ca0';
+  ctx.textAlign = 'left';
+  ctx.fillText('TX:', 8, baseline + 4);
+}
+
+document.getElementById('mod-randomize').onclick = () => {
+  modBits = Array.from({length: MOD_BITS}, () => Math.random() < 0.5 ? 1 : 0);
+  renderModBits(); drawMod();
+};
+document.getElementById('mod-clear').onclick = () => {
+  modBits = Array(MOD_BITS).fill(0);
+  renderModBits(); drawMod();
+};
+document.getElementById('mod-set').onclick = () => {
+  modBits = Array(MOD_BITS).fill(1);
+  renderModBits(); drawMod();
+};
+renderModBits();
+drawMod();
+
+
+// ============== 3. ENCODING ==============
+const ENC_BITS = 8;
+let encBits = [1,0,1,1,0,0,1,0];
+
+function renderEncBits() {
+  const container = document.getElementById('enc-bits');
+  container.innerHTML = '';
+  encBits.forEach((b, i) => {
+    const el = document.createElement('div');
+    el.className = 'bit ' + (b ? 'on' : '');
+    el.textContent = b;
+    el.onclick = () => { encBits[i] = 1 - encBits[i]; renderEncBits(); drawAllEnc(); };
+    container.appendChild(el);
+  });
+}
+
+function drawSquareWave(canvasId, color, getYForX) {
+  const c = document.getElementById(canvasId);
+  const ctx = c.getContext('2d');
+  const W = c.width, H = c.height;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle = '#0a0f14';
+  ctx.fillRect(0,0,W,H);
+
+  const bitWidth = (W - 80) / ENC_BITS;
+  const high = H * 0.25;
+  const low = H * 0.75;
+
+  // bit boundaries
+  ctx.strokeStyle = '#243140';
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= ENC_BITS; i++) {
+    ctx.setLineDash([2, 3]);
+    ctx.beginPath();
+    ctx.moveTo(40 + i * bitWidth, 5);
+    ctx.lineTo(40 + i * bitWidth, H - 25);
+    ctx.stroke();
+  }
+  ctx.setLineDash([]);
+
+  // midline
+  ctx.strokeStyle = '#1a232e';
+  ctx.beginPath();
+  ctx.moveTo(40, H / 2);
+  ctx.lineTo(W - 40, H / 2);
+  ctx.stroke();
+
+  // waveform
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  let started = false;
+  let prevY = null;
+  for (let x = 0; x <= W - 80; x++) {
+    const y = getYForX(x, bitWidth, high, low);
+    if (!started) { ctx.moveTo(40 + x, y); started = true; prevY = y; }
+    else {
+      if (y !== prevY) {
+        ctx.lineTo(40 + x, prevY);
+        ctx.lineTo(40 + x, y);
+      } else {
+        ctx.lineTo(40 + x, y);
+      }
+      prevY = y;
+    }
+  }
+  ctx.stroke();
+
+  // labels
+  ctx.font = '11px JetBrains Mono, monospace';
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#7a8ca0';
+  for (let i = 0; i < ENC_BITS; i++) {
+    ctx.fillStyle = encBits[i] ? color : '#7a8ca0';
+    ctx.fillText(encBits[i], 40 + (i + 0.5) * bitWidth, H - 8);
+  }
+  ctx.fillStyle = '#7a8ca0';
+  ctx.textAlign = 'right';
+  ctx.fillText('1', 32, high + 4);
+  ctx.fillText('0', 32, low + 4);
+}
+
+function drawAllEnc() {
+  // NRZ: high for 1, low for 0
+  drawSquareWave('nrz-canvas', '#5eb6ff', (x, bw, hi, lo) => {
+    const i = Math.floor(x / bw);
+    return encBits[i] === 1 ? hi : lo;
+  });
+  // Manchester (IEEE convention): 1 = high→low, 0 = low→high
+  drawSquareWave('manchester-canvas', '#00d9a0', (x, bw, hi, lo) => {
+    const i = Math.floor(x / bw);
+    const frac = (x % bw) / bw;
+    const bit = encBits[i];
+    if (bit === 1) return frac < 0.5 ? hi : lo;
+    else return frac < 0.5 ? lo : hi;
+  });
+  // PWM: 1 = long high (~75%) + short low, 0 = short high (~25%) + long low
+  drawSquareWave('pwm-canvas', '#ffb547', (x, bw, hi, lo) => {
+    const i = Math.floor(x / bw);
+    const frac = (x % bw) / bw;
+    const bit = encBits[i];
+    if (bit === 1) return frac < 0.75 ? hi : lo;
+    else return frac < 0.25 ? hi : lo;
+  });
+}
+
+document.getElementById('enc-randomize').onclick = () => {
+  encBits = Array.from({length: ENC_BITS}, () => Math.random() < 0.5 ? 1 : 0);
+  renderEncBits(); drawAllEnc();
+};
+document.getElementById('enc-pattern').onclick = () => {
+  encBits = [0,1,0,1,0,1,0,1];
+  renderEncBits(); drawAllEnc();
+};
+document.getElementById('enc-pattern2').onclick = () => {
+  encBits = [1,1,1,1,0,0,0,0];
+  renderEncBits(); drawAllEnc();
+};
+renderEncBits();
+drawAllEnc();
+
+
+// ============== 4. FIXED VS ROLLING ==============
+const FIXED_CODE = '101010 110011 010101 110100';
+let rollingCounter = 0x0042;
+let pressCount = 0;
+
+function hexCipher(counter) {
+  // Pseudo-realistic ciphertext: deterministic but visually scrambled based on counter
+  let h = 0;
+  let v = counter;
+  for (let i = 0; i < 8; i++) {
+    v = ((v * 1103515245) + 12345) & 0x7fffffff;
+    h = (h ^ v) & 0xffffffff;
+  }
+  return ('00000000' + (h >>> 0).toString(16)).slice(-8).toUpperCase();
+}
+
+document.getElementById('press-fixed').onclick = () => {
+  pressCount++;
+  const log = document.getElementById('fixed-log');
+  if (pressCount === 1) log.innerHTML = '';
+  log.innerHTML += `<div style="margin-bottom: 6px;">
+    <span style="color: var(--muted); font-size: 11px;">press #${pressCount}:</span><br>
+    <span style="color: var(--accent);">${FIXED_CODE}</span> <span style="color: var(--muted); font-size: 11px;">(24 bits)</span>
+  </div>`;
+};
+
+document.getElementById('press-rolling').onclick = () => {
+  rollingCounter++;
+  const cipher = hexCipher(rollingCounter);
+  const serial = '4F23A91';
+  const btn = 'S1';
+  const log = document.getElementById('rolling-log');
+  if (rollingCounter === 0x0043) log.innerHTML = '';
+  log.innerHTML += `<div style="margin-bottom: 6px;">
+    <span style="color: var(--muted); font-size: 11px;">press #${rollingCounter - 0x0042} (counter ${'0x'+rollingCounter.toString(16).toUpperCase()}):</span><br>
+    <span style="color: var(--warn);">${cipher}</span><span style="color:var(--accent);">${serial}</span><span style="color:var(--accent-2);">${btn}</span>
+    <span style="color: var(--muted); font-size: 11px;"> (cipher / serial / btn)</span>
+  </div>`;
+};
+
+document.getElementById('reset-codes').onclick = () => {
+  pressCount = 0;
+  rollingCounter = 0x0042;
+  document.getElementById('fixed-log').innerHTML = '<span style="color: var(--muted);">No presses yet. Click "Press fixed-code remote".</span>';
+  document.getElementById('rolling-log').innerHTML = '<span style="color: var(--muted);">No presses yet. Click "Press rolling-code remote".</span>';
+};
+
+
+// ============== 6. ROLLJAM TIMELINE ==============
+const ROLLJAM_STEPS = [
+  {
+    title: 'Step 0 — Initial state',
+    text: 'Remote counter at 42 (next press will transmit). Receiver has accepted up through counter 41. Attacker has nothing.',
+    remote: 42, stash: '[empty]', rx: 41,
+    arrows: []
+  },
+  {
+    title: 'Step 1 — User presses remote (1st time)',
+    text: 'User presses; remote transmits packet with counter 42. Attacker is nearby with a jammer on the receiver\'s frequency.',
+    remote: 43, stash: '[empty]', rx: 41,
+    arrows: [{from: 'remote', to: 'jam', label: 'TX counter=42', color: '#5eb6ff'}]
+  },
+  {
+    title: 'Step 2 — Attacker jams + captures',
+    text: 'Attacker\'s narrow jammer blocks the receiver\'s frequency. Receiver sees noise. Attacker\'s SDR is offset slightly and still hears the remote — captures counter=42 into the stash.',
+    remote: 43, stash: '{42}', rx: 41,
+    arrows: [{from: 'remote', to: 'attacker', label: 'captured', color: '#ff5a6e'}, {from: 'attacker', to: 'receiver', label: 'JAM', color: '#ff5a6e', dashed: true}]
+  },
+  {
+    title: 'Step 3 — Door doesn\'t open. User presses again.',
+    text: 'From the user\'s perspective, the remote didn\'t work (door didn\'t open). They press again. Attacker is still jamming.',
+    remote: 44, stash: '{42}', rx: 41,
+    arrows: [{from: 'remote', to: 'jam', label: 'TX counter=43', color: '#5eb6ff'}]
+  },
+  {
+    title: 'Step 4 — Attacker jams + captures #2, replays #1',
+    text: 'Attacker captures the second packet (counter=43) into stash. SIMULTANEOUSLY, attacker stops jamming and replays the FIRST captured packet (counter=42). Receiver accepts counter=42 (one ahead of last-accepted 41 — within resync window).',
+    remote: 44, stash: '{43}', rx: 42,
+    arrows: [{from: 'remote', to: 'attacker', label: 'captured', color: '#ff5a6e'}, {from: 'attacker', to: 'receiver', label: 'replay 42', color: '#ffb547'}]
+  },
+  {
+    title: 'Step 5 — Door opens. User assumes "weak signal".',
+    text: 'Door opens (counter=42 accepted). User shrugs, assumes flaky remote. Attacker still has UNUSED counter=43 in the stash, and the receiver\'s last-accepted is now 42.',
+    remote: 44, stash: '{43}', rx: 42,
+    arrows: [{from: 'receiver', to: 'door', label: 'OPEN', color: '#00d9a0'}]
+  },
+  {
+    title: 'Step 6 — Hours later: attacker returns and replays.',
+    text: 'Attacker comes back when nobody is around. Transmits the stashed counter=43 packet. Receiver compares to last-accepted (42), accepts (43 > 42, within window). Door opens.',
+    remote: 44, stash: '[used]', rx: 43,
+    arrows: [{from: 'attacker', to: 'receiver', label: 'replay 43', color: '#ffb547'}]
+  },
+  {
+    title: 'Step 7 — Compromise complete',
+    text: 'Attacker had clean physical access to the protected space. User has no detectable signal — counter sequence appears legitimate. Defense requires two-way protocol, timestamp validation, or aggressive resync window collapse.',
+    remote: 44, stash: '[done]', rx: 43,
+    arrows: []
+  }
+];
+
+let rollJamStep = 0;
+
+function drawRollJamArrows(arrows) {
+  const g = document.getElementById('rolljam-actions');
+  g.innerHTML = '';
+  let yBase = 80;
+  arrows.forEach((a, idx) => {
+    const y = yBase + idx * 50;
+    const positions = {
+      remote: 140,
+      attacker: 480,
+      jam: 480,
+      receiver: 960,
+      door: 1060
+    };
+    let x1 = positions[a.from], x2 = positions[a.to];
+    if (a.to === 'jam') x2 = 460;
+    if (a.from === 'attacker' && a.to === 'receiver') { x1 = 620; }
+    if (a.from === 'remote' && a.to === 'attacker') { x1 = 140; x2 = 480; }
+    const dash = a.dashed ? '6,4' : 'none';
+    g.innerHTML += `
+      <line x1="${x1}" y1="${y}" x2="${x2}" y2="${y}" stroke="${a.color}" stroke-width="2" stroke-dasharray="${dash}" marker-end="url(#rj-arrow-${idx})"/>
+      <text x="${(x1+x2)/2}" y="${y - 6}" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="${a.color}">${a.label}</text>
+      <defs><marker id="rj-arrow-${idx}" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="${a.color}"/></marker></defs>
+    `;
+  });
+}
+
+function updateRollJam() {
+  const s = ROLLJAM_STEPS[rollJamStep];
+  document.getElementById('rolljam-step-num').textContent = rollJamStep;
+  document.getElementById('counter-remote').textContent = s.remote;
+  document.getElementById('counter-stash').textContent = s.stash;
+  document.getElementById('counter-rx').textContent = s.rx;
+  document.getElementById('rolljam-narration').innerHTML =
+    '<strong style="color: var(--accent);">' + s.title + '</strong><br>' + s.text;
+  drawRollJamArrows(s.arrows);
+}
+
+document.getElementById('rolljam-next').onclick = () => {
+  if (rollJamStep < ROLLJAM_STEPS.length - 1) { rollJamStep++; updateRollJam(); }
+};
+document.getElementById('rolljam-prev').onclick = () => {
+  if (rollJamStep > 0) { rollJamStep--; updateRollJam(); }
+};
+document.getElementById('rolljam-reset').onclick = () => {
+  rollJamStep = 0; updateRollJam();
+};
+updateRollJam();
+
+
+// ============== 7. BRUTE FORCE MATH ==============
+function fmtBig(n) {
+  if (n < 1e6) return n.toLocaleString();
+  if (n < 1e9) return (n / 1e6).toFixed(1) + ' M';
+  if (n < 1e12) return (n / 1e9).toFixed(1) + ' B';
+  if (n < 1e15) return (n / 1e12).toFixed(1) + ' T';
+  return n.toExponential(2);
+}
+
+function fmtTime(seconds) {
+  if (seconds < 60) return seconds.toFixed(1) + ' s';
+  if (seconds < 3600) return (seconds / 60).toFixed(1) + ' min';
+  if (seconds < 86400) return (seconds / 3600).toFixed(1) + ' hr';
+  if (seconds < 31557600) return (seconds / 86400).toFixed(1) + ' days';
+  if (seconds < 31557600 * 1e3) return (seconds / 31557600).toFixed(1) + ' yr';
+  if (seconds < 31557600 * 1e6) return (seconds / (31557600 * 1e3)).toFixed(2) + 'k yr';
+  if (seconds < 31557600 * 1e9) return (seconds / (31557600 * 1e6)).toFixed(2) + 'M yr';
+  return (seconds / (31557600 * 1e9)).toExponential(2) + 'G yr';
+}
+
+function verdictFor(timeS) {
+  if (timeS < 60) return '<span style="color: var(--danger);">⚠ TRIVIAL — minutes</span>';
+  if (timeS < 3600) return '<span style="color: var(--danger);">⚠ Feasible in a session</span>';
+  if (timeS < 86400) return '<span style="color: var(--warn);">⚠ Overnight job — feasible</span>';
+  if (timeS < 86400 * 30) return '<span style="color: var(--warn);">Borderline — weeks</span>';
+  if (timeS < 86400 * 365 * 100) return '<span style="color: var(--accent);">✓ Infeasible — years</span>';
+  return '<span style="color: var(--accent);">✓ Cryptographic infeasibility</span>';
+}
+
+function updateBF() {
+  const bits = parseInt(document.getElementById('bf-bits').value);
+  const rate = parseInt(document.getElementById('bf-rate').value);
+  const total = Math.pow(2, bits);
+  const meanS = total / rate / 2;
+  document.getElementById('bf-bits-label').textContent = bits;
+  document.getElementById('bf-rate-label').textContent = rate;
+  document.getElementById('bf-rate-caption').textContent = rate;
+  document.getElementById('bf-total').textContent = fmtBig(total);
+  document.getElementById('bf-exp').textContent = bits;
+  document.getElementById('bf-time').textContent = fmtTime(meanS);
+  document.getElementById('bf-verdict').innerHTML = verdictFor(meanS);
+}
+document.getElementById('bf-bits').oninput = updateBF;
+document.getElementById('bf-rate').oninput = updateBF;
+updateBF();
+</script>
+
+</body>
+</html>

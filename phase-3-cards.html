@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Phase 3 — Card Technologies (visuals)</title>
+<style>
+  :root {
+    --bg: #0b0f14;
+    --panel: #131a23;
+    --panel-2: #1a232e;
+    --line: #2a3744;
+    --text: #d6e1ec;
+    --muted: #7a8ca0;
+    --accent: #00d9a0;
+    --accent-2: #5eb6ff;
+    --warn: #ffb547;
+    --danger: #ff5a6e;
+    --purple: #c084fc;
+    --mono: "JetBrains Mono", "Fira Code", Consolas, monospace;
+    --sans: -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.55; }
+  body { max-width: 1180px; margin: 0 auto; padding: 32px 24px 80px; }
+  h1 { font-size: 28px; margin: 0 0 4px; }
+  h2 { font-size: 22px; margin: 0 0 8px; color: var(--accent); border-left: 3px solid var(--accent); padding-left: 12px; }
+  h3 { font-size: 16px; margin: 18px 0 8px; color: var(--accent-2); }
+  p { margin: 8px 0; }
+  a { color: var(--accent-2); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .breadcrumb { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 20px; margin: 16px 0 32px; }
+  .panel-tight { padding: 14px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12px; color: var(--muted); margin: 8px 0; }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .swatch { width: 14px; height: 14px; border-radius: 3px; }
+  .controls { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; padding: 10px 12px; background: var(--panel-2); border-radius: 6px; margin-bottom: 12px; font-size: 13px; }
+  button { background: var(--panel-2); color: var(--text); border: 1px solid var(--line); padding: 6px 14px; border-radius: 5px; cursor: pointer; font-family: var(--sans); font-size: 13px; transition: all 0.15s; }
+  button:hover { border-color: var(--accent); color: var(--accent); }
+  button.primary { background: var(--accent); color: #001a14; border-color: var(--accent); font-weight: 600; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-family: var(--mono); margin: 0 2px; }
+  .badge.ok { background: rgba(0,217,160,0.15); color: var(--accent); border: 1px solid var(--accent); }
+  .badge.warn { background: rgba(255,181,71,0.15); color: var(--warn); border: 1px solid var(--warn); }
+  .badge.bad { background: rgba(255,90,110,0.15); color: var(--danger); border: 1px solid var(--danger); }
+  .badge.purple { background: rgba(192,132,252,0.15); color: var(--purple); border: 1px solid var(--purple); }
+  table { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 13px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+  th { color: var(--muted); font-weight: 500; font-size: 11px; text-transform: uppercase; letter-spacing: 0.6px; }
+  td.mono, .mono { font-family: var(--mono); }
+  .caption { font-size: 12px; color: var(--muted); margin-top: 6px; font-style: italic; }
+  .callout { background: rgba(94,182,255,0.08); border-left: 3px solid var(--accent-2); padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; font-size: 13px; }
+  .callout.warn { background: rgba(255,181,71,0.08); border-color: var(--warn); }
+  .callout.danger { background: rgba(255,90,110,0.08); border-color: var(--danger); }
+  svg { display: block; max-width: 100%; }
+  .nav-toc { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px 18px; margin-bottom: 24px; font-size: 14px; }
+  .nav-toc ol { margin: 6px 0 0; padding-left: 24px; }
+  .nav-toc li { margin: 3px 0; }
+  details { margin: 8px 0; }
+  summary { cursor: pointer; color: var(--accent-2); font-size: 13px; user-select: none; }
+  /* Bit display */
+  .bitrow { display: flex; flex-wrap: wrap; gap: 0; margin: 4px 0; }
+  .bit-cell { width: 22px; height: 28px; display: inline-flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 12px; font-weight: 600; border-right: 1px solid #0a0f14; cursor: help; }
+  .bit-cell:first-child { border-left: 1px solid #0a0f14; }
+  .bit-cell.header { background: rgba(94,182,255,0.3); color: #d6e1ec; }
+  .bit-cell.facility { background: rgba(0,217,160,0.4); color: #001a14; }
+  .bit-cell.card { background: rgba(255,181,71,0.4); color: #001a14; }
+  .bit-cell.parity { background: rgba(192,132,252,0.4); color: #001a14; }
+  .bit-cell.stop { background: rgba(255,90,110,0.4); color: #001a14; }
+  /* MIFARE grid */
+  .mfg-sector { background: var(--panel-2); border: 1px solid var(--line); border-radius: 4px; padding: 6px; margin-bottom: 6px; cursor: pointer; transition: all 0.15s; }
+  .mfg-sector:hover { border-color: var(--accent); }
+  .mfg-sector.cracked { border-color: var(--accent); background: rgba(0,217,160,0.08); }
+  .mfg-sector.attempted { border-color: var(--warn); background: rgba(255,181,71,0.08); }
+  .mfg-sector.locked { border-color: var(--danger); background: rgba(255,90,110,0.05); }
+  .mfg-block { font-family: var(--mono); font-size: 10px; color: var(--muted); padding: 2px 0; }
+  .mfg-block.trailer { color: var(--danger); }
+  .mfg-block.data { color: var(--text); }
+  .mfg-block.unread { color: #3a4754; }
+  .pill { display: inline-block; background: var(--panel-2); border: 1px solid var(--line); padding: 3px 10px; border-radius: 12px; font-size: 11px; font-family: var(--mono); margin: 0 4px 4px 0; }
+</style>
+</head>
+<body>
+
+<div class="breadcrumb">
+  <a href="index.html">visuals</a> &nbsp;/&nbsp; Phase 3 &nbsp;/&nbsp; Card Technologies
+</div>
+
+<h1>Phase 3 — Card Technologies (LF RFID + HF NFC)</h1>
+<p style="color: var(--muted); margin: 0 0 24px;">Interactive visualizations for the two contactless families. The dividing line: pre-2005 systems = LF, trivial. Post-2010 + budget = HF DESFire, unclonable. The middle ground (MIFARE Classic) is where the interesting attacks live.</p>
+
+<div class="nav-toc">
+  <strong style="color: var(--accent);">On this page</strong>
+  <ol>
+    <li><a href="#lf-vs-hf">LF vs HF — physics, range, capability</a></li>
+    <li><a href="#em4100">EM4100 packet anatomy</a> — every bit of a 64-bit transmission</li>
+    <li><a href="#nfc-family">NFC family tree</a> — what's broken, what isn't</li>
+    <li><a href="#mifare-memory">MIFARE Classic memory map</a> — 16 sectors, 4 blocks each, interactive</li>
+    <li><a href="#crypto1-attacks">Crypto1 attack ladder</a> — dictionary → nested → hardnested → mfkey32</li>
+    <li><a href="#emv">Why Flipper can't clone EMV</a></li>
+    <li><a href="#clone-workflow">Clone workflow — LF and HF</a></li>
+  </ol>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- 1. LF vs HF -->
+<!-- ============================================================ -->
+<section id="lf-vs-hf">
+<h2>1. LF vs HF — physics, range, capability</h2>
+<p>Both use inductive coupling (tag harvests power from reader's field). Different frequencies → different range, data rate, and protocol depth.</p>
+
+<div class="panel">
+  <svg viewBox="0 0 1100 360">
+    <!-- LF side -->
+    <g>
+      <rect x="20" y="20" width="510" height="320" rx="10" fill="#1a232e" stroke="#5eb6ff" stroke-width="2"/>
+      <text x="275" y="45" text-anchor="middle" font-size="18" fill="#5eb6ff" font-weight="bold">LF — 125 kHz</text>
+      <text x="275" y="65" text-anchor="middle" font-size="11" fill="#7a8ca0">Low Frequency RFID</text>
+
+      <!-- Reader coil -->
+      <g transform="translate(120, 180)">
+        <ellipse cx="0" cy="0" rx="60" ry="40" fill="none" stroke="#5eb6ff" stroke-width="3"/>
+        <text x="0" y="65" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#5eb6ff">reader coil</text>
+        <text x="0" y="78" text-anchor="middle" font-size="9" fill="#7a8ca0">125 kHz oscillator</text>
+      </g>
+
+      <!-- Coupling field (visual) -->
+      <g opacity="0.4">
+        <path d="M 180 180 Q 250 130, 320 180" fill="none" stroke="#5eb6ff" stroke-width="1.5"/>
+        <path d="M 180 180 Q 250 230, 320 180" fill="none" stroke="#5eb6ff" stroke-width="1.5"/>
+        <path d="M 180 180 Q 250 100, 320 180" fill="none" stroke="#5eb6ff" stroke-width="1.5" stroke-dasharray="3,2"/>
+        <path d="M 180 180 Q 250 260, 320 180" fill="none" stroke="#5eb6ff" stroke-width="1.5" stroke-dasharray="3,2"/>
+      </g>
+
+      <!-- Tag (smaller; passive) -->
+      <g transform="translate(380, 180)">
+        <rect x="-30" y="-22" width="60" height="44" rx="3" fill="#0a0f14" stroke="#5eb6ff"/>
+        <ellipse cx="0" cy="0" rx="22" ry="14" fill="none" stroke="#5eb6ff" stroke-width="2"/>
+        <circle cx="-13" cy="0" r="3" fill="#5eb6ff"/>
+        <text x="0" y="50" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#5eb6ff">EM4100 tag</text>
+        <text x="0" y="63" text-anchor="middle" font-size="9" fill="#7a8ca0">passive — no battery</text>
+      </g>
+
+      <!-- Range arrow -->
+      <g>
+        <line x1="180" y1="270" x2="350" y2="270" stroke="#7a8ca0" stroke-width="1" marker-end="url(#a-end)" marker-start="url(#a-start)"/>
+        <text x="265" y="285" text-anchor="middle" font-size="10" fill="#7a8ca0">~5–10 cm</text>
+      </g>
+
+      <!-- Specs -->
+      <g font-family="JetBrains Mono, monospace" font-size="11" fill="#d6e1ec">
+        <text x="40" y="305">data rate: <tspan fill="#5eb6ff">~2 kbps</tspan></text>
+        <text x="40" y="320">crypto: <tspan fill="#ff5a6e">none</tspan></text>
+        <text x="280" y="305">payload: <tspan fill="#5eb6ff">40-bit ID</tspan></text>
+        <text x="280" y="320">clonable: <tspan fill="#ff5a6e">YES — trivially</tspan></text>
+      </g>
+    </g>
+
+    <!-- HF side -->
+    <g>
+      <rect x="570" y="20" width="510" height="320" rx="10" fill="#1a232e" stroke="#00d9a0" stroke-width="2"/>
+      <text x="825" y="45" text-anchor="middle" font-size="18" fill="#00d9a0" font-weight="bold">HF — 13.56 MHz</text>
+      <text x="825" y="65" text-anchor="middle" font-size="11" fill="#7a8ca0">High Frequency NFC</text>
+
+      <!-- Reader coil (smaller, denser) -->
+      <g transform="translate(670, 180)">
+        <ellipse cx="0" cy="0" rx="45" ry="30" fill="none" stroke="#00d9a0" stroke-width="3"/>
+        <ellipse cx="0" cy="0" rx="38" ry="24" fill="none" stroke="#00d9a0" stroke-width="1"/>
+        <ellipse cx="0" cy="0" rx="31" ry="18" fill="none" stroke="#00d9a0" stroke-width="1"/>
+        <text x="0" y="55" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#00d9a0">reader coil</text>
+        <text x="0" y="68" text-anchor="middle" font-size="9" fill="#7a8ca0">13.56 MHz</text>
+      </g>
+
+      <!-- Field -->
+      <g opacity="0.4">
+        <path d="M 720 180 Q 780 140, 840 180" fill="none" stroke="#00d9a0" stroke-width="1.5"/>
+        <path d="M 720 180 Q 780 220, 840 180" fill="none" stroke="#00d9a0" stroke-width="1.5"/>
+      </g>
+
+      <!-- Tag (with chip) -->
+      <g transform="translate(890, 180)">
+        <rect x="-32" y="-22" width="64" height="44" rx="3" fill="#0a0f14" stroke="#00d9a0"/>
+        <ellipse cx="0" cy="0" rx="22" ry="14" fill="none" stroke="#00d9a0" stroke-width="2"/>
+        <rect x="-6" y="-6" width="12" height="12" fill="#00d9a0"/>
+        <text x="0" y="-2" text-anchor="middle" font-size="7" fill="#001a14" font-weight="bold">IC</text>
+        <text x="0" y="50" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#00d9a0">MIFARE / DESFire</text>
+        <text x="0" y="63" text-anchor="middle" font-size="9" fill="#7a8ca0">stateful, processor-class</text>
+      </g>
+
+      <!-- Range arrow -->
+      <g>
+        <line x1="720" y1="270" x2="860" y2="270" stroke="#7a8ca0" stroke-width="1" marker-end="url(#a-end)" marker-start="url(#a-start)"/>
+        <text x="790" y="285" text-anchor="middle" font-size="10" fill="#7a8ca0">~0–10 cm</text>
+      </g>
+
+      <!-- Bidirectional arrows -->
+      <g stroke="#00d9a0" stroke-width="1.5" fill="none" opacity="0.6">
+        <line x1="715" y1="175" x2="850" y2="175" marker-end="url(#a-end-g)"/>
+        <line x1="850" y1="185" x2="715" y2="185" marker-end="url(#a-end-g)"/>
+      </g>
+
+      <g font-family="JetBrains Mono, monospace" font-size="11" fill="#d6e1ec">
+        <text x="590" y="305">data rate: <tspan fill="#00d9a0">~106–848 kbps</tspan></text>
+        <text x="590" y="320">crypto: <tspan fill="#00d9a0">AES (DESFire)</tspan></text>
+        <text x="840" y="305">payload: <tspan fill="#00d9a0">KB of structured mem</tspan></text>
+        <text x="840" y="320">clonable: <tspan fill="#00d9a0">depends on family</tspan></text>
+      </g>
+    </g>
+
+    <defs>
+      <marker id="a-end" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#7a8ca0"/></marker>
+      <marker id="a-start" markerWidth="8" markerHeight="8" refX="1" refY="3" orient="auto-start-reverse"><path d="M0,0 L0,6 L8,3 z" fill="#7a8ca0"/></marker>
+      <marker id="a-end-g" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#00d9a0"/></marker>
+    </defs>
+  </svg>
+
+  <table>
+    <thead><tr><th>Property</th><th>LF (125 kHz)</th><th>HF (13.56 MHz)</th></tr></thead>
+    <tbody>
+      <tr><td>Coupling</td><td class="mono">Inductive (near-field)</td><td class="mono">Inductive (near-field)</td></tr>
+      <tr><td>Channel</td><td>Mostly one-way (tag → reader)</td><td>Bidirectional, command/response</td></tr>
+      <tr><td>Crypto in the wild</td><td><span class="badge bad">essentially none</span></td><td><span class="badge warn">optional</span> (Classic) → <span class="badge ok">AES</span> (DESFire)</td></tr>
+      <tr><td>Memory model</td><td>Fixed ID broadcast</td><td>Sectors / files with per-sector keys</td></tr>
+      <tr><td>Blank lab card</td><td class="mono">T5577 (~$1)</td><td class="mono">Magic Mifare Gen1a/Gen2 (~$2)</td></tr>
+      <tr><td>Flipper hardware</td><td>Custom analog front-end</td><td>ST25R3916 NFC IC</td></tr>
+    </tbody>
+  </table>
+</div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- 2. EM4100 PACKET ANATOMY -->
+<!-- ============================================================ -->
+<section id="em4100">
+<h2>2. EM4100 — 64-bit packet, every bit accounted for</h2>
+<p>The format that singlehandedly justified migration to HF. Hover any bit to see what it does. <strong>Note: no crypto. No challenge-response. Tag broadcasts this every read.</strong></p>
+
+<div class="panel">
+  <div class="controls">
+    <label>Facility code: <input type="number" id="em-facility" value="68" min="0" max="255" style="width: 70px; background: var(--panel-2); border: 1px solid var(--line); color: var(--text); padding: 4px 6px; border-radius: 4px;"></label>
+    <label>Card number: <input type="number" id="em-card" value="12345" min="0" max="4294967295" style="width: 110px; background: var(--panel-2); border: 1px solid var(--line); color: var(--text); padding: 4px 6px; border-radius: 4px;"></label>
+    <button id="em-random">randomize</button>
+    <span style="margin-left: auto; color: var(--muted); font-size: 12px;">64 bits = 9 header + 40 data + 14 parity + 1 stop</span>
+  </div>
+
+  <div id="em-bits-container" style="font-family: var(--mono); user-select: none;"></div>
+
+  <div class="legend" style="margin-top: 14px;">
+    <div class="legend-item"><div class="swatch" style="background:rgba(94,182,255,0.6);"></div> Header (9 × 1s)</div>
+    <div class="legend-item"><div class="swatch" style="background:rgba(0,217,160,0.6);"></div> Facility code (8 bits)</div>
+    <div class="legend-item"><div class="swatch" style="background:rgba(255,181,71,0.6);"></div> Card number (32 bits)</div>
+    <div class="legend-item"><div class="swatch" style="background:rgba(192,132,252,0.6);"></div> Row + column parity (14 bits)</div>
+    <div class="legend-item"><div class="swatch" style="background:rgba(255,90,110,0.6);"></div> Stop bit (1)</div>
+  </div>
+
+  <div class="callout">
+    <strong>Reading this:</strong> the 40 data bits are organized as 10 rows × 4 bits, each row followed by an even-parity bit. The 4 final column-parity bits cover the columns. None of this is cryptographic — it's just error detection. Anyone with a 125 kHz coil and a few hundred lines of code can clone this.
+  </div>
+
+  <details>
+    <summary>Why parity, but no crypto?</summary>
+    <p style="font-size: 13px;">EM4100 was designed in the 1990s for industrial item-tracking. The threat model was "did the noisy industrial radio environment garble the read?" not "is someone trying to clone this." Parity catches single-bit corruption from the analog channel — that's all it was meant to do. The standard never went back to add crypto because the cost (chip silicon, fab change) outweighed the perceived need until a long-after-the-fact migration to HF.</p>
+  </details>
+</div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- 3. NFC FAMILY TREE -->
+<!-- ============================================================ -->
+<section id="nfc-family">
+<h2>3. NFC family tree — what's broken, what isn't</h2>
+<p>"Is this clonable?" depends entirely on which family. Don't paint all NFC with one brush.</p>
+
+<div class="panel">
+  <svg viewBox="0 0 1100 540">
+    <!-- Root -->
+    <g>
+      <rect x="450" y="10" width="200" height="40" rx="6" fill="#1a232e" stroke="#7a8ca0"/>
+      <text x="550" y="35" text-anchor="middle" font-size="14" fill="#d6e1ec" font-weight="bold">NFC (13.56 MHz)</text>
+    </g>
+
+    <!-- Lines from root -->
+    <g stroke="#7a8ca0" stroke-width="1" fill="none">
+      <path d="M 550 50 L 550 75 L 180 75 L 180 95"/>
+      <path d="M 550 75 L 460 75 L 460 95"/>
+      <path d="M 550 75 L 730 75 L 730 95"/>
+      <path d="M 550 75 L 950 75 L 950 95"/>
+    </g>
+
+    <!-- ISO 14443A branch (left) -->
+    <g>
+      <rect x="80" y="95" width="200" height="36" rx="5" fill="#1a232e" stroke="#5eb6ff"/>
+      <text x="180" y="118" text-anchor="middle" font-size="12" fill="#5eb6ff" font-weight="bold">ISO 14443 Type A</text>
+    </g>
+    <g stroke="#5eb6ff" stroke-width="1" fill="none" opacity="0.6">
+      <path d="M 180 131 L 180 155 L 110 155 L 110 175"/>
+      <path d="M 180 155 L 180 175"/>
+      <path d="M 180 155 L 260 155 L 260 175"/>
+    </g>
+    <!-- MIFARE Classic -->
+    <g>
+      <rect x="20" y="175" width="180" height="60" rx="5" fill="#3a1a2a" stroke="#ff5a6e" stroke-width="2"/>
+      <text x="110" y="195" text-anchor="middle" font-size="11" fill="#ff5a6e" font-weight="bold">MIFARE Classic 1k/4k</text>
+      <text x="110" y="210" text-anchor="middle" font-size="9" fill="#d6e1ec">Crypto1 cipher</text>
+      <text x="110" y="225" text-anchor="middle" font-size="9" fill="#ff5a6e">BROKEN (2008)</text>
+    </g>
+    <!-- MIFARE Ultralight -->
+    <g>
+      <rect x="210" y="175" width="100" height="60" rx="5" fill="#1a232e" stroke="#ffb547" stroke-width="2"/>
+      <text x="260" y="195" text-anchor="middle" font-size="11" fill="#ffb547" font-weight="bold">Ultralight</text>
+      <text x="260" y="210" text-anchor="middle" font-size="9" fill="#d6e1ec">NTAG21x</text>
+      <text x="260" y="225" text-anchor="middle" font-size="9" fill="#ffb547">partial crypto</text>
+    </g>
+    <!-- MIFARE Plus / DESFire -->
+    <g>
+      <rect x="320" y="175" width="140" height="60" rx="5" fill="#0a2a1a" stroke="#00d9a0" stroke-width="2"/>
+      <text x="390" y="195" text-anchor="middle" font-size="11" fill="#00d9a0" font-weight="bold">MIFARE Plus</text>
+      <text x="390" y="208" text-anchor="middle" font-size="11" fill="#00d9a0" font-weight="bold">DESFire EV1/2/3</text>
+      <text x="390" y="225" text-anchor="middle" font-size="9" fill="#00d9a0">AES — SECURE</text>
+    </g>
+
+    <!-- Type B (smaller branch) -->
+    <g>
+      <rect x="380" y="95" width="160" height="36" rx="5" fill="#1a232e" stroke="#5eb6ff"/>
+      <text x="460" y="118" text-anchor="middle" font-size="12" fill="#5eb6ff" font-weight="bold">ISO 14443 Type B</text>
+    </g>
+    <g stroke="#5eb6ff" stroke-width="1" fill="none" opacity="0.6"><path d="M 460 131 L 460 175"/></g>
+    <g>
+      <rect x="380" y="175" width="160" height="60" rx="5" fill="#0a2a1a" stroke="#00d9a0" stroke-width="2"/>
+      <text x="460" y="195" text-anchor="middle" font-size="11" fill="#00d9a0" font-weight="bold">EMV credit/debit</text>
+      <text x="460" y="210" text-anchor="middle" font-size="9" fill="#d6e1ec">issuer crypto applet</text>
+      <text x="460" y="225" text-anchor="middle" font-size="9" fill="#00d9a0">UNCLONABLE</text>
+    </g>
+
+    <!-- HID iCLASS group -->
+    <g>
+      <rect x="640" y="95" width="180" height="36" rx="5" fill="#1a232e" stroke="#c084fc"/>
+      <text x="730" y="118" text-anchor="middle" font-size="12" fill="#c084fc" font-weight="bold">HID iCLASS family</text>
+    </g>
+    <g stroke="#c084fc" stroke-width="1" fill="none" opacity="0.6">
+      <path d="M 730 131 L 730 155 L 660 155 L 660 175"/>
+      <path d="M 730 155 L 730 175"/>
+      <path d="M 730 155 L 820 155 L 820 175"/>
+    </g>
+    <g>
+      <rect x="580" y="175" width="160" height="60" rx="5" fill="#3a1a2a" stroke="#ff5a6e" stroke-width="2"/>
+      <text x="660" y="195" text-anchor="middle" font-size="11" fill="#ff5a6e" font-weight="bold">iCLASS Legacy</text>
+      <text x="660" y="210" text-anchor="middle" font-size="9" fill="#d6e1ec">shared master key</text>
+      <text x="660" y="225" text-anchor="middle" font-size="9" fill="#ff5a6e">BROKEN — extracted</text>
+    </g>
+    <g>
+      <rect x="750" y="175" width="140" height="60" rx="5" fill="#1a232e" stroke="#ffb547" stroke-width="2"/>
+      <text x="820" y="195" text-anchor="middle" font-size="11" fill="#ffb547" font-weight="bold">iCLASS SE</text>
+      <text x="820" y="210" text-anchor="middle" font-size="9" fill="#d6e1ec">diversified keys</text>
+      <text x="820" y="225" text-anchor="middle" font-size="9" fill="#ffb547">partial — Proxmark</text>
+    </g>
+    <g>
+      <rect x="900" y="175" width="100" height="60" rx="5" fill="#0a2a1a" stroke="#00d9a0" stroke-width="2"/>
+      <text x="950" y="195" text-anchor="middle" font-size="11" fill="#00d9a0" font-weight="bold">iCLASS Seos</text>
+      <text x="950" y="210" text-anchor="middle" font-size="9" fill="#d6e1ec">ISO 24727</text>
+      <text x="950" y="225" text-anchor="middle" font-size="9" fill="#00d9a0">SECURE</text>
+    </g>
+
+    <!-- Other -->
+    <g>
+      <rect x="870" y="95" width="160" height="36" rx="5" fill="#1a232e" stroke="#7a8ca0"/>
+      <text x="950" y="118" text-anchor="middle" font-size="12" fill="#d6e1ec" font-weight="bold">Other standards</text>
+    </g>
+    <g stroke="#7a8ca0" stroke-width="1" fill="none" opacity="0.6">
+      <path d="M 950 131 L 950 155 L 1020 155 L 1020 240"/>
+      <path d="M 950 155 L 950 240"/>
+    </g>
+    <g>
+      <rect x="870" y="240" width="160" height="50" rx="5" fill="#1a232e" stroke="#ffb547"/>
+      <text x="950" y="260" text-anchor="middle" font-size="11" fill="#ffb547" font-weight="bold">ISO 15693 (vicinity)</text>
+      <text x="950" y="278" text-anchor="middle" font-size="9" fill="#7a8ca0">libraries, ski passes</text>
+    </g>
+    <g>
+      <rect x="980" y="300" width="100" height="50" rx="5" fill="#1a232e" stroke="#ffb547"/>
+      <text x="1030" y="320" text-anchor="middle" font-size="11" fill="#ffb547" font-weight="bold">FeliCa</text>
+      <text x="1030" y="338" text-anchor="middle" font-size="9" fill="#7a8ca0">JP transit (Suica)</text>
+    </g>
+
+    <!-- Flipper capability summary at bottom -->
+    <g>
+      <rect x="20" y="380" width="1060" height="140" rx="8" fill="#0a0f14" stroke="#2a3744"/>
+      <text x="40" y="402" font-size="13" fill="#d6e1ec" font-weight="bold">Flipper Zero ST25R3916 capability snapshot</text>
+
+      <g font-family="JetBrains Mono, monospace" font-size="11">
+        <text x="40" y="425" fill="#ff5a6e">●</text><text x="55" y="425" fill="#d6e1ec">MIFARE Classic 1k/4k</text>
+        <text x="280" y="425" fill="#7a8ca0">read + dictionary + nested + write magic</text>
+
+        <text x="40" y="445" fill="#ffb547">●</text><text x="55" y="445" fill="#d6e1ec">MIFARE Ultralight / NTAG</text>
+        <text x="280" y="445" fill="#7a8ca0">read + emulate; sig validation breaks clone</text>
+
+        <text x="40" y="465" fill="#00d9a0">●</text><text x="55" y="465" fill="#d6e1ec">MIFARE DESFire EV1/2/3</text>
+        <text x="280" y="465" fill="#7a8ca0">UID + metadata only; AES applications opaque</text>
+
+        <text x="40" y="485" fill="#ff5a6e">●</text><text x="55" y="485" fill="#d6e1ec">HID iCLASS Legacy</text>
+        <text x="280" y="485" fill="#7a8ca0">partial (PicoPass FAP); Proxmark for serious</text>
+
+        <text x="40" y="505" fill="#00d9a0">●</text><text x="55" y="505" fill="#d6e1ec">EMV (credit/debit)</text>
+        <text x="280" y="505" fill="#7a8ca0">UID + AID + maybe expiry; cannot transact</text>
+
+        <text x="620" y="425" fill="#00d9a0">●</text><text x="635" y="425" fill="#d6e1ec">iCLASS Seos</text>
+        <text x="780" y="425" fill="#7a8ca0">UID read only — no clone</text>
+
+        <text x="620" y="445" fill="#ffb547">●</text><text x="635" y="445" fill="#d6e1ec">ISO 15693</text>
+        <text x="780" y="445" fill="#7a8ca0">read + write blocks (many deployments)</text>
+
+        <text x="620" y="465" fill="#ffb547">●</text><text x="635" y="465" fill="#d6e1ec">FeliCa</text>
+        <text x="780" y="465" fill="#7a8ca0">partial — UID, system code</text>
+
+        <text x="620" y="485" fill="#ff5a6e">●</text><text x="635" y="485" fill="#d6e1ec">"Magic" Mifare</text>
+        <text x="780" y="485" fill="#7a8ca0">Gen1a backdoor / Gen2 stable / Gen3-4 advanced</text>
+      </g>
+    </g>
+  </svg>
+</div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- 4. MIFARE CLASSIC MEMORY MAP -->
+<!-- ============================================================ -->
+<section id="mifare-memory">
+<h2>4. MIFARE Classic 1k memory map — interactive</h2>
+<p>16 sectors × 4 blocks × 16 bytes = 1024 bytes. Each sector has its own Key A and Key B in the sector trailer (block 3 of the sector). <strong>Click a sector</strong> to see its layout.</p>
+
+<div class="panel">
+  <div class="controls">
+    <button id="mf-reset">reset all sectors</button>
+    <button id="mf-dictionary" class="primary">run dictionary attack →</button>
+    <button id="mf-nested">run nested →</button>
+    <button id="mf-mfkey32">simulate mfkey32 →</button>
+    <span style="margin-left: auto; color: var(--muted); font-size: 12px;" id="mf-status">0/16 sectors cracked</span>
+  </div>
+
+  <div class="grid-3" id="mf-grid" style="grid-template-columns: repeat(4, 1fr);"></div>
+
+  <div id="mf-selected" class="panel panel-tight" style="margin: 16px 0 0; min-height: 200px;">
+    <div style="color: var(--muted); font-size: 12px;">Click a sector above to inspect.</div>
+  </div>
+
+  <div class="callout">
+    <strong>Real workflow:</strong> read card → Flipper auto-runs dictionary against every sector → cracked sectors dump → for remaining sectors, use nested (leverages one known key to derive others) → for "hardened" cards, use mfkey32 from a reader interaction. End-state: full 1024-byte dump including all 32 keys.
+  </div>
+</div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- 5. CRYPTO1 ATTACK LADDER -->
+<!-- ============================================================ -->
+<section id="crypto1-attacks">
+<h2>5. The Crypto1 attack ladder — when to use which</h2>
+<p>Four distinct attacks. They're not alternatives — they're rungs of a ladder. Try cheap things first; escalate only on failure.</p>
+
+<div class="panel">
+  <svg viewBox="0 0 1100 480">
+    <!-- Title -->
+    <text x="550" y="25" text-anchor="middle" font-size="14" fill="#d6e1ec">Attack a MIFARE Classic 1k — pick the cheapest method that works</text>
+
+    <!-- Start node -->
+    <g>
+      <rect x="450" y="50" width="200" height="40" rx="20" fill="#1a232e" stroke="#5eb6ff" stroke-width="2"/>
+      <text x="550" y="75" text-anchor="middle" font-size="13" fill="#5eb6ff" font-weight="bold">▶ Captured card — start</text>
+    </g>
+
+    <!-- Decision 1: try dictionary -->
+    <line x1="550" y1="90" x2="550" y2="115" stroke="#7a8ca0" stroke-width="1.5" marker-end="url(#card-arrow)"/>
+    <defs>
+      <marker id="card-arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#7a8ca0"/></marker>
+    </defs>
+
+    <g>
+      <rect x="380" y="115" width="340" height="80" rx="8" fill="#0a2a1a" stroke="#00d9a0" stroke-width="2"/>
+      <text x="550" y="138" text-anchor="middle" font-size="13" fill="#00d9a0" font-weight="bold">1. Dictionary attack</text>
+      <text x="550" y="156" text-anchor="middle" font-size="11" fill="#d6e1ec">Try ~1000 known default keys (FFFFFFFFFFFF, A0A1A2A3A4A5, etc.)</text>
+      <text x="550" y="172" text-anchor="middle" font-size="11" fill="#d6e1ec" font-family="JetBrains Mono, monospace">cost: ~30 sec/sector · success: ~80% of sectors</text>
+      <text x="550" y="188" text-anchor="middle" font-size="10" fill="#7a8ca0">Built into Flipper "Read" — runs automatically</text>
+    </g>
+
+    <line x1="550" y1="195" x2="550" y2="220" stroke="#7a8ca0" stroke-width="1.5" marker-end="url(#card-arrow)"/>
+    <text x="555" y="213" font-size="11" fill="#ffb547" font-style="italic">if sector still locked ↓</text>
+
+    <!-- Step 2: nested -->
+    <g>
+      <rect x="380" y="220" width="340" height="80" rx="8" fill="#3a2a0a" stroke="#ffb547" stroke-width="2"/>
+      <text x="550" y="243" text-anchor="middle" font-size="13" fill="#ffb547" font-weight="bold">2. Nested attack</text>
+      <text x="550" y="261" text-anchor="middle" font-size="11" fill="#d6e1ec">Use ONE known sector key to leak others (Crypto1 PRNG weakness)</text>
+      <text x="550" y="277" text-anchor="middle" font-size="11" fill="#d6e1ec" font-family="JetBrains Mono, monospace">cost: ~seconds/sector · prereq: at least 1 key known</text>
+      <text x="550" y="293" text-anchor="middle" font-size="10" fill="#7a8ca0">Automatic on Flipper if dictionary cracked Sector 0</text>
+    </g>
+
+    <line x1="550" y1="300" x2="550" y2="325" stroke="#7a8ca0" stroke-width="1.5" marker-end="url(#card-arrow)"/>
+    <text x="555" y="318" font-size="11" fill="#ffb547" font-style="italic">if card is "hardened" ↓</text>
+
+    <!-- Step 3: hardnested -->
+    <g>
+      <rect x="380" y="325" width="340" height="80" rx="8" fill="#3a1a2a" stroke="#ff5a6e" stroke-width="2"/>
+      <text x="550" y="348" text-anchor="middle" font-size="13" fill="#ff5a6e" font-weight="bold">3. Hardnested attack</text>
+      <text x="550" y="366" text-anchor="middle" font-size="11" fill="#d6e1ec">Variant for cards that randomize early-round PRNG</text>
+      <text x="550" y="382" text-anchor="middle" font-size="11" fill="#d6e1ec" font-family="JetBrains Mono, monospace">cost: ~30 sec/sector · still feasible · CPU-heavy</text>
+      <text x="550" y="398" text-anchor="middle" font-size="10" fill="#7a8ca0">Some Flipper firmwares (Momentum) ship hardnested</text>
+    </g>
+
+    <line x1="550" y1="405" x2="550" y2="430" stroke="#7a8ca0" stroke-width="1.5" marker-end="url(#card-arrow)"/>
+    <text x="555" y="423" font-size="11" fill="#ffb547" font-style="italic">if no key known and reader access available →</text>
+
+    <!-- Step 4: mfkey32 (branching to side) -->
+    <g>
+      <rect x="780" y="220" width="300" height="180" rx="8" fill="#3a1a3a" stroke="#c084fc" stroke-width="2"/>
+      <text x="930" y="243" text-anchor="middle" font-size="13" fill="#c084fc" font-weight="bold">4. mfkey32 — reader-side attack</text>
+      <text x="930" y="262" text-anchor="middle" font-size="11" fill="#d6e1ec">Use Flipper "Detect Reader" mode against</text>
+      <text x="930" y="276" text-anchor="middle" font-size="11" fill="#d6e1ec">the LEGITIMATE READER (with authorization).</text>
+      <text x="930" y="296" text-anchor="middle" font-size="11" fill="#d6e1ec">Reader sends a challenge that contains</text>
+      <text x="930" y="310" text-anchor="middle" font-size="11" fill="#d6e1ec">cryptographic material derivable to the key.</text>
+      <text x="930" y="330" text-anchor="middle" font-size="11" fill="#d6e1ec" font-family="JetBrains Mono, monospace">Collect 2 reader nonces → desktop mfkey32 → key.</text>
+      <text x="930" y="358" text-anchor="middle" font-size="10" fill="#7a8ca0">When you have the reader but not the card.</text>
+      <text x="930" y="380" text-anchor="middle" font-size="10" fill="#c084fc">Requires: Mfkey32 FAP + desktop cracker</text>
+    </g>
+    <line x1="780" y1="305" x2="720" y2="305" stroke="#c084fc" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#purple-arrow)"/>
+    <defs>
+      <marker id="purple-arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#c084fc"/></marker>
+    </defs>
+
+    <!-- End node -->
+    <g>
+      <rect x="430" y="430" width="240" height="40" rx="20" fill="#0a2a1a" stroke="#00d9a0" stroke-width="2"/>
+      <text x="550" y="455" text-anchor="middle" font-size="13" fill="#00d9a0" font-weight="bold">✓ All keys known → clone</text>
+    </g>
+
+    <!-- Branch: skip to clone (small text) -->
+    <g>
+      <rect x="40" y="115" width="300" height="290" rx="8" fill="#1a232e" stroke="#7a8ca0" stroke-dasharray="4,3"/>
+      <text x="190" y="138" text-anchor="middle" font-size="13" fill="#7a8ca0" font-weight="bold">Underlying weakness</text>
+      <g font-family="JetBrains Mono, monospace" font-size="10" fill="#d6e1ec">
+        <text x="60" y="165">Crypto1 stream cipher uses</text>
+        <text x="60" y="180">a 48-bit LFSR + nonlinear filter.</text>
+        <text x="60" y="205">Two design flaws:</text>
+        <text x="60" y="225" fill="#ff5a6e">  1. Predictable PRNG</text>
+        <text x="60" y="240" fill="#d6e1ec">     Card nonces have</text>
+        <text x="60" y="255" fill="#d6e1ec">     limited entropy</text>
+        <text x="60" y="275" fill="#ff5a6e">  2. Information leakage</text>
+        <text x="60" y="290" fill="#d6e1ec">     Authentication leaks</text>
+        <text x="60" y="305" fill="#d6e1ec">     bits of next session</text>
+        <text x="60" y="325" fill="#d6e1ec">     keystream</text>
+        <text x="60" y="350" fill="#ffb547">All four attacks above</text>
+        <text x="60" y="365" fill="#ffb547">exploit one or both.</text>
+        <text x="60" y="385" fill="#7a8ca0">Nohl/Plötz/Tews 2008.</text>
+      </g>
+    </g>
+  </svg>
+</div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- 6. EMV (CREDIT CARD) - WHY UNCLONABLE -->
+<!-- ============================================================ -->
+<section id="emv">
+<h2>6. EMV (credit/debit) — what the Flipper can and can't do</h2>
+<p>The most common misconception in tech-press articles. Let's draw the line precisely.</p>
+
+<div class="panel">
+  <svg viewBox="0 0 1100 360">
+    <!-- Card silhouette -->
+    <g transform="translate(80, 60)">
+      <rect width="280" height="180" rx="14" fill="#1a232e" stroke="#00d9a0" stroke-width="2"/>
+      <!-- Chip -->
+      <rect x="20" y="40" width="40" height="40" rx="4" fill="#7a8ca0" stroke="#d6e1ec" stroke-width="1"/>
+      <g stroke="#1a232e" stroke-width="1" fill="none">
+        <line x1="20" y1="55" x2="60" y2="55"/>
+        <line x1="20" y1="65" x2="60" y2="65"/>
+        <line x1="30" y1="40" x2="30" y2="80"/>
+        <line x1="50" y1="40" x2="50" y2="80"/>
+      </g>
+      <text x="40" y="100" text-anchor="middle" font-size="9" fill="#d6e1ec" font-family="JetBrains Mono, monospace">EMV applet</text>
+      <text x="40" y="112" text-anchor="middle" font-size="8" fill="#7a8ca0">(VSDC, MCRD)</text>
+      <!-- Brand block -->
+      <text x="180" y="60" font-size="12" fill="#d6e1ec" font-weight="bold">CREDIT CARD</text>
+      <text x="180" y="130" font-family="JetBrains Mono, monospace" font-size="14" fill="#d6e1ec">4567 ●●●● ●●●● 8910</text>
+      <text x="180" y="155" font-size="10" fill="#7a8ca0">CARDHOLDER</text>
+      <text x="180" y="170" font-size="11" fill="#d6e1ec">A. SAMPLE</text>
+    </g>
+
+    <!-- Flipper -->
+    <g transform="translate(800, 100)">
+      <rect width="200" height="100" rx="14" fill="#3a1a0a" stroke="#ffb547" stroke-width="2"/>
+      <circle cx="100" cy="40" r="22" fill="#ffb547"/>
+      <text x="100" y="46" text-anchor="middle" font-size="14" fill="#3a1a0a" font-weight="bold">:3</text>
+      <text x="100" y="78" text-anchor="middle" font-size="11" fill="#ffb547" font-weight="bold">Flipper Zero</text>
+      <text x="100" y="92" text-anchor="middle" font-size="9" fill="#d6e1ec">ST25R3916 NFC</text>
+    </g>
+
+    <!-- Arrow: read attempt -->
+    <g stroke="#5eb6ff" stroke-width="1.5" fill="none">
+      <line x1="380" y1="130" x2="780" y2="130" marker-end="url(#emv-arrow)"/>
+      <text x="580" y="120" text-anchor="middle" font-size="11" fill="#5eb6ff" font-family="JetBrains Mono, monospace">SELECT AID, GET DATA</text>
+    </g>
+    <defs>
+      <marker id="emv-arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#5eb6ff"/></marker>
+    </defs>
+
+    <!-- What Flipper gets -->
+    <g transform="translate(380, 240)">
+      <rect width="400" height="100" rx="6" fill="#0a2a1a" stroke="#00d9a0"/>
+      <text x="200" y="22" text-anchor="middle" font-size="12" fill="#00d9a0" font-weight="bold">✓ What the Flipper CAN read</text>
+      <g font-family="JetBrains Mono, monospace" font-size="11" fill="#d6e1ec">
+        <text x="20" y="45">• UID (often randomized per read in modern issuance)</text>
+        <text x="20" y="62">• AID (Application Identifier) — VISA, MC, AMEX</text>
+        <text x="20" y="79">• Card type, application label, sometimes expiry</text>
+      </g>
+    </g>
+
+    <!-- What Flipper can't -->
+    <g transform="translate(380, 0)">
+      <rect width="400" height="60" rx="6" fill="#3a1a2a" stroke="#ff5a6e"/>
+      <text x="200" y="22" text-anchor="middle" font-size="12" fill="#ff5a6e" font-weight="bold">✗ What it CANNOT do</text>
+      <g font-family="JetBrains Mono, monospace" font-size="10" fill="#d6e1ec">
+        <text x="20" y="40">• Sign a transaction cryptogram (issuer keys never leave card)</text>
+        <text x="20" y="52">• Produce a "magic clone" — keys stay in HSM at the issuer</text>
+      </g>
+    </g>
+  </svg>
+
+  <div class="callout warn">
+    <strong>Why this matters:</strong> "Flipper Zero steals credit cards" is a misleading headline. The Flipper performs the same APDU exchange any terminal does. The difference is the Flipper never sees the issuer's private signing key. Without that key, the cardholder cryptogram cannot be reproduced, so no terminal will accept a transaction. <strong>Caveat:</strong> compromised terminals and relay attacks (paired devices bridging a real card and a real reader live) are real — but require coordinated infrastructure beyond a solo Flipper.
+  </div>
+</div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- 7. CLONE WORKFLOW -->
+<!-- ============================================================ -->
+<section id="clone-workflow">
+<h2>7. Clone workflow — LF and HF</h2>
+<p>Side-by-side. Same conceptual steps, different blank cards. Click the steps in order.</p>
+
+<div class="panel">
+  <div class="grid-2">
+    <!-- LF workflow -->
+    <div>
+      <h3 style="color: var(--accent-2);">LF (EM4100 → T5577)</h3>
+      <div id="lf-flow"></div>
+    </div>
+    <div>
+      <h3 style="color: var(--accent);">HF (MIFARE Classic → magic Mifare)</h3>
+      <div id="hf-flow"></div>
+    </div>
+  </div>
+
+  <div class="callout" style="margin-top: 16px;">
+    <strong>For audit demonstrations:</strong> emulation alone (no physical clone) is usually enough to prove the point — and avoids leaving a physical artifact behind. Cloning a physical card is for engagements where persistent access is needed across multiple sessions.
+  </div>
+</div>
+</section>
+
+
+<p style="margin-top: 48px; color: var(--muted); font-size: 12px;">
+  Curriculum source: <span style="opacity:0.55;cursor:default" title="Source lives in the private workspace">03-card-technologies.md</span> · Back to <a href="index.html">visuals hub</a> · <span style="opacity:0.55;cursor:default" title="Source lives in the private workspace">phase index</span>
+</p>
+
+
+<!-- ============================================================ -->
+<!-- SCRIPTS -->
+<!-- ============================================================ -->
+<script>
+// ============== EM4100 BITS ==============
+function em4100Bits(facility, card) {
+  // 9 header bits + 10 rows of (4-bit nibble + parity) + 4 column parity bits + 1 stop bit
+  const bits = [];
+  const meta = [];
+  for (let i = 0; i < 9; i++) { bits.push(1); meta.push({type: 'header', note: `Header bit ${i+1}/9 (always 1)`}); }
+
+  // 40 data bits = facility (8) + card (32), arranged as 10 nibbles
+  const data = ((facility & 0xFF) * 0x100000000) + (card & 0xFFFFFFFF);
+  // Build the 40 bits MSB-first
+  const dataBits = [];
+  for (let i = 39; i >= 0; i--) {
+    const bit = (i < 32) ? ((card >>> i) & 1) : ((facility >>> (i - 32)) & 1);
+    dataBits.push(bit);
+  }
+  // Group into 10 nibbles, each with row parity
+  const columnSums = [0,0,0,0];
+  for (let row = 0; row < 10; row++) {
+    let rowSum = 0;
+    for (let col = 0; col < 4; col++) {
+      const b = dataBits[row * 4 + col];
+      bits.push(b);
+      const isFacility = (row * 4 + col) < 8;
+      meta.push({type: isFacility ? 'facility' : 'card', note: `Row ${row+1}, col ${col+1} — ${isFacility ? 'facility' : 'card #'} bit`});
+      rowSum += b;
+      columnSums[col] += b;
+    }
+    const rowParity = rowSum & 1;
+    bits.push(rowParity);
+    meta.push({type: 'parity', note: `Row ${row+1} even parity = ${rowParity}`});
+  }
+  // 4 column parity bits
+  for (let col = 0; col < 4; col++) {
+    const cp = columnSums[col] & 1;
+    bits.push(cp);
+    meta.push({type: 'parity', note: `Column ${col+1} even parity = ${cp}`});
+  }
+  // Stop bit
+  bits.push(0);
+  meta.push({type: 'stop', note: 'Stop bit (always 0)'});
+  return {bits, meta};
+}
+
+function renderEM() {
+  const facility = parseInt(document.getElementById('em-facility').value) || 0;
+  const card = parseInt(document.getElementById('em-card').value) || 0;
+  const {bits, meta} = em4100Bits(facility, card);
+  const container = document.getElementById('em-bits-container');
+  container.innerHTML = '';
+
+  // Render as 4 rows of 16 cells for visual grouping
+  let row = document.createElement('div');
+  row.className = 'bitrow';
+  bits.forEach((b, i) => {
+    if (i > 0 && i % 16 === 0) {
+      container.appendChild(row);
+      row = document.createElement('div');
+      row.className = 'bitrow';
+    }
+    const cell = document.createElement('div');
+    cell.className = 'bit-cell ' + meta[i].type;
+    cell.textContent = b;
+    cell.title = `Bit ${i+1}: ${meta[i].note}`;
+    row.appendChild(cell);
+  });
+  container.appendChild(row);
+
+  // Bit count summary
+  const summary = document.createElement('div');
+  summary.style.marginTop = '12px';
+  summary.style.fontSize = '12px';
+  summary.style.color = 'var(--muted)';
+  summary.innerHTML = `Total: <strong style="color: var(--text);">${bits.length} bits</strong> · facility = <strong style="color: var(--accent);">${facility}</strong> · card = <strong style="color: var(--warn);">${card.toLocaleString()}</strong> · transmitted Manchester-encoded at ~2 kbps`;
+  container.appendChild(summary);
+}
+
+document.getElementById('em-facility').oninput = renderEM;
+document.getElementById('em-card').oninput = renderEM;
+document.getElementById('em-random').onclick = () => {
+  document.getElementById('em-facility').value = Math.floor(Math.random() * 256);
+  document.getElementById('em-card').value = Math.floor(Math.random() * 1000000);
+  renderEM();
+};
+renderEM();
+
+
+// ============== MIFARE CLASSIC MEMORY MAP ==============
+const NUM_SECTORS = 16;
+let sectorState = Array(NUM_SECTORS).fill(null).map(() => ({
+  status: 'locked',
+  keyA: null,
+  keyB: null,
+  data: Array(3).fill(null)
+}));
+let selectedSector = 0;
+
+const COMMON_KEYS = [
+  'FFFFFFFFFFFF', 'A0A1A2A3A4A5', 'B0B1B2B3B4B5', 'D3F7D3F7D3F7',
+  '000000000000', 'A0B0C0D0E0F0', '4D3A99C351DD', '5C8FF9990DA2'
+];
+
+function renderMfGrid() {
+  const grid = document.getElementById('mf-grid');
+  grid.innerHTML = '';
+  for (let i = 0; i < NUM_SECTORS; i++) {
+    const s = sectorState[i];
+    const div = document.createElement('div');
+    div.className = 'mfg-sector ' + s.status;
+    if (i === selectedSector) div.style.outline = '2px solid var(--accent-2)';
+    div.onclick = () => { selectedSector = i; renderMfGrid(); renderMfSelected(); };
+
+    let html = `<div style="display:flex; justify-content:space-between; align-items:center;">
+      <span style="font-family: var(--mono); font-size: 11px; color: var(--accent-2);">Sector ${i}</span>`;
+    if (s.status === 'cracked') html += '<span class="badge ok">cracked</span>';
+    else if (s.status === 'attempted') html += '<span class="badge warn">trying</span>';
+    else html += '<span class="badge bad">locked</span>';
+    html += '</div>';
+
+    // 3 data blocks + 1 trailer
+    for (let b = 0; b < 3; b++) {
+      const blockData = s.data[b] || '?? ?? ?? ?? ?? ?? ?? ??';
+      const cls = s.data[b] ? 'data' : 'unread';
+      html += `<div class="mfg-block ${cls}">Blk${b}: ${blockData}</div>`;
+    }
+    const ka = s.keyA || '????????????';
+    const kb = s.keyB || '????????????';
+    html += `<div class="mfg-block trailer">Blk3: <span title="Key A">${ka}</span>·<span title="Key B">${kb}</span></div>`;
+
+    div.innerHTML = html;
+    grid.appendChild(div);
+  }
+  updateMfStatus();
+}
+
+function renderMfSelected() {
+  const s = sectorState[selectedSector];
+  const html = `
+    <div style="display: flex; gap: 20px; align-items: flex-start;">
+      <div>
+        <strong style="color: var(--accent-2);">Sector ${selectedSector}</strong>
+        <span class="badge ${s.status === 'cracked' ? 'ok' : s.status === 'attempted' ? 'warn' : 'bad'}">${s.status}</span>
+      </div>
+      <div style="flex: 1;">
+        <div style="font-family: var(--mono); font-size: 12px; margin-bottom: 8px;">
+          <div>Block 0 (data): ${s.data[0] || '<span style="color: var(--muted);">unreadable — sector locked</span>'}</div>
+          <div>Block 1 (data): ${s.data[1] || '<span style="color: var(--muted);">unreadable</span>'}</div>
+          <div>Block 2 (data): ${s.data[2] || '<span style="color: var(--muted);">unreadable</span>'}</div>
+          <div style="margin-top: 6px; color: var(--danger);">Block 3 (trailer):
+            Key A = ${s.keyA || '<span style="color: var(--muted);">??</span>'} /
+            access bits / Key B = ${s.keyB || '<span style="color: var(--muted);">??</span>'}
+          </div>
+        </div>
+        ${selectedSector === 0 ? '<div class="callout" style="margin: 4px 0;">Sector 0 contains the UID (block 0) and the manufacturer block. Block 0 is read-only on standard cards; magic cards override this.</div>' : ''}
+      </div>
+    </div>
+  `;
+  document.getElementById('mf-selected').innerHTML = html;
+}
+
+function updateMfStatus() {
+  const cracked = sectorState.filter(s => s.status === 'cracked').length;
+  document.getElementById('mf-status').textContent = `${cracked}/${NUM_SECTORS} sectors cracked`;
+  document.getElementById('mf-status').style.color = cracked === NUM_SECTORS ? 'var(--accent)' : 'var(--muted)';
+}
+
+function randomHex(len) {
+  let r = '';
+  for (let i = 0; i < len; i++) r += '0123456789ABCDEF'[Math.floor(Math.random() * 16)];
+  return r;
+}
+
+document.getElementById('mf-reset').onclick = () => {
+  sectorState = Array(NUM_SECTORS).fill(null).map(() => ({
+    status: 'locked', keyA: null, keyB: null, data: Array(3).fill(null)
+  }));
+  renderMfGrid(); renderMfSelected();
+};
+
+document.getElementById('mf-dictionary').onclick = async () => {
+  for (let i = 0; i < NUM_SECTORS; i++) {
+    if (sectorState[i].status === 'cracked') continue;
+    sectorState[i].status = 'attempted';
+    renderMfGrid();
+    await new Promise(r => setTimeout(r, 80));
+    // ~70% of sectors crack with defaults
+    if (Math.random() < 0.7 || i === 0) {
+      sectorState[i].status = 'cracked';
+      sectorState[i].keyA = COMMON_KEYS[Math.floor(Math.random() * COMMON_KEYS.length)];
+      sectorState[i].keyB = 'FFFFFFFFFFFF';
+      sectorState[i].data = [randomHex(16).replace(/(..)/g, '$1 ').trim(), randomHex(16).replace(/(..)/g, '$1 ').trim(), randomHex(16).replace(/(..)/g, '$1 ').trim()];
+    } else {
+      sectorState[i].status = 'locked';
+    }
+    renderMfGrid();
+    if (i === selectedSector) renderMfSelected();
+  }
+};
+
+document.getElementById('mf-nested').onclick = async () => {
+  if (!sectorState.some(s => s.status === 'cracked')) {
+    alert('Run dictionary attack first — nested needs at least one known key to bootstrap.');
+    return;
+  }
+  for (let i = 0; i < NUM_SECTORS; i++) {
+    if (sectorState[i].status === 'cracked') continue;
+    sectorState[i].status = 'attempted';
+    renderMfGrid();
+    await new Promise(r => setTimeout(r, 200));
+    // Nested cracks 80% of remaining
+    if (Math.random() < 0.8) {
+      sectorState[i].status = 'cracked';
+      sectorState[i].keyA = randomHex(12);
+      sectorState[i].keyB = randomHex(12);
+      sectorState[i].data = [randomHex(16).replace(/(..)/g, '$1 ').trim(), randomHex(16).replace(/(..)/g, '$1 ').trim(), randomHex(16).replace(/(..)/g, '$1 ').trim()];
+    } else {
+      sectorState[i].status = 'locked';
+    }
+    renderMfGrid();
+    if (i === selectedSector) renderMfSelected();
+  }
+};
+
+document.getElementById('mf-mfkey32').onclick = async () => {
+  // mfkey32 cracks any remaining locked sectors (assumes reader access)
+  for (let i = 0; i < NUM_SECTORS; i++) {
+    if (sectorState[i].status === 'cracked') continue;
+    sectorState[i].status = 'attempted';
+    renderMfGrid();
+    await new Promise(r => setTimeout(r, 350));
+    sectorState[i].status = 'cracked';
+    sectorState[i].keyA = randomHex(12);
+    sectorState[i].keyB = randomHex(12);
+    sectorState[i].data = [randomHex(16).replace(/(..)/g, '$1 ').trim(), randomHex(16).replace(/(..)/g, '$1 ').trim(), randomHex(16).replace(/(..)/g, '$1 ').trim()];
+    renderMfGrid();
+    if (i === selectedSector) renderMfSelected();
+  }
+};
+
+renderMfGrid();
+renderMfSelected();
+
+
+// ============== CLONE WORKFLOWS ==============
+const LF_STEPS = [
+  { title: '1. Read original', desc: 'Flipper → 125 kHz → Read. EM4100 tag broadcasts 64-bit packet. ~200 ms.', state: '🆔 EM4100 captured: facility=68, card=12345' },
+  { title: '2. Save to SD', desc: 'Flipper writes a .rfid file to /lfrfid/ on the SD card. Plain text — editable.', state: '💾 /lfrfid/my-badge.rfid' },
+  { title: '3. Present blank T5577', desc: 'Place a blank T5577 card on the Flipper\'s LF coil location.', state: '⚪ T5577 detected' },
+  { title: '4. Write', desc: 'Saved → Write. Flipper programs the T5577 with the captured ID. ~1 second.', state: '✓ Write complete' },
+  { title: '5. Verify', desc: 'Read the T5577. ID should match the original. Present to a reader.', state: '✓ Clone authenticates as original' }
+];
+
+const HF_STEPS = [
+  { title: '1. Read original', desc: 'Flipper → NFC → Read. Detects MIFARE Classic 1k. UID + ATQA + SAK.', state: '🆔 MIFARE Classic 1k, UID=A1B2C3D4' },
+  { title: '2. Dictionary', desc: 'Flipper auto-runs dictionary against all 16 sectors. ~70% crack with defaults.', state: '🔓 11/16 sectors cracked' },
+  { title: '3. Nested', desc: 'Use known sector keys to derive remaining sectors. PRNG weakness leak.', state: '🔓 15/16 sectors cracked' },
+  { title: '4. mfkey32 (if needed)', desc: 'If one sector resists nested, use Mfkey32 against the legitimate reader.', state: '🔓 16/16 sectors cracked — full dump' },
+  { title: '5. Write to magic Mifare', desc: 'Flipper → NFC Magic → write. Gen1a backdoor command rewrites block 0 (UID).', state: '✓ Magic card programmed' },
+  { title: '6. Verify', desc: 'Present clone to reader. Authenticates as original — full sector keys preserved.', state: '✓ Clone accepted by reader' }
+];
+
+function renderFlow(containerId, steps) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  steps.forEach((step, i) => {
+    const card = document.createElement('div');
+    card.style.cssText = 'background: var(--panel-2); border: 1px solid var(--line); padding: 10px 12px; margin-bottom: 8px; border-radius: 6px; cursor: pointer; transition: all 0.15s;';
+    card.innerHTML = `
+      <div style="display: flex; gap: 10px; align-items: flex-start;">
+        <div style="background: var(--line); color: var(--text); width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; flex-shrink: 0; margin-top: 2px;" class="flow-num">${i+1}</div>
+        <div>
+          <div style="color: var(--accent); font-weight: 600; font-size: 13px;">${step.title}</div>
+          <div style="color: var(--muted); font-size: 12px; margin-top: 2px;">${step.desc}</div>
+          <div class="flow-state" style="color: var(--text); font-family: var(--mono); font-size: 11px; margin-top: 6px; opacity: 0;">${step.state}</div>
+        </div>
+      </div>
+    `;
+    card.onclick = () => {
+      const stateEl = card.querySelector('.flow-state');
+      const numEl = card.querySelector('.flow-num');
+      const active = stateEl.style.opacity === '1';
+      stateEl.style.opacity = active ? '0' : '1';
+      numEl.style.background = active ? 'var(--line)' : 'var(--accent)';
+      numEl.style.color = active ? 'var(--text)' : '#001a14';
+    };
+    container.appendChild(card);
+  });
+}
+
+renderFlow('lf-flow', LF_STEPS);
+renderFlow('hf-flow', HF_STEPS);
+</script>
+
+</body>
+</html>
