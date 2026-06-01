@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0b0f14"/>
+      <stop offset="100%" stop-color="#1a232e"/>
+    </linearGradient>
+    <linearGradient id="accentGlow" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#00d9a0" stop-opacity="0.0"/>
+      <stop offset="50%" stop-color="#00d9a0" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#00d9a0" stop-opacity="0.0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Subtle grid -->
+  <g stroke="#2a3744" stroke-width="0.5" opacity="0.4">
+    <line x1="0" y1="100" x2="1200" y2="100"/>
+    <line x1="0" y1="200" x2="1200" y2="200"/>
+    <line x1="0" y1="300" x2="1200" y2="300"/>
+    <line x1="0" y1="400" x2="1200" y2="400"/>
+    <line x1="0" y1="500" x2="1200" y2="500"/>
+    <line x1="200" y1="0" x2="200" y2="630"/>
+    <line x1="400" y1="0" x2="400" y2="630"/>
+    <line x1="600" y1="0" x2="600" y2="630"/>
+    <line x1="800" y1="0" x2="800" y2="630"/>
+    <line x1="1000" y1="0" x2="1000" y2="630"/>
+  </g>
+
+  <!-- Accent band -->
+  <rect x="0" y="240" width="1200" height="170" fill="url(#accentGlow)"/>
+
+  <!-- Title -->
+  <text x="80" y="270" font-family="'JetBrains Mono', Consolas, monospace" font-size="18" fill="#7a8ca0" letter-spacing="2">FLIPPER ZERO CURRICULUM</text>
+  <text x="80" y="370" font-family="-apple-system, 'Segoe UI', Roboto, sans-serif" font-size="86" font-weight="700" fill="#d6e1ec">Visual companion</text>
+  <text x="80" y="430" font-family="-apple-system, 'Segoe UI', Roboto, sans-serif" font-size="32" font-weight="500" fill="#00d9a0">~50 interactive visualizations · 9 phases · ethics-first</text>
+
+  <!-- Phase pills -->
+  <g font-family="'JetBrains Mono', Consolas, monospace" font-size="18">
+    <rect x="80" y="475" width="120" height="36" rx="6" fill="#3a1a2a" stroke="#ff5a6e"/>
+    <text x="140" y="500" text-anchor="middle" fill="#ff5a6e">sub-GHz</text>
+
+    <rect x="210" y="475" width="120" height="36" rx="6" fill="#3a2a0a" stroke="#ffb547"/>
+    <text x="270" y="500" text-anchor="middle" fill="#ffb547">cards</text>
+
+    <rect x="340" y="475" width="120" height="36" rx="6" fill="#3a1a3a" stroke="#e879f9"/>
+    <text x="400" y="500" text-anchor="middle" fill="#e879f9">IR + iButton</text>
+
+    <rect x="470" y="475" width="120" height="36" rx="6" fill="#1a2a3a" stroke="#5eb6ff"/>
+    <text x="530" y="500" text-anchor="middle" fill="#5eb6ff">Bad USB</text>
+
+    <rect x="600" y="475" width="120" height="36" rx="6" fill="#0a2a1a" stroke="#00d9a0"/>
+    <text x="660" y="500" text-anchor="middle" fill="#00d9a0">wireless</text>
+
+    <rect x="730" y="475" width="120" height="36" rx="6" fill="#2a1a3a" stroke="#c084fc"/>
+    <text x="790" y="500" text-anchor="middle" fill="#c084fc">hardware</text>
+
+    <rect x="860" y="475" width="120" height="36" rx="6" fill="#0a2a1a" stroke="#00d9a0"/>
+    <text x="920" y="500" text-anchor="middle" fill="#00d9a0">defense</text>
+
+    <rect x="990" y="475" width="130" height="36" rx="6" fill="#3a2a0a" stroke="#ffb547"/>
+    <text x="1055" y="500" text-anchor="middle" fill="#ffb547">capstones</text>
+  </g>
+
+  <!-- Footer -->
+  <text x="80" y="585" font-family="'JetBrains Mono', Consolas, monospace" font-size="16" fill="#5eb6ff">n0xide.github.io/flipper-zero-visuals</text>
+
+  <!-- Decorative bracket on right side -->
+  <g stroke="#00d9a0" stroke-width="2" fill="none" opacity="0.5">
+    <path d="M 1100 60 L 1140 60 L 1140 100"/>
+    <path d="M 1100 570 L 1140 570 L 1140 530"/>
+  </g>
+</svg>

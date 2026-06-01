@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  validate:
+    name: HTML + link integrity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install htmlhint
+        run: npm install -g htmlhint@1
+
+      - name: HTML lint (htmlhint)
+        run: htmlhint --config .github/htmlhint.json *.html
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Internal anchor + relative-link integrity
+        run: python .github/scripts/check_anchors.py
+
+      - name: Verify no stray .md hrefs survived the mirror
+        run: |
+          set -e
+          # Per MAINTAINING.md, .md hrefs are stripped at mirror time.
+          # If any survive, the publish process drifted.
+          n=$(grep -rE 'href="[^"]+\.md"' . --include='*.html' | wc -l)
+          if [ "$n" -ne "0" ]; then
+            echo "::error::Found $n .md href(s) that should have been stripped:"
+            grep -rE 'href="[^"]+\.md"' . --include='*.html'
+            exit 1
+          fi
+          echo "OK: zero stray .md hrefs."
+
+      - name: lychee external link check (non-blocking)
+        uses: lycheeverse/lychee-action@v2
+        continue-on-error: true
+        with:
+          args: |
+            --no-progress
+            --max-concurrency 4
+            --max-redirects 5
+            --timeout 30
+            --exclude-path .git
+            --exclude-path .github
+            '*.html'
+          fail: false

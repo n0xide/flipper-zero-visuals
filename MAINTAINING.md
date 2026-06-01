@@ -29,24 +29,46 @@ sed -i -E 's|<a href="[^"]*\.md">(.*)</a>|<span style="opacity:0.55;cursor:defau
 
 ## Before pushing — integrity checklist
 
+CI runs both checks automatically on every push to `main` (see
+`.github/workflows/ci.yml`), but you can replicate locally:
+
 ```bash
-# 1. No .md hrefs remain
+# 1. Internal anchor + relative-link integrity (handles JS-rendered
+#    Phase 8 deep links and template-literal false positives).
+python .github/scripts/check_anchors.py
+
+# 2. No .md hrefs survived the mirror.
 grep -rE 'href="[^"]+\.md"' . --include='*.html' | wc -l
 # expect 0
 
-# 2. Every linked phase HTML resolves
-python -c "
-import re, os
-for f in os.listdir('.'):
-    if not f.endswith('.html'): continue
-    for ref in re.findall(r'href=\"([^\"]+\.html)\"', open(f, encoding='utf-8').read()):
-        path = ref if not ref.startswith('/') else ref.lstrip('/')
-        if not os.path.exists(path):
-            print(f'BROKEN in {f}: {ref}')
-"
+# 3. HTML well-formedness.
+npx --yes htmlhint@1 --config .github/htmlhint.json *.html
 ```
 
-Both checks should pass before `git push`.
+All three should pass before `git push`. CI also runs `lychee` for
+external links, non-blocking.
+
+## og:image / twitter:card meta tags
+
+Every HTML page carries a `<!-- og:meta-injected -->` block before
+`</head>` with per-page title + description, social card image
+(`og-image.svg`), and canonical URL. The block is managed by:
+
+```
+<workspace-root>/scripts/inject-flipper-meta.py
+```
+
+Run from the workspace root:
+
+```bash
+python scripts/inject-flipper-meta.py \
+  cybersecurity/docs/flipper-zero/visuals \
+  cybersecurity/docs/flipper-zero/dist
+```
+
+It's idempotent — re-running cleans the prior block before writing
+the new one. To change a page's title/description, edit the `PAGES`
+dict in the script and re-run.
 
 ## Adding a new phase visual
 

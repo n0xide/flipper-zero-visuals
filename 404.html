@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>404 — Flipper Zero curriculum visuals</title>
+<meta name="description" content="Page not found. Return to the visuals hub.">
+<style>
+  :root {
+    --bg: #0b0f14;
+    --panel: #131a23;
+    --line: #2a3744;
+    --text: #d6e1ec;
+    --muted: #7a8ca0;
+    --accent: #00d9a0;
+    --accent-2: #5eb6ff;
+    --danger: #ff5a6e;
+    --mono: "JetBrains Mono", "Fira Code", Consolas, monospace;
+    --sans: -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.55; min-height: 100vh; }
+  body { display: flex; align-items: center; justify-content: center; padding: 40px 24px; }
+  .container { max-width: 640px; width: 100%; }
+  .glitch {
+    font-family: var(--mono);
+    font-size: 96px;
+    font-weight: 700;
+    margin: 0;
+    color: var(--accent);
+    letter-spacing: -2px;
+  }
+  h1 { font-size: 28px; margin: 8px 0 16px; }
+  p { font-size: 15px; color: var(--text); margin: 12px 0; }
+  .options { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 18px 22px; margin-top: 24px; }
+  .options h2 { font-size: 14px; color: var(--muted); margin: 0 0 12px; text-transform: uppercase; letter-spacing: 0.6px; }
+  .options ul { margin: 0; padding-left: 20px; font-family: var(--mono); font-size: 13px; }
+  .options li { margin: 6px 0; }
+  a { color: var(--accent-2); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .ascii { font-family: var(--mono); white-space: pre; color: var(--muted); font-size: 11px; line-height: 1.3; margin-top: 36px; }
+  @media (max-width: 720px) {
+    .glitch { font-size: 64px; }
+    h1 { font-size: 20px; }
+    .ascii { font-size: 9px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <p class="glitch">404</p>
+  <h1>Lost the signal.</h1>
+  <p>The page at <code style="color: var(--danger); font-family: var(--mono);" id="lost-url"></code> isn't part of the bundle. Probably a stale deep link or a typo in the URL.</p>
+
+  <div class="options">
+    <h2>Try one of these instead</h2>
+    <ul>
+      <li><a href="./">↑ visuals hub (start here)</a></li>
+      <li><a href="phase-1-foundations.html">phase 1 — foundations</a></li>
+      <li><a href="phase-2-subghz.html">phase 2 — sub-GHz</a></li>
+      <li><a href="phase-3-cards.html">phase 3 — cards</a></li>
+      <li><a href="phase-4-ir-ibutton.html">phase 4 — IR + iButton</a></li>
+      <li><a href="phase-5-badusb.html">phase 5 — Bad USB</a></li>
+      <li><a href="phase-6-wireless.html">phase 6 — wireless</a></li>
+      <li><a href="phase-7-hardware.html">phase 7 — hardware</a></li>
+      <li><a href="phase-8-defense.html">phase 8 — defense matrix</a></li>
+      <li><a href="phase-9-capstones.html">phase 9 — capstones</a></li>
+      <li><a href="glossary.html">📖 glossary (search by acronym)</a></li>
+    </ul>
+  </div>
+
+  <pre class="ascii">      ____      _____ _ _                       _____
+     |  _ \    |  ___| (_)_ __  _ __   ___ _ __ |__  /___ _ __ ___
+     | |_) |   | |_  | | | '_ \| '_ \ / _ \ '__|  / // _ \ '__/ _ \
+     |  _ <    |  _| | | | |_) | |_) |  __/ |    / /|  __/ | | (_) |
+     |_| \_\   |_|   |_|_| .__/| .__/ \___|_|   /____\___|_|  \___/
+                         |_|   |_|
+                         curriculum visuals
+  </pre>
+</div>
+
+<script>
+  // Surface the URL that broke (useful when this 404 is served by GH Pages)
+  document.getElementById('lost-url').textContent = window.location.pathname + window.location.search;
+</script>
+</body>
+</html>
