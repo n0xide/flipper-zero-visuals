@@ -52,13 +52,29 @@
   .callout.warn { background: rgba(255,181,71,0.08); border-color: var(--warn); }
   .callout.danger { background: rgba(255,90,110,0.08); border-color: var(--danger); }
   svg { display: block; max-width: 100%; }
+  @media (max-width: 720px) {
+    body { padding: 18px 12px 60px; }
+    h1 { font-size: 22px; }
+    h2 { font-size: 18px; }
+    h3 { font-size: 14px; }
+    .grid-2, .grid-3 { grid-template-columns: 1fr !important; }
+    .controls { padding: 8px; gap: 8px; font-size: 12px; }
+    .panel { padding: 14px; }
+    .callout { font-size: 12px; padding: 8px 12px; }
+    table { font-size: 12px; }
+    .panel > table, section > table, section > .panel > table { display: block; overflow-x: auto; }
+    svg, canvas { max-width: 100%; height: auto; }
+    nav[aria-label="Phases"] { font-size: 11px; padding: 6px 8px; gap: 4px; }
+    nav[aria-label="Phases"] a { padding: 2px 6px; }
+  }
   .nav-toc { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px 18px; margin-bottom: 24px; font-size: 14px; }
   .nav-toc ol { margin: 6px 0 0; padding-left: 24px; }
   .nav-toc li { margin: 3px 0; }
   details { margin: 8px 0; }
   summary { cursor: pointer; color: var(--accent-2); font-size: 13px; user-select: none; }
-  .pin { cursor: pointer; }
-  .pin:hover circle { stroke-width: 3; }
+  .pin { cursor: pointer; outline: none; }
+  .pin:hover circle, .pin:focus circle { stroke-width: 3; stroke: var(--accent); }
+  .pin:focus { outline: 2px dashed var(--accent); outline-offset: 4px; }
   /* Pin function colors */
   .fn-power { fill: #ff5a6e; }
   .fn-gnd { fill: #7a8ca0; }
@@ -66,6 +82,7 @@
   .fn-spi { fill: #5eb6ff; }
   .fn-i2c { fill: #ffb547; }
   .fn-swd { fill: #c084fc; }
+  .fn-onewire { fill: #e879f9; }
   .fn-gpio { fill: #4a5d72; }
   canvas { display: block; max-width: 100%; }
 </style>
@@ -76,8 +93,32 @@
   <a href="index.html">visuals</a> &nbsp;/&nbsp; Phase 7 &nbsp;/&nbsp; GPIO + Hardware Hacking
 </div>
 
+<nav aria-label="Phases" style="display:flex; gap:6px; flex-wrap:wrap; padding:8px 12px; background:#131a23; border:1px solid #2a3744; border-radius:6px; font-family:'JetBrains Mono',Consolas,monospace; font-size:12px; margin:0 0 20px;">
+  <span style="color:#7a8ca0;">phases:</span>
+  <a href="phase-2-subghz.html" style="color:#5eb6ff;padding:2px 8px;border-radius:3px;text-decoration:none;">2 sub-GHz</a>
+  <a href="phase-3-cards.html" style="color:#5eb6ff;padding:2px 8px;border-radius:3px;text-decoration:none;">3 cards</a>
+  <a href="phase-4-ir-ibutton.html" style="color:#5eb6ff;padding:2px 8px;border-radius:3px;text-decoration:none;">4 IR + iButton</a>
+  <a href="phase-5-badusb.html" style="color:#5eb6ff;padding:2px 8px;border-radius:3px;text-decoration:none;">5 Bad USB</a>
+  <a href="phase-6-wireless.html" style="color:#5eb6ff;padding:2px 8px;border-radius:3px;text-decoration:none;">6 wireless</a>
+  <a href="phase-7-hardware.html" style="color:#001a14;background:#00d9a0;padding:2px 8px;border-radius:3px;text-decoration:none;font-weight:600;">7 hardware</a>
+  <a href="phase-8-defense.html" style="color:#5eb6ff;padding:2px 8px;border-radius:3px;text-decoration:none;">8 defense</a>
+  <a href="index.html" style="color:#7a8ca0;padding:2px 8px;margin-left:auto;text-decoration:none;">↑ hub</a>
+</nav>
+
 <h1>Phase 7 — GPIO + Hardware Hacking</h1>
 <p style="color: var(--muted); margin: 0 0 24px;">Where the Flipper stops being a contactless multi-tool and starts being a hardware bench in your pocket. Visualizations for the GPIO header, three bus protocols (UART/SPI/I²C), SOIC-8 flash dumping, the audit chain, and ARM RDP levels.</p>
+
+<div class="callout warn" style="margin-bottom: 24px;">
+  <strong>Legality boundary — hardware hacking pivots on ownership.</strong>
+  <ul style="margin: 6px 0 0; padding-left: 18px; font-size: 13px;">
+    <li><strong>A device you bought, opened, and own</strong> — UART boot logs, SPI flash dumps, SWD halt-and-debug, even chip-off. All legal. Right-to-repair laws (US DMCA §1201 exemptions, EU Right-to-Repair Directive) explicitly protect security research and reverse-engineering of devices you own.</li>
+    <li><strong>A junk-yard router, an end-of-life smart bulb, an eBay teardown unit</strong> — same. The signal is: you have the right to disassemble and probe what you own.</li>
+    <li><strong>A device under maintenance contract / warranty</strong> — opening voids warranty but is still legal. Tampering with a leased device (Tesla, John Deere, medical device) gets messier and may be barred by contract; not criminal in most jurisdictions but contractually defensible.</li>
+    <li><strong>Someone else's device, even temporarily</strong> — not yours. Probing a coworker's IoT thermostat, a hotel TV, or a borrowed router without owner consent is unauthorized access in nearly every jurisdiction.</li>
+    <li><strong>Vendor disclosure</strong> — vulnerabilities discovered in a device you own and disclosed to the vendor under a reasonable embargo is protected research speech in the US and most of Europe. Doing the same work and weaponizing it against deployed third-party devices is not.</li>
+  </ul>
+  Every technique below assumes the target is your hardware (or your authorized test bench). The defenses in §5 — RDP, secure boot, glitch protection — are the deliverables a client gets when you finish the audit.
+</div>
 
 <div class="nav-toc">
   <strong style="color: var(--accent);">On this page</strong>
@@ -108,6 +149,7 @@
     <button class="fn-filter" data-fn="spi">SPI</button>
     <button class="fn-filter" data-fn="i2c">I²C</button>
     <button class="fn-filter" data-fn="swd">SWD</button>
+    <button class="fn-filter" data-fn="onewire">1-Wire</button>
     <button class="fn-filter" data-fn="gpio">GPIO</button>
   </div>
 
@@ -145,6 +187,7 @@
     <div class="legend-item"><div class="swatch" style="background:#5eb6ff;"></div> SPI</div>
     <div class="legend-item"><div class="swatch" style="background:#ffb547;"></div> I²C</div>
     <div class="legend-item"><div class="swatch" style="background:#c084fc;"></div> SWD</div>
+    <div class="legend-item"><div class="swatch" style="background:#e879f9;"></div> 1-Wire</div>
     <div class="legend-item"><div class="swatch" style="background:#4a5d72;"></div> GPIO</div>
   </div>
 
@@ -547,25 +590,29 @@
 <!-- ============================================================ -->
 <script>
 // ============== 1. GPIO PINOUT ==============
+// Canonical pinout per Flipper firmware furi_hal_resources.c.
+// IO mapping: pin2=PA7, pin3=PA6, pin4=PA4, pin5=PB3, pin6=PB2, pin7=PC3,
+// pin10=PA14(SWCLK), pin12=PA13(SWDIO), pin13=PB6(UART TX), pin14=PB7(UART RX),
+// pin15=PC1(I²C SDA), pin16=PC0(I²C SCL). GND: 8, 11, 18. Pin 17 = 1-Wire (iButton).
 const PINS = [
-  {n: 1, label: '+5V', alt: 'USB pass-through', fn: 'power', color: '#ff5a6e', desc: 'USB power passthrough, 500 mA max. Use to power small targets if (and only if) your USB host supplies enough.', tip: 'Useful for powering 5V dev boards from the Flipper. NEVER connect to a target that has its own power.'},
-  {n: 2, label: 'A7', alt: 'SPI MOSI / ADC / PWM', fn: 'spi', color: '#5eb6ff', desc: 'Multi-function. Primary: SPI MOSI (master-out). Also: ADC input, PWM output, GPIO.', tip: 'SPI flash dumping: this is the data line to the target chip.'},
-  {n: 3, label: 'A6', alt: 'SPI MISO', fn: 'spi', color: '#5eb6ff', desc: 'SPI master-in / GPIO.', tip: 'SPI flash dumping: target chip drives this back to the Flipper.'},
-  {n: 4, label: 'A4', alt: 'SPI CS / GPIO', fn: 'spi', color: '#5eb6ff', desc: 'SPI chip-select (active low) / GPIO.', tip: 'Drives the /CS pin of a SPI flash. Idle high, pulled low for transaction.'},
-  {n: 5, label: 'B3', alt: 'SPI SCK', fn: 'spi', color: '#5eb6ff', desc: 'SPI clock / GPIO.', tip: 'Master-driven clock. Flipper as SPI master generates this.'},
-  {n: 6, label: 'B2', alt: 'GPIO / PWM', fn: 'gpio', color: '#4a5d72', desc: 'General-purpose I/O, PWM-capable.', tip: 'Free pin — wire to anything.'},
-  {n: 7, label: 'C3', alt: 'GPIO', fn: 'gpio', color: '#4a5d72', desc: 'General-purpose I/O.', tip: 'Free pin — wire to anything.'},
-  {n: 8, label: '+3.3V', alt: 'regulated rail', fn: 'power', color: '#ff5a6e', desc: '3.3V regulated rail. Output. Up to ~~50 mA safely.', tip: 'Power small sensors / level shifter Vcc-A side.'},
-  {n: 9, label: '+3.3V', alt: 'regulated rail (also)', fn: 'power', color: '#ff5a6e', desc: 'Same 3.3V rail as pin 8 — provided in two locations for routing convenience.', tip: 'Identical to pin 8.'},
-  {n: 10, label: 'SWCLK', alt: 'SWD clock / A14', fn: 'swd', color: '#c084fc', desc: 'Serial Wire Debug clock. Drives the SWD probe interface on ARM Cortex-M targets.', tip: 'Pair with SWDIO (pin 12) to debug a Cortex-M chip.'},
-  {n: 11, label: 'GND', alt: 'ground', fn: 'gnd', color: '#7a8ca0', desc: 'Common ground. THE most important pin.', tip: 'Connect FIRST when wiring any target. Floating ground = weird intermittent behavior.'},
-  {n: 12, label: 'SWDIO', alt: 'SWD data / A13', fn: 'swd', color: '#c084fc', desc: 'Serial Wire Debug data (bidirectional). Pair with SWCLK.', tip: 'Use BlackMagic Probe FAP or external J-Link for serious debugging.'},
-  {n: 13, label: 'TX', alt: 'USART1 TX / B6', fn: 'uart', color: '#00d9a0', desc: 'UART transmit (Flipper → target). Idles HIGH.', tip: 'Connects to target\'s RX. Flipper TX → target RX.'},
-  {n: 14, label: 'RX', alt: 'USART1 RX / B7', fn: 'uart', color: '#00d9a0', desc: 'UART receive (target → Flipper). Idles HIGH.', tip: 'Connects to target\'s TX. Most common scan baud: 115200.'},
-  {n: 15, label: 'A15', alt: 'GPIO / I²C SDA (alt)', fn: 'gpio', color: '#4a5d72', desc: 'GPIO; on some firmwares serves as alternate I²C SDA.', tip: 'Verify against your firmware pinout — function varies.'},
-  {n: 16, label: 'A0', alt: 'GPIO', fn: 'gpio', color: '#4a5d72', desc: 'General-purpose I/O.', tip: 'Free pin.'},
-  {n: 17, label: 'C1', alt: 'I²C SCL', fn: 'i2c', color: '#ffb547', desc: 'I²C clock (master-driven). Open-drain — needs pull-up.', tip: 'For I²C EEPROM reads. Target board usually has pull-ups already.'},
-  {n: 18, label: 'C0', alt: 'I²C SDA', fn: 'i2c', color: '#ffb547', desc: 'I²C data (bidirectional, open-drain).', tip: 'Pair with SCL (pin 17). I²C Tools FAP scans the bus for devices.'},
+  {n: 1, label: '+5V', alt: 'USB OTG out (gated)', fn: 'power', color: '#ff5a6e', desc: '+5V output — passes through from USB host or Flipper battery boost. Off by default; enable via Menu → GPIO → "5V on GPIO".', tip: 'Useful for powering 5V dev boards from the Flipper. NEVER connect to a target that has its own power supply on the same rail.'},
+  {n: 2, label: 'PA7', alt: 'SPI MOSI / ADC12 / PWM', fn: 'spi', color: '#5eb6ff', desc: 'STM32 PA7. Primary use: SPI MOSI (master-out). Also: ADC input, PWM output, plain GPIO.', tip: 'SPI flash dumping: this is the data line to the target chip.'},
+  {n: 3, label: 'PA6', alt: 'SPI MISO / ADC11', fn: 'spi', color: '#5eb6ff', desc: 'STM32 PA6. SPI master-in / ADC input / GPIO.', tip: 'SPI flash dumping: target chip drives this back to the Flipper.'},
+  {n: 4, label: 'PA4', alt: 'SPI CS / DAC / ADC9', fn: 'spi', color: '#5eb6ff', desc: 'STM32 PA4. SPI chip-select (active low) / GPIO / DAC out / ADC in.', tip: 'Drives the /CS pin of a SPI flash. Idle high, pulled low for transaction.'},
+  {n: 5, label: 'PB3', alt: 'SPI SCK', fn: 'spi', color: '#5eb6ff', desc: 'STM32 PB3. SPI clock / GPIO.', tip: 'Master-driven clock. Flipper as SPI master generates this.'},
+  {n: 6, label: 'PB2', alt: 'SPI CE / GPIO', fn: 'spi', color: '#5eb6ff', desc: 'STM32 PB2. Used as chip-enable for the NRF24 module slot; otherwise plain GPIO with PWM.', tip: 'Free pin if not running NRF24 — wire to anything.'},
+  {n: 7, label: 'PC3', alt: 'GPIO / ADC4', fn: 'gpio', color: '#4a5d72', desc: 'STM32 PC3. General-purpose I/O, ADC input.', tip: 'Free pin — wire to anything.'},
+  {n: 8, label: 'GND', alt: 'ground', fn: 'gnd', color: '#7a8ca0', desc: 'Common ground. There are three GND pins on the header (8, 11, 18) for routing convenience.', tip: 'Connect FIRST when wiring any target. Floating ground = weird intermittent behavior.'},
+  {n: 9, label: '+3.3V', alt: 'regulated rail', fn: 'power', color: '#ff5a6e', desc: '3.3V regulated rail (output). Always on. Up to ~50 mA safely for small loads.', tip: 'Powers small sensors / the Vcc-A side of a level shifter.'},
+  {n: 10, label: 'PA14', alt: 'SWCLK / SWD clock', fn: 'swd', color: '#c084fc', desc: 'STM32 PA14 — Serial Wire Debug clock. Drives the SWD probe interface on ARM Cortex-M targets.', tip: 'Pair with SWDIO (pin 12) to debug a Cortex-M chip. BlackMagic Probe FAP turns the Flipper into a working SWD adapter.'},
+  {n: 11, label: 'GND', alt: 'ground', fn: 'gnd', color: '#7a8ca0', desc: 'Common ground (also pins 8 and 18). Use whichever is closest to your wiring.', tip: 'Connect FIRST when wiring any target.'},
+  {n: 12, label: 'PA13', alt: 'SWDIO / SWD data', fn: 'swd', color: '#c084fc', desc: 'STM32 PA13 — Serial Wire Debug data (bidirectional). Pair with SWCLK (pin 10).', tip: 'BlackMagic Probe FAP or external J-Link for serious Cortex-M debugging.'},
+  {n: 13, label: 'PB6', alt: 'USART1 TX', fn: 'uart', color: '#00d9a0', desc: 'STM32 PB6. UART transmit (Flipper → target). Idles HIGH.', tip: 'Connects to target\'s RX. Modern firmware auto-scans common bauds (9600, 38400, 57600, 115200).'},
+  {n: 14, label: 'PB7', alt: 'USART1 RX', fn: 'uart', color: '#00d9a0', desc: 'STM32 PB7. UART receive (target → Flipper). Idles HIGH.', tip: 'Connects to target\'s TX. Most common boot-log baud: 115200.'},
+  {n: 15, label: 'PC1', alt: 'I²C SDA / ADC2', fn: 'i2c', color: '#ffb547', desc: 'STM32 PC1 — I²C data (bidirectional, open-drain). Internal 4.7 kΩ pull-up to 3.3V on the Flipper PCB.', tip: 'Pair with SCL (pin 16). I²C Tools FAP scans the bus for devices.'},
+  {n: 16, label: 'PC0', alt: 'I²C SCL / ADC1', fn: 'i2c', color: '#ffb547', desc: 'STM32 PC0 — I²C clock (master-driven, open-drain). Internal 4.7 kΩ pull-up on the Flipper PCB.', tip: 'For I²C EEPROM reads / sensor probes. Most target boards have their own pull-ups.'},
+  {n: 17, label: '1W', alt: '1-Wire / iButton bus', fn: 'onewire', color: '#e879f9', desc: '1-Wire bus — the same pin the back iButton contact talks to. Open-drain with internal pull-up.', tip: 'iButton app uses this for DS1990A read/emulate. Stays active in DFU mode (a quirk worth knowing).'},
+  {n: 18, label: 'GND', alt: 'ground', fn: 'gnd', color: '#7a8ca0', desc: 'Common ground (also pins 8 and 11).', tip: 'Connect FIRST when wiring any target.'},
 ];
 
 let activeFilter = 'all';
@@ -589,7 +636,7 @@ function renderPins() {
     const opacity = active ? 1 : 0.15;
 
     g.innerHTML += `
-      <g class="pin" data-pin="${p.n}" style="opacity: ${opacity};">
+      <g class="pin" data-pin="${p.n}" tabindex="0" role="button" aria-label="Pin ${p.n}, ${p.label}, function ${p.fn}" style="opacity: ${opacity};">
         <circle cx="${col}" cy="${y}" r="8" fill="${p.color}" stroke="#0a0f14" stroke-width="2"/>
         <text x="${col}" y="${y+3}" text-anchor="middle" font-size="9" fill="#0a0f14" font-weight="bold" font-family="JetBrains Mono, monospace">${p.n}</text>
         <text x="${labelCol}" y="${y+4}" text-anchor="${labelAnchor}" font-size="10" fill="#d6e1ec" font-family="JetBrains Mono, monospace">${p.label}</text>
@@ -597,12 +644,24 @@ function renderPins() {
     `;
   });
 
-  // Add click handlers
+  // Wire interaction. Delegated via setTimeout so the freshly-set innerHTML is queryable.
   setTimeout(() => {
     document.querySelectorAll('.pin').forEach(el => {
-      el.addEventListener('click', () => {
-        const pn = parseInt(el.dataset.pin);
-        showPinInfo(PINS.find(p => p.n === pn));
+      const pn = parseInt(el.dataset.pin);
+      const activate = () => showPinInfo(PINS.find(p => p.n === pn));
+      el.addEventListener('click', activate);
+      el.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(); }
+        else if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+          e.preventDefault();
+          const next = document.querySelector(`.pin[data-pin="${pn === 18 ? 1 : pn + 1}"]`);
+          if (next) next.focus();
+        }
+        else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+          e.preventDefault();
+          const prev = document.querySelector(`.pin[data-pin="${pn === 1 ? 18 : pn - 1}"]`);
+          if (prev) prev.focus();
+        }
       });
     });
   }, 0);

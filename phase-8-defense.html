@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Phase 8 — Defense (visuals)</title>
+<style>
+  :root {
+    --bg: #0b0f14;
+    --panel: #131a23;
+    --panel-2: #1a232e;
+    --line: #2a3744;
+    --text: #d6e1ec;
+    --muted: #7a8ca0;
+    --accent: #00d9a0;
+    --accent-2: #5eb6ff;
+    --warn: #ffb547;
+    --danger: #ff5a6e;
+    --purple: #c084fc;
+    --mono: "JetBrains Mono", "Fira Code", Consolas, monospace;
+    --sans: -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.55; }
+  body { max-width: 1180px; margin: 0 auto; padding: 32px 24px 80px; }
+  h1 { font-size: 28px; margin: 0 0 4px; }
+  h2 { font-size: 22px; margin: 0 0 8px; color: var(--accent); border-left: 3px solid var(--accent); padding-left: 12px; }
+  h3 { font-size: 16px; margin: 18px 0 8px; color: var(--accent-2); }
+  p { margin: 8px 0; }
+  a { color: var(--accent-2); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .breadcrumb { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 20px; margin: 16px 0 32px; }
+  .controls { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; padding: 10px 12px; background: var(--panel-2); border-radius: 6px; margin-bottom: 12px; font-size: 13px; }
+  button { background: var(--panel-2); color: var(--text); border: 1px solid var(--line); padding: 6px 14px; border-radius: 5px; cursor: pointer; font-family: var(--sans); font-size: 13px; transition: all 0.15s; }
+  button:hover { border-color: var(--accent); color: var(--accent); }
+  button.primary { background: var(--accent); color: #001a14; border-color: var(--accent); font-weight: 600; }
+  button.active { background: var(--accent-2); color: #001a14; border-color: var(--accent-2); }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-family: var(--mono); margin: 0 2px; }
+  .badge.ok { background: rgba(0,217,160,0.15); color: var(--accent); border: 1px solid var(--accent); }
+  .badge.warn { background: rgba(255,181,71,0.15); color: var(--warn); border: 1px solid var(--warn); }
+  .badge.bad { background: rgba(255,90,110,0.15); color: var(--danger); border: 1px solid var(--danger); }
+  .badge.cheap { background: rgba(0,217,160,0.12); color: var(--accent); border: 1px solid var(--accent); }
+  .badge.med { background: rgba(255,181,71,0.12); color: var(--warn); border: 1px solid var(--warn); }
+  .badge.exp { background: rgba(255,90,110,0.12); color: var(--danger); border: 1px solid var(--danger); }
+  table { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 13px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 500; font-size: 11px; text-transform: uppercase; letter-spacing: 0.6px; cursor: pointer; user-select: none; }
+  th:hover { color: var(--accent); }
+  th.sort-asc::after { content: ' ▲'; color: var(--accent); }
+  th.sort-desc::after { content: ' ▼'; color: var(--accent); }
+  td.mono, .mono { font-family: var(--mono); font-size: 12px; }
+  .caption { font-size: 12px; color: var(--muted); margin-top: 6px; font-style: italic; }
+  .callout { background: rgba(94,182,255,0.08); border-left: 3px solid var(--accent-2); padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; font-size: 13px; }
+  .callout.warn { background: rgba(255,181,71,0.08); border-color: var(--warn); }
+  .callout.danger { background: rgba(255,90,110,0.08); border-color: var(--danger); }
+  svg { display: block; max-width: 100%; }
+  @media (max-width: 720px) {
+    body { padding: 18px 12px 60px; }
+    h1 { font-size: 22px; }
+    h2 { font-size: 18px; }
+    h3 { font-size: 14px; }
+    .grid-2, .grid-3 { grid-template-columns: 1fr !important; }
+    .controls { padding: 8px; gap: 8px; font-size: 12px; }
+    .panel { padding: 14px; }
+    .callout { font-size: 12px; padding: 8px 12px; }
+    table { font-size: 12px; }
+    .panel > table, section > table, section > .panel > table { display: block; overflow-x: auto; }
+    svg, canvas { max-width: 100%; height: auto; }
+    nav[aria-label="Phases"] { font-size: 11px; padding: 6px 8px; gap: 4px; }
+    nav[aria-label="Phases"] a { padding: 2px 6px; }
+  }
+  .nav-toc { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px 18px; margin-bottom: 24px; font-size: 14px; }
+  .nav-toc ol { margin: 6px 0 0; padding-left: 24px; }
+  .nav-toc li { margin: 3px 0; }
+  .phase-pill { display: inline-block; padding: 1px 7px; border-radius: 10px; font-size: 11px; font-family: var(--mono); margin-right: 4px; }
+  .phase-2 { background: rgba(255,90,110,0.15); color: #ff5a6e; }
+  .phase-3 { background: rgba(255,181,71,0.15); color: #ffb547; }
+  .phase-4 { background: rgba(192,132,252,0.15); color: #c084fc; }
+  .phase-5 { background: rgba(94,182,255,0.15); color: #5eb6ff; }
+  .phase-6 { background: rgba(0,217,160,0.15); color: #00d9a0; }
+  .phase-7 { background: rgba(232,121,249,0.15); color: #e879f9; }
+  details summary { cursor: pointer; padding: 8px 12px; background: var(--panel-2); border-radius: 4px; margin-bottom: 4px; }
+  .checklist { font-family: var(--mono); font-size: 12px; line-height: 1.7; }
+  .checklist li { list-style: none; padding-left: 22px; position: relative; margin: 2px 0; }
+  .checklist li::before { content: '☐'; position: absolute; left: 0; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<div class="breadcrumb">
+  <a href="index.html">visuals</a> &nbsp;/&nbsp; Phase 8 &nbsp;/&nbsp; Defense
+</div>
+
+<nav aria-label="Phases" style="display:flex; gap:6px; flex-wrap:wrap; padding:8px 12px; background:#131a23; border:1px solid #2a3744; border-radius:6px; font-family:'JetBrains Mono',Consolas,monospace; font-size:12px; margin:0 0 20px;">
+  <span style="color:#7a8ca0;">phases:</span>
+  <a href="phase-2-subghz.html" style="color:#5eb6ff;padding:2px 8px;border-radius:3px;text-decoration:none;">2 sub-GHz</a>
+  <a href="phase-3-cards.html" style="color:#5eb6ff;padding:2px 8px;border-radius:3px;text-decoration:none;">3 cards</a>
+  <a href="phase-4-ir-ibutton.html" style="color:#5eb6ff;padding:2px 8px;border-radius:3px;text-decoration:none;">4 IR + iButton</a>
+  <a href="phase-5-badusb.html" style="color:#5eb6ff;padding:2px 8px;border-radius:3px;text-decoration:none;">5 Bad USB</a>
+  <a href="phase-6-wireless.html" style="color:#5eb6ff;padding:2px 8px;border-radius:3px;text-decoration:none;">6 wireless</a>
+  <a href="phase-7-hardware.html" style="color:#5eb6ff;padding:2px 8px;border-radius:3px;text-decoration:none;">7 hardware</a>
+  <a href="phase-8-defense.html" style="color:#001a14;background:#00d9a0;padding:2px 8px;border-radius:3px;text-decoration:none;font-weight:600;">8 defense</a>
+  <a href="index.html" style="color:#7a8ca0;padding:2px 8px;margin-left:auto;text-decoration:none;">↑ hub</a>
+</nav>
+
+<h1>Phase 8 — Defense, audit, hardening</h1>
+<p style="color: var(--muted); margin: 0 0 24px;">The blue-team payoff. Every attack from Phases 2-7 turned into a defense recommendation. If you can't write the hardening section, you don't understand the attack.</p>
+
+<div class="callout" style="margin-bottom: 24px;">
+  <strong>Posture:</strong> defense is decision support, not security theatre. The matrix below maps each attack to (a) detection — how would a defender notice? — and (b) hardening — what control closes it? Each row also carries a cost tag so you can argue for the controls in budget terms when the engagement lands at the board level. This is the document you hand a client at the end of an audit, scaffolded.
+</div>
+
+<div class="nav-toc">
+  <strong style="color: var(--accent);">On this page</strong>
+  <ol>
+    <li><a href="#matrix">Attack → defense matrix</a> — every attack class, sortable + filterable</li>
+    <li><a href="#detection-layers">Detection layer breakdown</a> — what each tier of monitoring catches</li>
+    <li><a href="#audit-checklist">Audit deliverable checklist</a> — template for a client report</li>
+    <li><a href="#priority">Priority order</a> — what to do first / last in a real engagement</li>
+  </ol>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- 1. ATTACK → DEFENSE MATRIX -->
+<!-- ============================================================ -->
+<section id="matrix">
+<h2>1. Attack → defense matrix — every class from Phases 2-7</h2>
+<p>Click any column header to sort. Use the filter buttons to narrow by phase. Each row is one attack class with detection signals (what a defender sees) and the actual hardening recommendation.</p>
+
+<div class="panel">
+  <div class="controls">
+    <strong>Filter by phase:</strong>
+    <button class="phase-filter primary" data-phase="all">all</button>
+    <button class="phase-filter" data-phase="2">Phase 2 sub-GHz</button>
+    <button class="phase-filter" data-phase="3">Phase 3 cards</button>
+    <button class="phase-filter" data-phase="4">Phase 4 IR/iButton</button>
+    <button class="phase-filter" data-phase="5">Phase 5 Bad USB</button>
+    <button class="phase-filter" data-phase="6">Phase 6 wireless</button>
+    <button class="phase-filter" data-phase="7">Phase 7 hardware</button>
+  </div>
+
+  <table id="matrix-table">
+    <thead>
+      <tr>
+        <th data-col="phase">Phase</th>
+        <th data-col="attack">Attack</th>
+        <th data-col="detection">Detection (what defender sees)</th>
+        <th data-col="hardening">Hardening recommendation</th>
+        <th data-col="cost">Cost</th>
+      </tr>
+    </thead>
+    <tbody id="matrix-body"></tbody>
+  </table>
+  <p class="caption">Cost legend: <span class="badge cheap">cheap</span> = $0–$500 + a few hours · <span class="badge med">med</span> = up to $5k or weeks of ops time · <span class="badge exp">expensive</span> = $5k+ or significant program change.</p>
+</div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- 2. DETECTION LAYER BREAKDOWN -->
+<!-- ============================================================ -->
+<section id="detection-layers">
+<h2>2. Detection layers — who catches what</h2>
+<p>Detection isn't a single thing. Different attacks surface in different telemetry; pretending one product catches everything is how attacks slip through.</p>
+
+<div class="panel">
+  <table>
+    <thead>
+      <tr><th>Layer</th><th>What it sees</th><th>Catches</th><th>Misses</th><th>Tooling</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong style="color: var(--accent);">Physical / CCTV</strong></td>
+        <td>Bodies near hardware, unattended workstations, "stranger in server room"</td>
+        <td>Most physical-access attacks at the entry stage (Bad USB drop, hardware tampering)</td>
+        <td>Insiders, after-hours when monitoring is light</td>
+        <td>IP cameras, badge logs, alarm systems, signed-in-visitor logs</td>
+      </tr>
+      <tr>
+        <td><strong style="color: var(--accent);">RF monitoring</strong></td>
+        <td>Spurious transmissions, anomalous WiFi APs, deauth storms</td>
+        <td>Rogue APs (evil twin), sub-GHz brute-force attempts, jamming</td>
+        <td>Passive captures, off-frequency / SDR work</td>
+        <td>Kismet, Wireshark+monitor, Bastille SAFE, AirEye, simple SDR + script</td>
+      </tr>
+      <tr>
+        <td><strong style="color: var(--accent);">Endpoint EDR</strong></td>
+        <td>Process tree, file writes, registry changes, network connections from each host</td>
+        <td>Bad USB Stage 2 payloads, persistence, lateral movement</td>
+        <td>Hardware-only attacks (SWD/SPI flash dump) that never touch the OS</td>
+        <td>CrowdStrike Falcon, Microsoft Defender for Endpoint, SentinelOne, Elastic</td>
+      </tr>
+      <tr>
+        <td><strong style="color: var(--accent);">Network / NTA</strong></td>
+        <td>Flow records, TLS metadata, DNS lookups, unusual destinations</td>
+        <td>C2 callback, DNS tunneling, data exfil patterns</td>
+        <td>Encrypted-content payloads, traffic to allowed cloud SaaS as C2</td>
+        <td>Zeek, Suricata, Darktrace, Palo Alto Cortex XDR, Vectra</td>
+      </tr>
+      <tr>
+        <td><strong style="color: var(--accent);">Access logs</strong></td>
+        <td>Door reads, building entries, time stamps</td>
+        <td>Card cloning when the clone is used (same card "in" twice without an "out")</td>
+        <td>First use of a clone before any anomaly accumulates</td>
+        <td>Access-control system (AMAG, Lenel, etc.), correlation in SIEM</td>
+      </tr>
+      <tr>
+        <td><strong style="color: var(--accent);">USB telemetry</strong></td>
+        <td>Device-add events, VID/PID, descriptor strings, keystroke cadence</td>
+        <td>Bad USB drops, USB-storage exfil, HID injection floods</td>
+        <td>Slow-typing Bad USB tuned to look human</td>
+        <td>EDR USB module, Windows Event ID 6416, Linux <code>udev</code> + logging</td>
+      </tr>
+      <tr>
+        <td><strong style="color: var(--accent);">Hardware tamper</strong></td>
+        <td>Case-opened sensors, SOIC clip insertion, hardware-attestation failure</td>
+        <td>Physical hardware attacks (chip-off, glitch, SWD probe)</td>
+        <td>Everything if no sensor is fitted (most consumer hardware)</td>
+        <td>Tamper-evident seals, case-intrusion switches, secure boot + attestation reports</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <strong>The principle:</strong> defense in depth means the attacker has to evade every layer. <em>One</em> camera + <em>one</em> EDR + <em>one</em> network sensor → the attacker has to be invisible to all three. Most successful attacks succeed because one of the three layers wasn't actually deployed despite the budget line item; audits should verify deployment, not just procurement.
+  </div>
+</div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- 3. AUDIT CHECKLIST -->
+<!-- ============================================================ -->
+<section id="audit-checklist">
+<h2>3. Audit deliverable checklist — what a client gets</h2>
+<p>This is a template, not a script. Strike anything that doesn't apply to the engagement scope. Add sections as the engagement uncovers new surface. The final report should be terse enough that a non-technical decision-maker reads it cover-to-cover.</p>
+
+<div class="panel">
+  <details open>
+    <summary><strong style="color: var(--accent-2);">Section A — Executive summary (1 page)</strong></summary>
+    <ul class="checklist">
+      <li>Scope: building / floor / system list, dates of testing</li>
+      <li>Authorization: who signed, when, what was in/out of scope</li>
+      <li>Top 3 findings: severity + business impact, in plain English</li>
+      <li>Top 3 recommendations: budget tag, owner, timeline</li>
+      <li>Residual risk after recommendations implemented</li>
+    </ul>
+  </details>
+
+  <details>
+    <summary><strong style="color: var(--accent-2);">Section B — RF / physical-access surface</strong></summary>
+    <ul class="checklist">
+      <li>Sub-GHz: all fixed-code remotes inventoried; rolling-code deployments verified non-replayable</li>
+      <li>LF RFID: card formats identified; any 26-bit HID Prox / EM4100 flagged for replacement</li>
+      <li>HF NFC: MIFARE Classic deployments flagged for migration; DESFire / Plus-SL3 deployments validated</li>
+      <li>iButton: any building-access iButton flagged for second-factor or replacement</li>
+      <li>IR: not a security control — note any IR-only controls (door bells, remote shutdowns) for awareness</li>
+    </ul>
+  </details>
+
+  <details>
+    <summary><strong style="color: var(--accent-2);">Section C — Endpoint / Bad USB surface</strong></summary>
+    <ul class="checklist">
+      <li>USB port policy verified (allowlist / blocklist / disabled in non-essential ports)</li>
+      <li>HID-injection EDR rules verified (typed/created test rule and observed alert)</li>
+      <li>PowerShell Constrained Language Mode + AMSI status across endpoint fleet</li>
+      <li>WDAC / AppLocker deployment depth — sample of typical workstation tested</li>
+      <li>Egress filtering for typical workstation: DNS-tunnel test, common C2 destinations</li>
+      <li>User-training program: phishing + USB-drop result rates from last drill</li>
+    </ul>
+  </details>
+
+  <details>
+    <summary><strong style="color: var(--accent-2);">Section D — Wireless surface</strong></summary>
+    <ul class="checklist">
+      <li>WiFi: WPA3 + PMF mandatory; any WPA2-only with deauth-vulnerable PMF-off configurations</li>
+      <li>PSK strength — sample audit of staff-shared passphrases (with consent / in scope)</li>
+      <li>Guest WiFi: OWE or strong isolation from corporate; no path between</li>
+      <li>BLE: corporate-issued mobile policy for BLE address randomization where applicable</li>
+      <li>NRF24 KB/mouse receivers — any in use? Replace with Bluetooth or wired.</li>
+    </ul>
+  </details>
+
+  <details>
+    <summary><strong style="color: var(--accent-2);">Section E — Hardware / IoT surface</strong></summary>
+    <ul class="checklist">
+      <li>Internet-facing IoT inventoried; default credentials verified changed; firmware update path validated</li>
+      <li>For high-value IoT (cameras, building automation): SPI-flash dump performed, firmware analyzed for hardcoded secrets</li>
+      <li>UART debug headers present on production hardware — disable in next revision</li>
+      <li>Cortex-M / ARM RDP level on critical embedded controllers verified at level 1 or 2</li>
+      <li>Vendor disclosure log: any novel vulns found, status with vendor</li>
+    </ul>
+  </details>
+
+  <details>
+    <summary><strong style="color: var(--accent-2);">Section F — Detection coverage</strong></summary>
+    <ul class="checklist">
+      <li>SIEM rules deployed for each Phase-2-7 attack class — coverage matrix attached</li>
+      <li>Incident-response runbook updated for each attack class</li>
+      <li>Tabletop exercise scheduled within 90 days using findings from this audit</li>
+    </ul>
+  </details>
+
+  <details>
+    <summary><strong style="color: var(--accent-2);">Section G — Appendix</strong></summary>
+    <ul class="checklist">
+      <li>Tool list + versions used during the engagement</li>
+      <li>Network captures + Flipper save files (delivered separately, encrypted)</li>
+      <li>Findings register: every vuln found with CVSS, impact, suggested fix</li>
+      <li>Engagement logs: every test, timestamp, scope justification</li>
+      <li>Sign-off: client acknowledgement of receipt + agreed remediation owners</li>
+    </ul>
+  </details>
+</div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- 4. PRIORITY -->
+<!-- ============================================================ -->
+<section id="priority">
+<h2>4. Priority — what to fix first</h2>
+<p>The matrix in §1 lists every attack and its hardening. Real engagements never have budget for all of them at once. This is the ordering I'd recommend across most general-purpose enterprises.</p>
+
+<div class="panel">
+  <table>
+    <thead>
+      <tr><th>#</th><th>Action</th><th>Why first / why later</th><th>Cost</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>1</strong></td>
+        <td>Enable PMF + migrate to WPA3 on all WiFi</td>
+        <td>Single config change kills the deauth-class attack surface entirely. Most APs support it; the holdouts are the ones you want to replace anyway.</td>
+        <td><span class="badge cheap">cheap</span></td>
+      </tr>
+      <tr>
+        <td><strong>2</strong></td>
+        <td>Disable PowerShell v2; enforce CLM + AMSI logging</td>
+        <td>Catches the bulk of Bad USB / phishing payload chains. Already shipped in Windows; turn it on.</td>
+        <td><span class="badge cheap">cheap</span></td>
+      </tr>
+      <tr>
+        <td><strong>3</strong></td>
+        <td>Replace any MIFARE Classic / EM4100 / HID Prox 26-bit deployments</td>
+        <td>Clonable in 30 seconds with $50 of gear. The breaches happen; replacement to DESFire / Seos is a few hundred dollars per door.</td>
+        <td><span class="badge med">med</span></td>
+      </tr>
+      <tr>
+        <td><strong>4</strong></td>
+        <td>USB device-control policy (allowlist VID/PID, alert on new HID)</td>
+        <td>Bad USB defense onion ring 2 — cheap and high-yield. EDR usually already has the capability.</td>
+        <td><span class="badge cheap">cheap</span></td>
+      </tr>
+      <tr>
+        <td><strong>5</strong></td>
+        <td>NRF24 keyboard/mouse receivers → Bluetooth or wired</td>
+        <td>MouseJack is a 10-year-old attack; cheap to fix per workstation.</td>
+        <td><span class="badge med">med</span></td>
+      </tr>
+      <tr>
+        <td><strong>6</strong></td>
+        <td>Egress filtering + DNS monitoring for unusual destinations</td>
+        <td>Catches Stage-2 callbacks. Many shops already pay for the tooling but underuse it.</td>
+        <td><span class="badge med">med</span></td>
+      </tr>
+      <tr>
+        <td><strong>7</strong></td>
+        <td>WDAC / app allowlisting on critical hosts (DCs, servers, exec workstations)</td>
+        <td>The "expensive layer" of the onion. Operationally heavy; do critical machines first, not everywhere.</td>
+        <td><span class="badge exp">expensive</span></td>
+      </tr>
+      <tr>
+        <td><strong>8</strong></td>
+        <td>Hardware tamper evidence on critical IoT / embedded</td>
+        <td>Only the high-value targets (door controllers, badge readers, KVMs). Don't try to do it everywhere.</td>
+        <td><span class="badge exp">expensive</span></td>
+      </tr>
+      <tr>
+        <td><strong>9</strong></td>
+        <td>Migrate iButton-controlled doors to PIN + iButton, or to RFID</td>
+        <td>iButton alone is trivially cloned. PIN compensates; full replacement is better but slower.</td>
+        <td><span class="badge med">med</span></td>
+      </tr>
+      <tr>
+        <td><strong>10</strong></td>
+        <td>Tabletop exercise using the audit findings within 90 days</td>
+        <td>The audit becomes useful only when the response team can talk through it.</td>
+        <td><span class="badge cheap">cheap</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <strong>Anti-pattern to avoid:</strong> "we'll do them all next quarter." That promise rarely survives the next quarter's priorities. Pick 3 from this list, fund them, set names against them. The remaining 7 go into a quarterly roadmap with explicit owners.
+  </div>
+</div>
+</section>
+
+
+<p style="margin-top: 48px; color: var(--muted); font-size: 12px;">
+  Curriculum source: <span style="opacity:0.55;cursor:default" title="Source lives in the private workspace">08-defense.md</span> · Back to <a href="index.html">visuals hub</a> · <span style="opacity:0.55;cursor:default" title="Source lives in the private workspace">phase index</span>
+</p>
+
+
+<!-- ============================================================ -->
+<!-- SCRIPTS -->
+<!-- ============================================================ -->
+<script>
+// ============== ATTACK → DEFENSE MATRIX DATA ==============
+const ATTACKS = [
+  // Phase 2 — sub-GHz
+  { phase: 2, attack: 'Fixed-code replay (PT2262, HT12, Princeton 24-bit)', detection: 'Same code transmitted twice in unusual rhythm; RF receiver logs', hardening: 'Replace fixed-code remotes with rolling-code (KeeLoq, AES). Existing perimeter: add a second factor (PIN keypad + remote).', cost: 'cheap' },
+  { phase: 2, attack: 'RollJam against rolling-code (vulnerable receivers)', detection: 'Door receives code with counter older than expected; jamming on band briefly noticed', hardening: 'Tight counter rejection window; AES-based rolling instead of legacy KeeLoq; receiver alerts on rejected-old-counter events.', cost: 'med' },
+  { phase: 2, attack: 'Brute force on small keyspaces (HT12 4096 codes)', detection: 'Burst of malformed codes — receiver logs auth failures', hardening: 'Rate-limit at receiver (n bad codes → mute window). Replace 12-bit systems entirely.', cost: 'cheap' },
+  { phase: 2, attack: 'KeeLoq master-key extraction (DPA, lab attack)', detection: 'Indistinguishable on wire from legitimate use — implied by clone presence', hardening: 'Per-deployment master keys (not vendor-shared); modern KeeLoq AES variants.', cost: 'exp' },
+
+  // Phase 3 — cards
+  { phase: 3, attack: 'EM4100 / HID Prox 26-bit clone', detection: 'Door read happens at "wrong" location/time relative to original cardholder', hardening: 'Replace LF prox with HF DESFire EV2/EV3 (AES) or iCLASS Seos. Add badge-photo verification on entry.', cost: 'med' },
+  { phase: 3, attack: 'MIFARE Classic dictionary + nested (Crypto1)', detection: 'Successful access from a duplicated UID at unexpected reader', hardening: 'Migrate to MIFARE DESFire EV1/2/3 or Plus SL3 (AES). Until migration: monitor for duplicate UIDs in access logs.', cost: 'med' },
+  { phase: 3, attack: 'MIFARE Classic hardnested (against hardened cards)', detection: 'Sustained reader-side query bursts during attack', hardening: 'Same as above — replacement. Hardened-Classic was a partial fix; full DESFire migration is the durable answer.', cost: 'med' },
+  { phase: 3, attack: 'mfkey32 (reader-side attack)', detection: 'Reader sees unusual auth attempt patterns from non-deployed UIDs', hardening: 'Reader firmware patched (where vendors have released fixes); migrate to AES card systems.', cost: 'med' },
+  { phase: 3, attack: 'Darkside (Crypto1 parity-bit leak, blackbox case)', detection: 'Card sees thousands of failed auth attempts — telemetry from on-card counters', hardening: 'Migrate off Crypto1. Until then: rotate sector keys quarterly.', cost: 'med' },
+  { phase: 3, attack: 'EMV passive PAN harvest', detection: 'None on the contactless interface — the card complies with spec', hardening: 'Educate users; cards in RFID-blocking sleeves; issuer-side: per-transaction tokens (visible to cardholder, not stored card-side).', cost: 'cheap' },
+
+  // Phase 4 — IR + iButton
+  { phase: 4, attack: 'IR remote clone (TV, AC, projector)', detection: 'Two devices controlling the same target — visible to the user if both used at once', hardening: 'Not a security boundary; treat IR as convenience signaling, not auth. For IR-controlled access systems: replace with authenticated channels.', cost: 'cheap' },
+  { phase: 4, attack: 'TV-B-Gone IR jamming / power-off', detection: 'Mass simultaneous power-off of public TVs', hardening: 'Acceptance: TVs in public spaces are inherently vulnerable. For critical signage: hardwire override / wall-power-cycle policy.', cost: 'cheap' },
+  { phase: 4, attack: 'iButton DS1990A clone (RW1990 blank)', detection: 'Door read at unexpected time/location vs cardholder activity', hardening: 'Two-factor: iButton + keypad PIN. Long term: migrate intercom systems to RFID with crypto.', cost: 'med' },
+
+  // Phase 5 — Bad USB
+  { phase: 5, attack: 'Stage 1 HID injection → PowerShell cradle', detection: 'EDR: new HID device + rapid keystroke + powershell.exe spawn within 5s', hardening: 'Defense onion: USB device-control + EDR HID rules + PowerShell CLM + AMSI.', cost: 'cheap' },
+  { phase: 5, attack: 'USB drop (parking-lot variant)', detection: 'User report + EDR USB-add event', hardening: 'User training: report unknown USB; physical port blockers in sensitive areas.', cost: 'cheap' },
+  { phase: 5, attack: 'Keyboard-layout mismatched payload (still typing, garbage output)', detection: 'Failed login attempts, malformed commands in shell history', hardening: 'Audit can use the failure noise as a tripwire; defense layers remain the onion above.', cost: 'cheap' },
+  { phase: 5, attack: 'Stage 2 fileless C2 callback', detection: 'Network egress to new domain from non-browser process', hardening: 'Egress filter + DNS monitoring + EDR network module. Allowlist outbound destinations where feasible.', cost: 'med' },
+
+  // Phase 6 — wireless
+  { phase: 6, attack: 'BLE tracking (public/random static addresses)', detection: 'Privacy review: do issued devices ever leak public addresses?', hardening: 'Procure devices that use Random Private Resolvable addresses; verify before deployment.', cost: 'cheap' },
+  { phase: 6, attack: 'WPA2 4-way-handshake capture + offline crack', detection: 'Repeated deauth/reassoc on a single SSID', hardening: 'Strong PSK (12+ random chars), or 802.1X with cert auth (no PSK), or WPA3-SAE.', cost: 'med' },
+  { phase: 6, attack: 'PMKID attack (no-handshake variant)', detection: 'Anomalous association attempts from MACs not in DHCP lease history', hardening: 'AP firmware patch (most vendors shipped fixes); strong PSK; or 802.1X.', cost: 'cheap' },
+  { phase: 6, attack: 'Deauth flood (PMF off)', detection: 'Burst of deauth frames seen on WIDS', hardening: 'Enable PMF on every AP. WPA3 mandates it.', cost: 'cheap' },
+  { phase: 6, attack: 'Evil-twin AP / captive-portal credential capture', detection: 'WIDS rogue-AP alert (same SSID on attacker-controlled BSSID, higher RSSI than expected)', hardening: 'EAP-TLS (no passwords to phish); user training to recognize captive-portal red flags.', cost: 'med' },
+  { phase: 6, attack: 'MouseJack (NRF24 keystroke injection)', detection: 'EDR: HID input arriving with no foreground app focus / off-hour bursts', hardening: 'Replace NRF24 dongles with Bluetooth (encrypted) or wired peripherals.', cost: 'med' },
+  { phase: 6, attack: 'KRACK (nonce reuse against 4-way handshake)', detection: 'Most clients log KRACK-flag warnings if vulnerable; depends on OS', hardening: 'Patch all clients and APs (most vendors shipped fixes 2017-2018).', cost: 'cheap' },
+
+  // Phase 7 — hardware
+  { phase: 7, attack: 'UART boot-log credential disclosure', detection: 'None on the device — must be physically present', hardening: 'Disable UART output in production firmware; physical tamper-evident seal on case.', cost: 'cheap' },
+  { phase: 7, attack: 'U-Boot interrupt + init=/bin/sh', detection: 'None — device is unplugged during the attack', hardening: 'Lock U-Boot console (password or CONFIG_SILENT_CONSOLE); enable signed boot.', cost: 'cheap' },
+  { phase: 7, attack: 'SPI flash dump (SOIC-8 clip / chip-off)', detection: 'Tamper-evident seal disturbed; case-intrusion switch tripped', hardening: 'Encrypted flash (firmware encrypted at rest, key in SoC TrustZone). Tamper sensors on case.', cost: 'exp' },
+  { phase: 7, attack: 'SWD/JTAG read (RDP 0 chip)', detection: 'None — chip allows the read by design', hardening: 'Set RDP to Level 1 minimum on production silicon; Level 2 for high-value.', cost: 'cheap' },
+  { phase: 7, attack: 'Voltage glitch (defeat RDP / secure boot)', detection: 'On-chip glitch detectors (where present)', hardening: 'Use SoCs with hardware glitch detection (e.g. NXP K-series secure variants, STM32 Trust). Defense-in-depth: signed boot + attestation.', cost: 'exp' },
+  { phase: 7, attack: 'Hardcoded creds / keys in firmware', detection: 'binwalk + grep on a copy of firmware (continuous CI test)', hardening: 'Pre-release scan for hardcoded secrets; ship per-device keys provisioned at manufacture.', cost: 'cheap' },
+];
+
+let activeFilter = 'all';
+let sortCol = 'phase';
+let sortDir = 'asc';
+
+function renderMatrix() {
+  const tbody = document.getElementById('matrix-body');
+  let rows = ATTACKS.slice();
+  if (activeFilter !== 'all') rows = rows.filter(r => String(r.phase) === activeFilter);
+  rows.sort((a, b) => {
+    const av = a[sortCol], bv = b[sortCol];
+    if (typeof av === 'number') return sortDir === 'asc' ? av - bv : bv - av;
+    return sortDir === 'asc' ? String(av).localeCompare(String(bv)) : String(bv).localeCompare(String(av));
+  });
+
+  tbody.innerHTML = rows.map(r => `
+    <tr>
+      <td><span class="phase-pill phase-${r.phase}">P${r.phase}</span></td>
+      <td><strong>${r.attack}</strong></td>
+      <td>${r.detection}</td>
+      <td>${r.hardening}</td>
+      <td><span class="badge ${r.cost}">${r.cost}</span></td>
+    </tr>
+  `).join('');
+
+  document.querySelectorAll('#matrix-table th').forEach(th => {
+    th.classList.remove('sort-asc', 'sort-desc');
+    if (th.dataset.col === sortCol) th.classList.add(sortDir === 'asc' ? 'sort-asc' : 'sort-desc');
+  });
+}
+
+document.querySelectorAll('.phase-filter').forEach(b => {
+  b.onclick = () => {
+    activeFilter = b.dataset.phase;
+    document.querySelectorAll('.phase-filter').forEach(x => x.classList.remove('primary'));
+    b.classList.add('primary');
+    renderMatrix();
+  };
+});
+
+document.querySelectorAll('#matrix-table th').forEach(th => {
+  th.onclick = () => {
+    const col = th.dataset.col;
+    if (sortCol === col) { sortDir = sortDir === 'asc' ? 'desc' : 'asc'; }
+    else { sortCol = col; sortDir = 'asc'; }
+    renderMatrix();
+  };
+});
+
+renderMatrix();
+</script>
+
+</body>
+</html>

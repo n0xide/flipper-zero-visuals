@@ -59,9 +59,11 @@
   }
   .phase-card.p2::before { background: #ff5a6e; }
   .phase-card.p3::before { background: #ffb547; }
+  .phase-card.p4::before { background: #e879f9; }
   .phase-card.p5::before { background: #5eb6ff; }
   .phase-card.p6::before { background: #00d9a0; }
   .phase-card.p7::before { background: #c084fc; }
+  .phase-card.p8::before { background: #00d9a0; }
 
   .phase-num {
     font-family: var(--mono);
@@ -151,6 +153,18 @@
   .future-item { background: var(--panel-2); border: 1px solid var(--line); border-radius: 4px; padding: 10px 12px; }
   .future-item-title { color: var(--accent-2); font-size: 13px; font-weight: 600; }
   .future-item-desc { color: var(--muted); font-size: 12px; margin-top: 2px; }
+
+  @media (max-width: 720px) {
+    body { padding: 18px 12px 60px; }
+    h1 { font-size: 24px; }
+    h2 { font-size: 18px; }
+    .grid { grid-template-columns: 1fr; }
+    .meta-grid { grid-template-columns: 1fr; }
+    .future-grid { grid-template-columns: 1fr; }
+    .phase-card { padding: 16px; }
+    .small-table { display: block; overflow-x: auto; }
+    .intro-panel { padding: 16px; }
+  }
 </style>
 </head>
 <body>
@@ -169,12 +183,12 @@
   <div class="meta-grid">
     <div class="meta-card">
       <div class="meta-card-label">Phases covered</div>
-      <div class="meta-card-value">5 / 10</div>
-      <div class="meta-card-sub">the visually-dense ones</div>
+      <div class="meta-card-value">7 / 10</div>
+      <div class="meta-card-sub">2, 3, 4, 5, 6, 7, 8</div>
     </div>
     <div class="meta-card">
       <div class="meta-card-label">Total visualizations</div>
-      <div class="meta-card-value">31</div>
+      <div class="meta-card-value">42</div>
       <div class="meta-card-sub">interactive + diagrams + tables</div>
     </div>
     <div class="meta-card">
@@ -226,13 +240,32 @@
       <li class="complex">EM4100 packet anatomy — every bit</li>
       <li>NFC tag family tree with security badges</li>
       <li class="complex">MIFARE Classic memory map — 16 sectors</li>
-      <li>Crypto1 attack ladder decision tree</li>
+      <li>Crypto1 attack ladder + decision matrix (5 attacks)</li>
       <li>EMV — what Flipper can and can't read</li>
       <li class="complex">Clone workflow — LF and HF side-by-side</li>
     </ul>
     <div class="phase-footer">
       <span class="phase-link">phase-3-cards.html →</span>
       <span class="visual-count">7 visuals</span>
+    </div>
+  </a>
+
+  <!-- Phase 4 -->
+  <a href="phase-4-ir-ibutton.html" class="phase-card p4">
+    <div class="phase-num">Phase 04 · IR + 1-Wire</div>
+    <div class="phase-title">IR + iButton</div>
+    <div class="phase-tagline">Short-range protocols that were never designed for security. Lightest legal-boundary phase in the curriculum.</div>
+    <ul class="phase-visuals">
+      <li>IR physics — why 38 kHz carrier</li>
+      <li class="complex">NEC vs RC5 vs SIRC vs Pronto waveforms</li>
+      <li>Flipper IR capability matrix</li>
+      <li>1-Wire iButton physical layer + bus model</li>
+      <li>DS1990A read sequence — bus-level timing</li>
+      <li>iButton clone workflow + compatible blanks</li>
+    </ul>
+    <div class="phase-footer">
+      <span class="phase-link">phase-4-ir-ibutton.html →</span>
+      <span class="visual-count">6 visuals</span>
     </div>
   </a>
 
@@ -279,7 +312,7 @@
     <div class="phase-title">Hardware hacking</div>
     <div class="phase-tagline">Where the Flipper becomes a hardware bench. Pinouts, bus protocols, SOIC-8 flash dumping, the audit chain.</div>
     <ul class="phase-visuals">
-      <li class="complex">Flipper GPIO header — 18-pin interactive pinout</li>
+      <li class="complex">Flipper GPIO header — keyboard-accessible 18-pin pinout</li>
       <li class="complex">UART / SPI / I²C — wiring + timing side-by-side</li>
       <li>SOIC-8 SPI flash + CH341A wiring</li>
       <li class="complex">8-step hardware attack chain</li>
@@ -292,29 +325,46 @@
     </div>
   </a>
 
+  <!-- Phase 8 -->
+  <a href="phase-8-defense.html" class="phase-card p8">
+    <div class="phase-num">Phase 08 · Blue team</div>
+    <div class="phase-title">Defense + audit</div>
+    <div class="phase-tagline">Every attack from Phases 2-7 paired with detection + hardening. The deliverable a client gets at the end of an audit.</div>
+    <ul class="phase-visuals">
+      <li class="complex">Attack → defense matrix — sortable, filterable (30 rows)</li>
+      <li>Detection layer breakdown — who catches what</li>
+      <li>Audit deliverable checklist — 7 sections, ready to fill</li>
+      <li>Priority order — what to fix first / last</li>
+    </ul>
+    <div class="phase-footer">
+      <span class="phase-link">phase-8-defense.html →</span>
+      <span class="visual-count">4 visuals</span>
+    </div>
+  </a>
+
 </div>
 
 
 <!-- ============================================================ -->
 <!-- WHY NOT EVERY PHASE -->
 <!-- ============================================================ -->
-<h2>Why these five phases, not all ten</h2>
-<p style="margin-top: 12px;">Each phase visualization burns ~1500 lines of HTML. To stay valuable, the visuals target topics that are <em>genuinely hard to grok from text</em>. Some phases don't benefit:</p>
+<h2>Why these seven phases, not all ten</h2>
+<p style="margin-top: 12px;">Each phase visualization burns ~1500 lines of HTML. To stay valuable, the visuals target topics that are <em>genuinely hard to grok from text</em>. Two phases still don't benefit:</p>
 
 <table class="small-table">
   <thead>
     <tr><th>Phase</th><th>Status</th><th>Reason</th></tr>
   </thead>
   <tbody>
-    <tr><td>00 — Ethics + legal</td><td><span style="color: var(--muted);">no visuals</span></td><td>Pure text policy. A diagram doesn't help.</td></tr>
+    <tr><td>00 — Ethics + legal</td><td><span style="color: var(--muted);">no visuals</span></td><td>Pure text policy. The per-phase legality callouts inside Phases 2-7 carry it.</td></tr>
     <tr><td>01 — Foundations</td><td><span style="color: var(--muted);">no visuals (yet)</span></td><td>Capability table already in the markdown. Could add an interactive chip layout if Phase 1 hands-on starts.</td></tr>
     <tr><td>02 — Sub-GHz</td><td><span style="color: var(--accent);">covered ✓</span></td><td>RF modulation, encoding, rolling-code mechanics — densely visual.</td></tr>
     <tr><td>03 — Card tech</td><td><span style="color: var(--accent);">covered ✓</span></td><td>Packet anatomy, memory layouts, attack trees — densely visual.</td></tr>
-    <tr><td>04 — IR + iButton</td><td><span style="color: var(--muted);">no visuals</span></td><td>Mostly broken-by-design + short. The little visual benefit could be a single IR protocol comparison chart later.</td></tr>
+    <tr><td>04 — IR + iButton</td><td><span style="color: var(--accent);">covered ✓</span></td><td>IR protocol waveforms side-by-side + 1-Wire bus-level timing — the kind of "see one diagram, understand the whole thing" content.</td></tr>
     <tr><td>05 — Bad USB</td><td><span style="color: var(--accent);">covered ✓</span></td><td>Stage chain + defense layers benefit; keyboard layout demo is uniquely interactive.</td></tr>
-    <tr><td>06 — Wireless ext.</td><td><span style="color: var(--accent);">covered ✓</span></td><td>BLE addresses, WiFi handshake, evil twin — heavy diagrams.</td></tr>
+    <tr><td>06 — Wireless ext.</td><td><span style="color: var(--accent);">covered ✓</span></td><td>BLE addresses, WiFi handshake, evil twin, PMKID — heavy diagrams.</td></tr>
     <tr><td>07 — Hardware</td><td><span style="color: var(--accent);">covered ✓</span></td><td>The pinout alone is worth the page.</td></tr>
-    <tr><td>08 — Defense</td><td><span style="color: var(--muted);">no visuals (yet)</span></td><td>Cross-references the per-phase defense angles. An "attacks → defenses" matrix could go here.</td></tr>
+    <tr><td>08 — Defense</td><td><span style="color: var(--accent);">covered ✓</span></td><td>Sortable attack→defense matrix + audit checklist. Ties Phases 2-7 to a blue-team deliverable.</td></tr>
     <tr><td>09 — Capstones</td><td><span style="color: var(--muted);">no visuals (yet)</span></td><td>Scenario-based. Could add a "site map" of each capstone scenario when one activates.</td></tr>
   </tbody>
 </table>
@@ -329,20 +379,12 @@
 
   <div class="future-grid">
     <div class="future-item">
-      <div class="future-item-title">IR protocol comparison</div>
-      <div class="future-item-desc">NEC vs RC5 vs SIRC vs Pronto carrier + bit timing waveforms. Phase 4 trigger.</div>
-    </div>
-    <div class="future-item">
-      <div class="future-item-title">1-Wire iButton timing</div>
-      <div class="future-item-desc">DS1990A read sequence at bus level. Phase 4 trigger.</div>
-    </div>
-    <div class="future-item">
-      <div class="future-item-title">Attack → defense matrix</div>
-      <div class="future-item-desc">Every attack class from Phases 2–7 with its defense rec, sortable. Phase 8 trigger.</div>
-    </div>
-    <div class="future-item">
       <div class="future-item-title">Capstone site map</div>
       <div class="future-item-desc">Per-scenario visual map of attack surface for each Phase 9 capstone (home, office, vehicle, IoT, OT).</div>
+    </div>
+    <div class="future-item">
+      <div class="future-item-title">Phase 1 device anatomy</div>
+      <div class="future-item-desc">Interactive Flipper teardown — SoC, sub-GHz transceiver, NFC frontend, USB controller. Add if Phase 1 hands-on starts.</div>
     </div>
     <div class="future-item">
       <div class="future-item-title">SDR vs Flipper FFT</div>

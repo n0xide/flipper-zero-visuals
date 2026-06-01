@@ -1,9 +1,12 @@
 # Flipper Zero Visuals
 
 Interactive HTML visualizations for a self-taught Flipper Zero curriculum
-covering Sub-GHz, card technologies (LF + HF NFC), Bad USB, wireless
-(BLE / WiFi / NRF24), and GPIO + hardware hacking. ~31 visualizations across
-5 phase pages plus a hub index — all self-contained, offline-capable.
+covering Sub-GHz, card technologies (LF + HF NFC), IR + iButton, Bad USB,
+wireless (BLE / WiFi / NRF24), GPIO + hardware hacking, and the blue-team
+defense matrix that ties it all together. ~42 visualizations across 7 phase
+pages plus a hub index — all self-contained, offline-capable. Every phase
+opens with a legality callout so the reader knows which workflows are public
+practice and which need authorization.
 
 **Live site:** <https://n0xide.github.io/flipper-zero-visuals/>
 
@@ -12,11 +15,13 @@ covering Sub-GHz, card technologies (LF + HF NFC), Bad USB, wireless
 | File | Phase | Topics covered |
 |---|---|---|
 | `index.html` | Hub | Master grid of all visualizations + phase navigation |
-| `phase-2-subghz.html` | 02 | Modulation (AM/FM/ASK/OOK/FSK), capture vs replay vs rolling-code, frequency bands, common attacks |
-| `phase-3-cards.html` | 03 | LF (EM4100, HID, Indala) + HF (MIFARE Classic, DESFire, NTAG); sector/block memory map; UID vs sector data |
-| `phase-5-badusb.html` | 05 | HID injection script anatomy, payload examples, Rubber Ducky lineage, defensive postures |
-| `phase-6-wireless.html` | 06 | BLE GATT, WiFi deauth ethics, NRF24 sniffing, RF spectrum overview |
-| `phase-7-hardware.html` | 07 | GPIO pinout, SPI/I²C/UART probes, JTAG/SWD, glitching basics, logic analyzer reads |
+| `phase-2-subghz.html` | 02 | Modulation (ASK/OOK/2-FSK), encoding (NRZ/Manchester/PWM), fixed vs rolling code, KeeLoq packet anatomy, RollJam timeline, brute-force math |
+| `phase-3-cards.html` | 03 | LF (EM4100, HID) + HF (MIFARE Classic, DESFire, NTAG); sector/block map; Crypto1 attack ladder + decision matrix (dictionary → nested → hardnested → darkside → mfkey32); EMV clarity; clone workflow |
+| `phase-4-ir-ibutton.html` | 04 | 38 kHz IR physics; NEC vs RC5 vs SIRC vs Pronto waveform comparison; Flipper IR capability matrix; 1-Wire iButton bus model + DS1990A read sequence + clone workflow |
+| `phase-5-badusb.html` | 05 | HID injection premise (USB enumeration); annotated Ducky Script; Stage 1 → Stage 2 chain (8-step animated); 6-ring defense onion with named products (USBGuard, BeamGun, Defender ASR); keyboard-layout footgun (live US/AZERTY/QWERTZ/Dvorak transliteration) |
+| `phase-6-wireless.html` | 06 | BLE address types + tracking sim; WPA2 4-way handshake step-through; PMKID-attack flow; PMF on/off comparison; evil twin diagram; MouseJack; PSK crack-time calculator (length × charset × GPU rate) |
+| `phase-7-hardware.html` | 07 | Keyboard-accessible 18-pin GPIO header (canonical pinout); UART/SPI/I²C wiring + timing; SOIC-8 SPI flash dumping + CH341A; 8-step audit chain; ARM Cortex-M RDP levels; voltage / level-shift matrix |
+| `phase-8-defense.html` | 08 | Sortable attack→defense matrix (30 rows across Phases 2-7, filterable by phase, sortable by cost); detection-layer breakdown (physical / RF / EDR / network / access / USB / tamper); 7-section audit deliverable checklist; remediation priority list |
 
 All visualizations are interactive — sliders, animated waveforms, clickable diagrams.
 
