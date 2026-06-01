@@ -172,7 +172,7 @@
     </thead>
     <tbody>
       <tr>
-        <td class="mono">STM32WB55CG</td>
+        <td class="mono">STM32WB55RG</td>
         <td>Main MCU. Dual-core (Cortex-M4 application + M0+ radio). 1 MB flash, 256 KB RAM. Runs FuriHAL + the application code. Handles USB, BLE, file system, all UI.</td>
         <td>foundation for everything; specifically BLE in <a href="phase-6-wireless.html">Phase 6</a></td>
         <td>BLE is host-only on stock (advertising + GATT central). No raw radio access without dev firmware.</td>
@@ -215,7 +215,7 @@
       </tr>
       <tr>
         <td class="mono">18-pin GPIO header</td>
-        <td>Side header exposing 8 GPIOs + UART + SPI + I²C + SWD + 1-Wire + power rails. The hardware-hacking surface.</td>
+        <td>Side header exposing 13 user-I/O pins (muxed for UART, SPI, I²C, SWD, 1-Wire) plus +5V / +3.3V / 3× GND. The hardware-hacking surface.</td>
         <td><a href="phase-7-hardware.html">Phase 7 hardware</a></td>
         <td>3.3 V logic; ~20 mA per pin; 5 V rail off by default.</td>
       </tr>
@@ -281,7 +281,7 @@
     <h3 style="color: var(--danger);">Pro — only when you're sure you'll use it</h3>
     <p class="caption" style="margin-top: -8px;">Each item is $100+. Buy after the corresponding curriculum phase shows you need more depth than the Flipper provides.</p>
     <div class="gear-row"><div class="gear-name">Proxmark3 Easy or RDV4</div><div class="gear-cost">$100 / $300</div><div>Deep NFC card analysis far beyond Flipper. After Phase 3 if HF becomes a focus.</div></div>
-    <div class="gear-row"><div class="gear-name">HackRF One or RTL-SDR Blog V4</div><div class="gear-cost">$30 / $300</div><div>Wideband SDR. Phase 2 + 6 extension. RTL-SDR is the easier entry.</div></div>
+    <div class="gear-row"><div class="gear-name">RTL-SDR Blog V4 or HackRF One</div><div class="gear-cost">$40 / $300</div><div>Wideband SDR. Phase 2 + 6 extension. RTL-SDR is the easier entry.</div></div>
     <div class="gear-row"><div class="gear-name">ChipWhisperer-Lite or -Husky</div><div class="gear-cost">$300+</div><div>Phase 7 advanced — voltage glitch + side-channel. Multi-week learning curve.</div></div>
     <div class="gear-row"><div class="gear-name">Bench PSU with current display (DPS-150 or equivalent)</div><div class="gear-cost">$100+</div><div>Phase 7 power-glitch experiments + current monitoring.</div></div>
     <div class="gear-row"><div class="gear-name">USB logic analyzer (Saleae Logic 8 or DSLogic)</div><div class="gear-cost">$100+</div><div>Phase 7 protocol decoding when Flipper's built-in analyzer isn't enough.</div></div>
@@ -387,7 +387,7 @@ const COMPONENTS = {
   iButton: {
     view: 'top',
     name: 'iButton contact (1-Wire)',
-    body: 'Stainless-steel contact ring on the front face. Same 1-Wire line that\'s also exposed on GPIO pin 17. Reads + emulates DS1990A and intercom variants.',
+    body: 'Stainless-steel contact ring on the back of the device (shown here at the top of the "front view" for diagram clarity). Same 1-Wire line that\'s also exposed on GPIO pin 17. Reads + emulates DS1990A and intercom variants.',
     phase: 'Phase 4 iButton · also Phase 7 (GPIO 17)',
     hotspot: { type: 'circle', cx: 290, cy: 100, r: 16 }
   },
@@ -429,7 +429,7 @@ const COMPONENTS = {
   // Inside view
   stm32: {
     view: 'inside',
-    name: 'STM32WB55CG (main MCU)',
+    name: 'STM32WB55RG (main MCU)',
     body: 'Dual-core ARM Cortex-M4 (application, ~64 MHz) + Cortex-M0+ (radio coprocessor). 1 MB flash, 256 KB RAM. Native USB. The whole FuriHAL runtime lives here.',
     phase: 'foundation for everything; BLE in Phase 6',
     hotspot: { type: 'rect', x: 140, y: 200, w: 90, h: 70 }
@@ -464,7 +464,7 @@ const COMPONENTS = {
   },
   battery: {
     view: 'inside',
-    name: 'Li-Po battery (2000 mAh)',
+    name: 'Li-Po battery (2100 mAh)',
     body: 'Single-cell 3.7 V Li-Po. About a week of standby in light use; a few hours of active radio work.',
     phase: 'everything',
     hotspot: { type: 'rect', x: 60, y: 400, w: 240, h: 100 }
@@ -566,7 +566,7 @@ function renderAnatomy() {
 
       <!-- Battery -->
       <rect x="60" y="400" width="240" height="100" rx="6" fill="rgba(192,132,252,0.08)" stroke="#c084fc" stroke-width="2"/>
-      <text x="180" y="450" text-anchor="middle" font-size="12" fill="#c084fc" font-family="JetBrains Mono, monospace">Li-Po 2000 mAh</text>
+      <text x="180" y="450" text-anchor="middle" font-size="12" fill="#c084fc" font-family="JetBrains Mono, monospace">Li-Po 2100 mAh</text>
 
       <!-- microSD slot -->
       <rect x="250" y="510" width="60" height="30" rx="3" fill="#1a232e" stroke="#5eb6ff" stroke-width="2"/>

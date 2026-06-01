@@ -282,12 +282,12 @@ const SCENARIOS = {
       { x: 170, y: 90, type: 'circle', r: 18, label: 'Garage door opener', phase: 2, phaseLabel: 'Phase 2 sub-GHz', body: 'Likely 300–400 MHz fixed-code or KeeLoq rolling-code. Capture passively first; identify class before any active test.', defenses: ['fixed-code-replay', 'rolljam'] },
       { x: 80, y: 380, type: 'circle', r: 18, label: 'Front-door RFID lock', phase: 3, phaseLabel: 'Phase 3 cards', body: 'Could be HID Prox (LF) or MIFARE-based (HF). Identify card format first — that decides which Phase 3 attack tree applies.', defenses: ['em4100-clone', 'mifare-dict-nested'] },
       { x: 430, y: 100, type: 'circle', r: 18, label: 'Smart TV (IR remote)', phase: 4, phaseLabel: 'Phase 4 IR', body: 'NEC or RC5 protocol typically. Universal-remote-style attack: TV-B-Gone, IR clone. Educational; not a security boundary.', defenses: ['ir-clone', 'tv-b-gone'] },
-      { x: 530, y: 110, type: 'circle', r: 14, label: 'Smart bulb (BLE)', phase: 6, phaseLabel: 'Phase 6 BLE', body: 'Likely BLE-controlled or Zigbee. Check address type — public + static = trackable.', defenses: ['ble-tracking'] },
-      { x: 520, y: 160, type: 'circle', r: 14, label: 'Voice assistant', phase: 6, phaseLabel: 'Phase 6 wireless', body: 'WiFi-connected with BLE setup. Capture the setup handshake; pwn the WiFi PSK; pwn the cloud creds.', defenses: ['wpa2-handshake-crack', 'pmkid'] },
+      { x: 530, y: 110, type: 'circle', r: 14, label: 'Smart bulb', phase: 6, phaseLabel: 'Phase 6 BLE / wireless', body: 'BLE-controlled bulbs: check address type (public/static = trackable). Zigbee bulbs (Hue, most mesh) use a separate attack tree outside the Phase 6 BLE scope — passive observation only.', defenses: ['ble-tracking'] },
+      { x: 520, y: 160, type: 'circle', r: 14, label: 'Voice assistant', phase: 6, phaseLabel: 'Phase 6 wireless', body: 'WiFi-connected with BLE setup. Capture the joining-segment handshake; PSK-strength review; cloud-API review only under ToS or a vendor bug-bounty program. Modern Echo/Google use TLS-pinned channels — most app-level "cloud creds" work is out of casual scope.', defenses: ['wpa2-handshake-crack', 'pmkid'] },
       { x: 100, y: 240, type: 'circle', r: 16, label: 'Family laptop on table', phase: 5, phaseLabel: 'Phase 5 Bad USB', body: 'Unattended workstation. Bad USB drop, Stage 1 cradle, Stage 2 callback to lab C2. CONSENT required even for a family member.', defenses: ['hid-injection', 'usb-drop'] },
       { x: 220, y: 240, type: 'circle', r: 14, label: 'Smart fridge / oven', phase: 7, phaseLabel: 'Phase 7 hardware', body: 'WiFi-connected appliances often have UART debug headers. Engineering-mode access if you can open the case.', defenses: ['uart-leak', 'spi-flash-dump'] },
       { x: 380, y: 250, type: 'circle', r: 16, label: 'WiFi router', phase: 6, phaseLabel: 'Phase 6 wireless', body: 'Test PMF status; capture handshake; check PSK strength; verify WPA3 path. Also a Phase 7 target (UART on most consumer routers).', defenses: ['pmkid', 'deauth-flood', 'wpa2-handshake-crack'] },
-      { x: 430, y: 380, type: 'circle', r: 16, label: 'Smart door lock', phase: 6, phaseLabel: 'Phase 6 BLE', body: 'BLE pairing surface; replay-protection check; companion-app cloud creds.', defenses: ['ble-tracking', 'wpa2-handshake-crack'] },
+      { x: 430, y: 380, type: 'circle', r: 16, label: 'Smart door lock', phase: 6, phaseLabel: 'Phase 6 BLE', body: 'BLE pairing surface; replay-protection check on the lock/unlock command; companion-app cloud creds reviewed under bug-bounty terms only.', defenses: ['ble-tracking'] },
       { x: 540, y: 350, type: 'circle', r: 12, label: 'BLE tracker', phase: 6, phaseLabel: 'Phase 6 BLE', body: 'Item tag / keys. Check whether it broadcasts RPA or static random — privacy review.', defenses: ['ble-tracking'] }
     ]
   },
@@ -349,7 +349,7 @@ const SCENARIOS = {
       { x: 380, y: 100, type: 'circle', r: 14, label: 'Ceiling WiFi APs', phase: 6, phaseLabel: 'Phase 6 wireless', body: 'PMF status, WPA3 readiness, PSK vs 802.1X. Verify guest segregation.', defenses: ['pmkid', 'deauth-flood', 'evil-twin'] },
       { x: 130, y: 380, type: 'circle', r: 14, label: 'Conference room AV + IR projector', phase: 4, phaseLabel: 'Phase 4 IR', body: 'IR remotes for projector. Mostly nuisance class but documents the surface for the report.', defenses: ['ir-clone', 'tv-b-gone'] },
       { x: 350, y: 360, type: 'circle', r: 14, label: 'Networked printer / MFP', phase: 7, phaseLabel: 'Phase 7 hardware', body: 'Default creds, UART debug, firmware-update channel. Many printers store scanned-doc cache.', defenses: ['uart-leak', 'hardcoded-keys'] },
-      { x: 450, y: 360, type: 'circle', r: 12, label: 'Smart fridge / vending NFC', phase: 3, phaseLabel: 'Phase 3 cards', body: 'Often MIFARE Classic-based for payment. Easy lab demo of contactless cloning.', defenses: ['mifare-dict-nested'] }
+      { x: 450, y: 360, type: 'circle', r: 12, label: 'Smart fridge / vending NFC', phase: 3, phaseLabel: 'Phase 3 cards', body: 'Legacy systems are sometimes MIFARE Classic-based for closed-loop payment; modern operators (Nayax, Cantaloupe) typically use DESFire or contactless EMV. Identify the card format before assuming clonability.', defenses: ['mifare-dict-nested'] }
     ]
   },
 
@@ -395,7 +395,7 @@ const SCENARIOS = {
       { x: 300, y: 150, type: 'circle', r: 14, label: 'Infotainment (BT + WiFi)', phase: 6, phaseLabel: 'Phase 6 wireless', body: 'BT pairing replay, infotainment WiFi hotspot, app-store SoC. Many surface CVEs over the years.', defenses: ['wpa2-handshake-crack', 'ble-tracking'] },
       { x: 250, y: 230, type: 'circle', r: 12, label: 'OBD-II port (under steering)', phase: 7, phaseLabel: 'Phase 7 hardware', body: 'CAN bus access. Engine + body controllers reachable. Tuning + diagnostic and (depending on vehicle) lock-control.', defenses: ['uart-leak', 'uboot-shell'] },
       { x: 300, y: 220, type: 'circle', r: 12, label: 'NFC unlock (B-pillar / handle)', phase: 3, phaseLabel: 'Phase 3 cards', body: 'Modern vehicles: NFC-as-key for phone-as-key features. Apple/Google CCC standard.', defenses: ['mifare-dict-nested'] },
-      { x: 360, y: 350, type: 'circle', r: 12, label: 'Aftermarket dashcam (BLE)', phase: 6, phaseLabel: 'Phase 6 BLE', body: 'Cheap dashcams with no auth on BLE config interface. Firmware update side-channel.', defenses: ['ble-tracking'] }
+      { x: 360, y: 350, type: 'circle', r: 12, label: 'Aftermarket dashcam (BLE / WiFi)', phase: 6, phaseLabel: 'Phase 6 wireless', body: 'Cheap dashcams often expose unauthenticated BLE config + a WiFi AP for video review. The WiFi PSK is frequently hardcoded — verify before assuming it isn\'t.', defenses: ['ble-tracking', 'wpa2-handshake-crack'] }
     ]
   },
 
@@ -456,7 +456,7 @@ const SCENARIOS = {
       <defs><marker id="iot-arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#5eb6ff"/></marker></defs>
     `,
     hotspots: [
-      { x: 170, y: 100, type: 'circle', r: 30, label: 'Camera + mic input', phase: 6, phaseLabel: 'Phase 6 wireless', body: 'Privacy review: what packets leave the device on motion / sound trigger? Cloud telemetry surface.', defenses: ['wpa2-handshake-crack'] },
+      { x: 170, y: 100, type: 'circle', r: 30, label: 'Camera + mic input', phase: 6, phaseLabel: 'Phase 6 wireless', body: 'Privacy review surface: what packets leave the device on motion / sound trigger? Cloud telemetry shape. No direct Phase 8 row — taught at concept level only.', defenses: [] },
       { x: 170, y: 200, type: 'circle', r: 25, label: 'Doorbell button (trigger)', phase: 6, phaseLabel: 'Phase 6 wireless', body: 'Triggers cloud event. Look for an unauthenticated wake-on-press handler in the firmware.', defenses: ['hardcoded-keys'] },
       { x: 400, y: 130, type: 'rect', x_real: 360, y_real: 100, w: 80, h: 60, label: 'SoC', phase: 7, phaseLabel: 'Phase 7 hardware', body: 'Main MCU / SoC. SWD or JTAG headers? Check RDP level.', defenses: ['swd-read', 'voltage-glitch'] },
       { x: 500, y: 120, type: 'rect', x_real: 470, y_real: 100, w: 60, h: 40, label: 'SPI flash chip', phase: 7, phaseLabel: 'Phase 7 hardware', body: 'SOIC-8 SPI flash. CH341A + clip = full firmware dump. binwalk for hardcoded secrets.', defenses: ['spi-flash-dump', 'hardcoded-keys'] },
@@ -510,7 +510,7 @@ const SCENARIOS = {
       { x: 500, y: 150, type: 'circle', r: 14, label: 'Cellular / LoRa backhaul', phase: 6, phaseLabel: 'Phase 6 wireless', body: 'Some plants send process data over LoRa or cellular. Passive observation is the legitimate path.', defenses: ['wpa2-handshake-crack'] },
       { x: 110, y: 360, type: 'circle', r: 14, label: 'PLC (machine 1)', phase: 7, phaseLabel: 'Phase 7 hardware', body: 'Most PLCs have a Modbus or proprietary serial diagnostic port. Lab replica only for active testing.', defenses: ['uart-leak', 'hardcoded-keys'] },
       { x: 230, y: 360, type: 'circle', r: 14, label: 'PLC (machine 2)', phase: 7, phaseLabel: 'Phase 7 hardware', body: 'Same family + lab-only constraint.', defenses: ['uart-leak'] },
-      { x: 350, y: 360, type: 'circle', r: 14, label: 'Wireless instrument (sensor)', phase: 6, phaseLabel: 'Phase 6 wireless', body: 'ISA100 / WirelessHART / proprietary 900 MHz. Passive capture only; transmissions back to the gateway out of scope.', defenses: ['wpa2-handshake-crack'] },
+      { x: 350, y: 360, type: 'circle', r: 14, label: 'Wireless instrument (sensor)', phase: 6, phaseLabel: 'Phase 6 wireless', body: 'ISA100.11a and WirelessHART both mandate AES-128 encryption (Join Key + Network Key + per-pair Session Keys + MIC) — passive capture yields ciphertext + timing/topology metadata, not field values. Proprietary 900 MHz instrumentation varies; some legacy systems do transmit cleartext.', defenses: [] },
       { x: 470, y: 360, type: 'circle', r: 14, label: 'RTU (remote-terminal unit)', phase: 7, phaseLabel: 'Phase 7 hardware', body: 'Often older hardware; UART debug or unauthenticated serial protocol.', defenses: ['uart-leak', 'uboot-shell'] },
       { x: 100, y: 80, type: 'circle', r: 12, label: 'Network switch / backplane', phase: 6, phaseLabel: 'Phase 6 wireless', body: 'OT vs IT segmentation check. Default-creds + flat-network smell-test.', defenses: ['hardcoded-keys'] }
     ]
@@ -570,7 +570,10 @@ function showHotspot(idx) {
   const h = sc.hotspots[idx];
   if (!h) return;
   lastHotspotKey = idx;
-  const defLinks = h.defenses.map(id => `<a href="phase-8-defense.html#a=${id}">${id} →</a>`).join('<br>');
+  const hasDefenses = h.defenses && h.defenses.length > 0;
+  const defLinks = hasDefenses
+    ? h.defenses.map(id => `<a href="phase-8-defense.html#a=${id}">${id} →</a>`).join('<br>')
+    : '<em style="color: var(--muted);">No direct Phase 8 row — this surface is taught at concept level only or sits outside the audit-class taxonomy.</em>';
   document.getElementById('scenario-info').innerHTML = `
     <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px;">
       <span class="phase-pill phase-${h.phase}">${h.phaseLabel}</span>
