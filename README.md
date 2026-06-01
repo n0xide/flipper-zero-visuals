@@ -1,14 +1,15 @@
 # Flipper Zero Visuals
 
 Interactive HTML visualizations for a self-taught Flipper Zero curriculum
-covering Sub-GHz, card technologies (LF + HF NFC), IR + iButton, Bad USB,
-wireless (BLE / WiFi / NRF24), GPIO + hardware hacking, and the blue-team
-defense matrix that ties it all together. ~42 visualizations across 7 phase
-pages plus a hub index and a glossary — all self-contained, offline-capable.
-Every phase opens with a legality callout so the reader knows which workflows
-are public practice and which need authorization, ends with a 5-question
-understanding check, and cross-links to the Phase 8 defense matrix for every
-attack class taught.
+covering device foundations, Sub-GHz, card technologies (LF + HF NFC), IR +
+iButton, Bad USB, wireless (BLE / WiFi / NRF24), GPIO + hardware hacking,
+the blue-team defense matrix, and integration capstones across 5 canonical
+environments. ~50 visualizations across 9 phase pages plus a hub index and
+a searchable glossary — all self-contained, offline-capable. Every phase
+opens with a legality callout so the reader knows which workflows are public
+practice and which need authorization, ends with a 5-question understanding
+check, and cross-links to the Phase 8 defense matrix for every attack class
+taught.
 
 Calculator state (Phase 2 brute-force, Phase 6 PSK, Phase 8 filter/sort)
 serialises into the URL hash — links are shareable. Keyboard-first
@@ -22,6 +23,7 @@ steps), and `prefers-reduced-motion` honoured on every page.
 | File | Phase | Topics covered |
 |---|---|---|
 | `index.html` | Hub | Master grid of all visualizations + phase navigation |
+| `phase-1-foundations.html` | 01 | Interactive Flipper teardown (top view + inside); chip-to-phase map; 3-tier bench gear checklist with budget tags; firmware ecosystem comparison (OFW vs Momentum vs Xtreme) |
 | `phase-2-subghz.html` | 02 | Modulation (ASK/OOK/2-FSK), encoding (NRZ/Manchester/PWM), fixed vs rolling code, KeeLoq packet anatomy, RollJam timeline, brute-force math |
 | `phase-3-cards.html` | 03 | LF (EM4100, HID) + HF (MIFARE Classic, DESFire, NTAG); sector/block map; Crypto1 attack ladder + decision matrix (dictionary → nested → hardnested → darkside → mfkey32); EMV clarity; clone workflow |
 | `phase-4-ir-ibutton.html` | 04 | 38 kHz IR physics; NEC vs RC5 vs SIRC vs Pronto waveform comparison; Flipper IR capability matrix; 1-Wire iButton bus model + DS1990A read sequence + clone workflow |
@@ -29,6 +31,7 @@ steps), and `prefers-reduced-motion` honoured on every page.
 | `phase-6-wireless.html` | 06 | BLE address types + tracking sim; WPA2 4-way handshake step-through; PMKID-attack flow; PMF on/off comparison; evil twin diagram; MouseJack; PSK crack-time calculator (length × charset × GPU rate) |
 | `phase-7-hardware.html` | 07 | Keyboard-accessible 18-pin GPIO header (canonical pinout); UART/SPI/I²C wiring + timing; SOIC-8 SPI flash dumping + CH341A; 8-step audit chain; ARM Cortex-M RDP levels; voltage / level-shift matrix |
 | `phase-8-defense.html` | 08 | Sortable attack→defense matrix (30 rows across Phases 2-7, filterable by phase, sortable by cost, deep-linkable per row); detection-layer breakdown (physical / RF / EDR / network / access / USB / tamper); 7-section audit deliverable checklist; remediation priority list |
+| `phase-9-capstones.html` | 09 | Five scenario site maps (home, office, vehicle, IoT, OT) with clickable attack-surface hotspots; per-scenario scoping checklist; 5-stage engagement playbook; every hotspot cross-links to the matching Phase 8 defense row |
 | `glossary.html` | All | Searchable glossary of every acronym used across the curriculum (PMKID, RDP, Crypto1, hashcat, IRK, MIC, PTK, GTK, FAP, SWD, …). Tagged by domain. Each entry links back to the phase(s) where it appears. |
 
 All visualizations are interactive — sliders, animated waveforms, clickable diagrams.

@@ -59,6 +59,7 @@
     transform: translateY(-2px);
     text-decoration: none;
   }
+  .phase-card.p1::before { background: #5eb6ff; }
   .phase-card.p2::before { background: #ff5a6e; }
   .phase-card.p3::before { background: #ffb547; }
   .phase-card.p4::before { background: #e879f9; }
@@ -66,6 +67,7 @@
   .phase-card.p6::before { background: #00d9a0; }
   .phase-card.p7::before { background: #c084fc; }
   .phase-card.p8::before { background: #00d9a0; }
+  .phase-card.p9::before { background: #ffb547; }
 
   .phase-num {
     font-family: var(--mono);
@@ -189,12 +191,12 @@
   <div class="meta-grid">
     <div class="meta-card">
       <div class="meta-card-label">Phases covered</div>
-      <div class="meta-card-value">7 / 10</div>
-      <div class="meta-card-sub">2, 3, 4, 5, 6, 7, 8</div>
+      <div class="meta-card-value">9 / 10</div>
+      <div class="meta-card-sub">1, 2, 3, 4, 5, 6, 7, 8, 9</div>
     </div>
     <div class="meta-card">
       <div class="meta-card-label">Total visualizations</div>
-      <div class="meta-card-value">42</div>
+      <div class="meta-card-value">50</div>
       <div class="meta-card-sub">interactive + diagrams + tables</div>
     </div>
     <div class="meta-card">
@@ -215,6 +217,23 @@
 <!-- PHASE CARDS -->
 <!-- ============================================================ -->
 <div class="grid">
+
+  <!-- Phase 1 -->
+  <a href="phase-1-foundations.html" class="phase-card p1">
+    <div class="phase-num">Phase 01 · device + gear</div>
+    <div class="phase-title">Foundations</div>
+    <div class="phase-tagline">What's inside the Flipper, what gear you need around it, and which firmware to run. The lab-bench setup chapter.</div>
+    <ul class="phase-visuals">
+      <li class="complex">Interactive device anatomy — top view + inside</li>
+      <li>Which chip handles which curriculum phase</li>
+      <li>3-tier bench gear checklist with budget tags</li>
+      <li>Firmware ecosystem — OFW vs Momentum vs Xtreme</li>
+    </ul>
+    <div class="phase-footer">
+      <span class="phase-link">phase-1-foundations.html →</span>
+      <span class="visual-count">4 visuals</span>
+    </div>
+  </a>
 
   <!-- Phase 2 -->
   <a href="phase-2-subghz.html" class="phase-card p2">
@@ -348,22 +367,39 @@
     </div>
   </a>
 
+  <!-- Phase 9 -->
+  <a href="phase-9-capstones.html" class="phase-card p9">
+    <div class="phase-num">Phase 09 · Integration</div>
+    <div class="phase-title">Capstone scenarios</div>
+    <div class="phase-tagline">Five canonical engagement targets — home, office, vehicle, IoT, OT. Walk each site map; every hotspot links back to its Phase 8 defense.</div>
+    <ul class="phase-visuals">
+      <li class="complex">Scenario picker with site maps (5 environments)</li>
+      <li>Per-scenario scoping checklist</li>
+      <li>Engagement playbook (pre-engagement → report)</li>
+      <li>Cross-links: every hotspot → Phase 8 matrix row</li>
+    </ul>
+    <div class="phase-footer">
+      <span class="phase-link">phase-9-capstones.html →</span>
+      <span class="visual-count">4 visuals</span>
+    </div>
+  </a>
+
 </div>
 
 
 <!-- ============================================================ -->
 <!-- WHY NOT EVERY PHASE -->
 <!-- ============================================================ -->
-<h2>Why these seven phases, not all ten</h2>
-<p style="margin-top: 12px;">Each phase visualization burns ~1500 lines of HTML. To stay valuable, the visuals target topics that are <em>genuinely hard to grok from text</em>. Two phases still don't benefit:</p>
+<h2>Why nine phases, not all ten</h2>
+<p style="margin-top: 12px;">Each phase visualization burns ~1500 lines of HTML. To stay valuable, the visuals target topics that are <em>genuinely hard to grok from text</em>. Only Phase 0 stays text-only — pure policy that a diagram doesn't help.</p>
 
 <table class="small-table">
   <thead>
     <tr><th>Phase</th><th>Status</th><th>Reason</th></tr>
   </thead>
   <tbody>
-    <tr><td>00 — Ethics + legal</td><td><span style="color: var(--muted);">no visuals</span></td><td>Pure text policy. The per-phase legality callouts inside Phases 2-7 carry it.</td></tr>
-    <tr><td>01 — Foundations</td><td><span style="color: var(--muted);">no visuals (yet)</span></td><td>Capability table already in the markdown. Could add an interactive chip layout if Phase 1 hands-on starts.</td></tr>
+    <tr><td>00 — Ethics + legal</td><td><span style="color: var(--muted);">no visuals</span></td><td>Pure text policy. The per-phase legality callouts inside Phases 1-7 carry it.</td></tr>
+    <tr><td>01 — Foundations</td><td><span style="color: var(--accent);">covered ✓</span></td><td>Interactive Flipper teardown + chip-to-phase map + gear checklist + firmware ecosystem.</td></tr>
     <tr><td>02 — Sub-GHz</td><td><span style="color: var(--accent);">covered ✓</span></td><td>RF modulation, encoding, rolling-code mechanics — densely visual.</td></tr>
     <tr><td>03 — Card tech</td><td><span style="color: var(--accent);">covered ✓</span></td><td>Packet anatomy, memory layouts, attack trees — densely visual.</td></tr>
     <tr><td>04 — IR + iButton</td><td><span style="color: var(--accent);">covered ✓</span></td><td>IR protocol waveforms side-by-side + 1-Wire bus-level timing — the kind of "see one diagram, understand the whole thing" content.</td></tr>
@@ -371,7 +407,7 @@
     <tr><td>06 — Wireless ext.</td><td><span style="color: var(--accent);">covered ✓</span></td><td>BLE addresses, WiFi handshake, evil twin, PMKID — heavy diagrams.</td></tr>
     <tr><td>07 — Hardware</td><td><span style="color: var(--accent);">covered ✓</span></td><td>The pinout alone is worth the page.</td></tr>
     <tr><td>08 — Defense</td><td><span style="color: var(--accent);">covered ✓</span></td><td>Sortable attack→defense matrix + audit checklist. Ties Phases 2-7 to a blue-team deliverable.</td></tr>
-    <tr><td>09 — Capstones</td><td><span style="color: var(--muted);">no visuals (yet)</span></td><td>Scenario-based. Could add a "site map" of each capstone scenario when one activates.</td></tr>
+    <tr><td>09 — Capstones</td><td><span style="color: var(--accent);">covered ✓</span></td><td>Per-scenario site maps (home, office, vehicle, IoT, OT) with hotspots cross-linked to the Phase 8 defense matrix.</td></tr>
   </tbody>
 </table>
 
@@ -385,12 +421,8 @@
 
   <div class="future-grid">
     <div class="future-item">
-      <div class="future-item-title">Capstone site map</div>
-      <div class="future-item-desc">Per-scenario visual map of attack surface for each Phase 9 capstone (home, office, vehicle, IoT, OT).</div>
-    </div>
-    <div class="future-item">
-      <div class="future-item-title">Phase 1 device anatomy</div>
-      <div class="future-item-desc">Interactive Flipper teardown — SoC, sub-GHz transceiver, NFC frontend, USB controller. Add if Phase 1 hands-on starts.</div>
+      <div class="future-item-title">Phase 0 ethics + legal flowchart</div>
+      <div class="future-item-desc">A decision tree: "is this surface in scope?" Currently every page has its own legality callout; Phase 0 could centralise the framework. Add only if the decision rules diverge.</div>
     </div>
     <div class="future-item">
       <div class="future-item-title">SDR vs Flipper FFT</div>

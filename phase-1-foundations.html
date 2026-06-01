@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Phase 1 — Foundations (visuals)</title>
+<style>
+  :root {
+    --bg: #0b0f14;
+    --panel: #131a23;
+    --panel-2: #1a232e;
+    --line: #2a3744;
+    --text: #d6e1ec;
+    --muted: #7a8ca0;
+    --accent: #00d9a0;
+    --accent-2: #5eb6ff;
+    --warn: #ffb547;
+    --danger: #ff5a6e;
+    --purple: #c084fc;
+    --pink: #e879f9;
+    --mono: "JetBrains Mono", "Fira Code", Consolas, monospace;
+    --sans: -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.55; }
+  body { max-width: 1180px; margin: 0 auto; padding: 32px 24px 80px; }
+  h1 { font-size: 28px; margin: 0 0 4px; }
+  h2 { font-size: 22px; margin: 0 0 8px; color: var(--accent); border-left: 3px solid var(--accent); padding-left: 12px; }
+  h3 { font-size: 16px; margin: 18px 0 8px; color: var(--accent-2); }
+  p { margin: 8px 0; }
+  a { color: var(--accent-2); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  a:focus-visible { outline: 2px dashed var(--accent); outline-offset: 2px; border-radius: 2px; }
+  .breadcrumb { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 20px; margin: 16px 0 32px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .controls { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; padding: 10px 12px; background: var(--panel-2); border-radius: 6px; margin-bottom: 12px; font-size: 13px; }
+  button { background: var(--panel-2); color: var(--text); border: 1px solid var(--line); padding: 6px 14px; border-radius: 5px; cursor: pointer; font-family: var(--sans); font-size: 13px; transition: all 0.15s; }
+  button:hover, button:focus { border-color: var(--accent); color: var(--accent); outline: none; }
+  button:focus-visible { outline: 2px dashed var(--accent); outline-offset: 2px; }
+  button.primary { background: var(--accent); color: #001a14; border-color: var(--accent); font-weight: 600; }
+  button.active { background: var(--accent-2); color: #001a14; border-color: var(--accent-2); }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-family: var(--mono); margin: 0 2px; }
+  .badge.ok { background: rgba(0,217,160,0.15); color: var(--accent); border: 1px solid var(--accent); }
+  .badge.warn { background: rgba(255,181,71,0.15); color: var(--warn); border: 1px solid var(--warn); }
+  .badge.bad { background: rgba(255,90,110,0.15); color: var(--danger); border: 1px solid var(--danger); }
+  table { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 13px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 500; font-size: 11px; text-transform: uppercase; letter-spacing: 0.6px; }
+  td.mono, .mono { font-family: var(--mono); }
+  .caption { font-size: 12px; color: var(--muted); margin-top: 6px; font-style: italic; }
+  .callout { background: rgba(94,182,255,0.08); border-left: 3px solid var(--accent-2); padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; font-size: 13px; }
+  .callout.warn { background: rgba(255,181,71,0.08); border-color: var(--warn); }
+  .callout.danger { background: rgba(255,90,110,0.08); border-color: var(--danger); }
+  svg { display: block; max-width: 100%; }
+  .nav-toc { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px 18px; margin-bottom: 24px; font-size: 14px; }
+  .nav-toc ol { margin: 6px 0 0; padding-left: 24px; }
+  .nav-toc li { margin: 3px 0; }
+  .hotspot { cursor: pointer; outline: none; }
+  .hotspot:hover circle, .hotspot:hover rect, .hotspot:focus circle, .hotspot:focus rect { stroke-width: 3 !important; }
+  .hotspot:focus-visible { outline: 2px dashed var(--accent); outline-offset: 4px; }
+  .gear-tier { background: var(--panel-2); border: 1px solid var(--line); border-radius: 6px; padding: 14px; margin-bottom: 14px; }
+  .gear-tier h3 { margin-top: 0; }
+  .gear-row { display: grid; grid-template-columns: 1.4fr 0.8fr 1.6fr; gap: 10px; padding: 6px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
+  .gear-row:last-child { border-bottom: none; }
+  .gear-name { font-family: var(--mono); color: var(--accent); }
+  .gear-cost { font-family: var(--mono); color: var(--warn); }
+  .firmware-card { background: var(--panel-2); border: 1px solid var(--line); border-radius: 6px; padding: 14px; }
+  .firmware-card h3 { margin-top: 0; }
+  @media (max-width: 720px) {
+    body { padding: 18px 12px 60px; }
+    h1 { font-size: 22px; }
+    h2 { font-size: 18px; }
+    h3 { font-size: 14px; }
+    .grid-2 { grid-template-columns: 1fr !important; }
+    .gear-row { grid-template-columns: 1fr; gap: 4px; }
+    .controls { padding: 8px; gap: 8px; font-size: 12px; }
+    .panel { padding: 14px; }
+    .callout { font-size: 12px; padding: 8px 12px; }
+    table { font-size: 12px; }
+    .panel > table, section > table, section > .panel > table { display: block; overflow-x: auto; }
+    svg, canvas { max-width: 100%; height: auto; }
+    nav[aria-label="Phases"] { font-size: 11px; padding: 6px 8px; gap: 4px; }
+    nav[aria-label="Phases"] a { padding: 2px 6px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+    button:hover { transform: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="breadcrumb">
+  <a href="index.html">visuals</a> &nbsp;/&nbsp; Phase 1 &nbsp;/&nbsp; Foundations
+</div>
+
+<nav aria-label="Phases" style="display:flex; gap:6px; flex-wrap:wrap; padding:8px 12px; background:#131a23; border:1px solid #2a3744; border-radius:6px; font-family:'JetBrains Mono',Consolas,monospace; font-size:12px; margin:0 0 20px;">
+  <span style="color:#7a8ca0;">phases:</span>
+  <a href="phase-1-foundations.html" style="color:#001a14;background:#00d9a0;padding:2px 8px;border-radius:3px;text-decoration:none;font-weight:600;">1 foundations</a>
+  <a href="phase-2-subghz.html" style="color:#5eb6ff;padding:2px 8px;border-radius:3px;text-decoration:none;">2 sub-GHz</a>
+  <a href="phase-3-cards.html" style="color:#5eb6ff;padding:2px 8px;border-radius:3px;text-decoration:none;">3 cards</a>
+  <a href="phase-4-ir-ibutton.html" style="color:#5eb6ff;padding:2px 8px;border-radius:3px;text-decoration:none;">4 IR + iButton</a>
+  <a href="phase-5-badusb.html" style="color:#5eb6ff;padding:2px 8px;border-radius:3px;text-decoration:none;">5 Bad USB</a>
+  <a href="phase-6-wireless.html" style="color:#5eb6ff;padding:2px 8px;border-radius:3px;text-decoration:none;">6 wireless</a>
+  <a href="phase-7-hardware.html" style="color:#5eb6ff;padding:2px 8px;border-radius:3px;text-decoration:none;">7 hardware</a>
+  <a href="phase-8-defense.html" style="color:#5eb6ff;padding:2px 8px;border-radius:3px;text-decoration:none;">8 defense</a>
+  <a href="phase-9-capstones.html" style="color:#5eb6ff;padding:2px 8px;border-radius:3px;text-decoration:none;">9 capstones</a>
+  <a href="glossary.html" style="color:#7a8ca0;padding:2px 8px;text-decoration:none;">📖 glossary</a>
+  <a href="index.html" style="color:#7a8ca0;padding:2px 8px;margin-left:auto;text-decoration:none;">↑ hub</a>
+</nav>
+
+<h1>Phase 1 — Foundations</h1>
+<p style="color: var(--muted); margin: 0 0 24px;">What the Flipper actually is, what's inside it, what gear you need around it, and which firmware to run. Treat this as the lab-bench setup chapter — once you can identify which chip handles each later phase, the rest of the curriculum makes sense as "we exercise this chip now."</p>
+
+<div class="callout" style="margin-bottom: 24px;">
+  <strong>Legality boundary on this page:</strong> the lightest of any chapter. The Flipper itself is legal to own and to take apart in every jurisdiction the curriculum targets. The hardware is yours — disassemble it, probe it, flash it. The constraints kick in later when you transmit, read, or inject into other people's systems. See Phase 0 for the policy framing and each later phase for domain-specific limits.
+</div>
+
+<div class="nav-toc">
+  <strong style="color: var(--accent);">On this page</strong>
+  <ol>
+    <li><a href="#anatomy">Device anatomy</a> — click any component to inspect</li>
+    <li><a href="#chip-to-phase">Which chip does what</a> — map curriculum phases to silicon</li>
+    <li><a href="#gear">Bench gear checklist</a> — essential, recommended, pro tiers with budget tags</li>
+    <li><a href="#firmware">Firmware ecosystem</a> — stock vs Momentum vs Xtreme</li>
+    <li><a href="#quiz">Understanding check</a> — 5 questions</li>
+  </ol>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- 1. ANATOMY -->
+<!-- ============================================================ -->
+<section id="anatomy">
+<h2>1. Device anatomy — what's actually inside</h2>
+<p>The Flipper looks like a Tamagotchi from the outside; inside it's a multi-radio embedded board with a 5-way d-pad and a 128×64 LCD. Click any labelled hotspot to inspect.</p>
+
+<div class="panel">
+  <div class="controls">
+    <button class="view-btn primary" data-view="top">Top view</button>
+    <button class="view-btn" data-view="inside">Inside (logical)</button>
+    <span style="margin-left:auto; color: var(--muted); font-size:12px;">Use Tab to step through hotspots; Enter to inspect.</span>
+  </div>
+
+  <div class="grid-2" style="gap: 24px;">
+    <div>
+      <svg viewBox="0 0 360 600" id="anatomy-svg" style="background:#0a0f14; border-radius: 8px; max-height: 600px;"></svg>
+      <div class="caption" id="view-caption">Top view of Flipper Zero. Approximate proportions; not to scale.</div>
+    </div>
+
+    <div>
+      <div id="anatomy-info" style="background: var(--panel-2); border: 1px solid var(--line); border-radius: 6px; padding: 16px; min-height: 400px;">
+        <strong style="color: var(--accent);">Click a hotspot</strong> on the left to see what it is, what it does, and which phase of the curriculum exercises it.
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- 2. CHIP-TO-PHASE MAP -->
+<!-- ============================================================ -->
+<section id="chip-to-phase">
+<h2>2. Which chip does what — curriculum phase by silicon</h2>
+<p>Every later phase exercises a specific subsystem. This is the map.</p>
+
+<div class="panel">
+  <table>
+    <thead>
+      <tr><th>Subsystem / chip</th><th>What it does</th><th>Curriculum phase(s)</th><th>Limits</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="mono">STM32WB55CG</td>
+        <td>Main MCU. Dual-core (Cortex-M4 application + M0+ radio). 1 MB flash, 256 KB RAM. Runs FuriHAL + the application code. Handles USB, BLE, file system, all UI.</td>
+        <td>foundation for everything; specifically BLE in <a href="phase-6-wireless.html">Phase 6</a></td>
+        <td>BLE is host-only on stock (advertising + GATT central). No raw radio access without dev firmware.</td>
+      </tr>
+      <tr>
+        <td class="mono">CC1101</td>
+        <td>TI sub-GHz transceiver, SPI-attached to the WB55. 300–348 / 387–464 / 779–928 MHz; ASK/OOK + 2-FSK + 4-FSK + MSK + GFSK.</td>
+        <td><a href="phase-2-subghz.html">Phase 2 sub-GHz</a></td>
+        <td>~10 mW TX. Limited by Flipper firmware to the regional ISM allowlist (unlock requires alternate firmware).</td>
+      </tr>
+      <tr>
+        <td class="mono">ST25R3916</td>
+        <td>NFC reader IC, SPI-attached. ISO 14443A/B + ISO 15693 + FeliCa + NFC-A/B/F. Drives the front-side NFC antenna coil.</td>
+        <td><a href="phase-3-cards.html">Phase 3 HF NFC</a></td>
+        <td>Cannot fully emulate a card (passive ground-coupling); good for reads + simple tag emulation.</td>
+      </tr>
+      <tr>
+        <td class="mono">LF RFID frontend</td>
+        <td>Discrete 125 kHz analog frontend on a separate antenna coil. Reads EM4100, HID Prox, Indala, FDX-B; emulates EM4100 + HID for cloning.</td>
+        <td><a href="phase-3-cards.html">Phase 3 LF RFID</a></td>
+        <td>125 kHz only; not all LF protocols supported in stock firmware.</td>
+      </tr>
+      <tr>
+        <td class="mono">1-Wire / iButton contact</td>
+        <td>Steel back contact + 1-Wire bus driven by an STM32 GPIO. Reads + emulates DS1990A and several intercom variants (Cyfral, Metakom).</td>
+        <td><a href="phase-4-ir-ibutton.html">Phase 4 iButton</a> · also exposed on <a href="phase-7-hardware.html">GPIO pin 17</a></td>
+        <td>Open-drain bus; works on owned hardware only by policy.</td>
+      </tr>
+      <tr>
+        <td class="mono">IR LED + TSOP receiver</td>
+        <td>Front-mounted ~940 nm IR transmit LED and a TSOP-style 38 kHz bandpass receiver. Auto-classifies NEC / RC5 / SIRC; imports Pronto.</td>
+        <td><a href="phase-4-ir-ibutton.html">Phase 4 IR</a></td>
+        <td>One-way: TX yes, RX yes, but no protocol-level bidirectional channel. CEC over HDMI is a different beast.</td>
+      </tr>
+      <tr>
+        <td class="mono">USB-C (native USB)</td>
+        <td>Native USB on the WB55. Used for charging, file transfer, and Bad USB HID emulation in attack mode.</td>
+        <td><a href="phase-5-badusb.html">Phase 5 Bad USB</a></td>
+        <td>Bad USB requires the Bad USB application to be loaded; otherwise just shows up as CDC + MTP.</td>
+      </tr>
+      <tr>
+        <td class="mono">18-pin GPIO header</td>
+        <td>Side header exposing 8 GPIOs + UART + SPI + I²C + SWD + 1-Wire + power rails. The hardware-hacking surface.</td>
+        <td><a href="phase-7-hardware.html">Phase 7 hardware</a></td>
+        <td>3.3 V logic; ~20 mA per pin; 5 V rail off by default.</td>
+      </tr>
+      <tr>
+        <td class="mono">microSD slot</td>
+        <td>SPI-attached microSD. Stores the application file system, captures, NFC dumps, sub-GHz <code>.sub</code> files.</td>
+        <td>required for most apps + capture work</td>
+        <td>FAT32 only; the SD is essentially a requirement for any non-trivial use.</td>
+      </tr>
+      <tr>
+        <td class="mono">Buzzer</td>
+        <td>Piezo buzzer for UI + Music Player + sub-GHz audio visualisation.</td>
+        <td>UI + Music Player FAP</td>
+        <td>Tone only; no PCM.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- 3. GEAR CHECKLIST -->
+<!-- ============================================================ -->
+<section id="gear">
+<h2>3. Bench gear checklist — what to actually buy</h2>
+<p>Three tiers. The essential tier covers Phases 2–5 end to end and most of Phase 7. Recommended adds the WiFi/NRF24 dev boards (Phase 6) and proper hardware-bench tools. Pro is what you reach for after a few audits, not before.</p>
+
+<div class="panel">
+
+  <div class="gear-tier">
+    <h3 style="color: var(--accent);">Essential — completes Phases 2–5 + most of Phase 7</h3>
+    <p class="caption" style="margin-top: -8px;">Total: ~$200 in addition to the Flipper itself.</p>
+    <div class="gear-row" style="font-weight: 600; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.6px;">
+      <div>Item</div><div>Cost</div><div>Why</div>
+    </div>
+    <div class="gear-row"><div class="gear-name">Flipper Zero (firmware current)</div><div class="gear-cost">$170</div><div>The platform itself. Stock firmware first; upgrade later.</div></div>
+    <div class="gear-row"><div class="gear-name">T5577 LF blank cards (pack of 5)</div><div class="gear-cost">~$10</div><div>Phase 3 LF cloning targets (emulates EM4100, HID Prox).</div></div>
+    <div class="gear-row"><div class="gear-name">Magic Mifare HF cards (Gen1a + Gen2 / CUID)</div><div class="gear-cost">~$15</div><div>Phase 3 HF cloning targets. Get both Gen1a and Gen2.</div></div>
+    <div class="gear-row"><div class="gear-name">RW1990 iButton blanks (pack of 10)</div><div class="gear-cost">~$10</div><div>Phase 4 iButton clones.</div></div>
+    <div class="gear-row"><div class="gear-name">Cheap fixed-code 433 MHz remote</div><div class="gear-cost">~$5</div><div>Phase 2 owned RF target. PT2262 or HT12 internals are perfect.</div></div>
+    <div class="gear-row"><div class="gear-name">Owned rolling-code remote</div><div class="gear-cost">$0 (your car/garage)</div><div>Phase 2. KeeLoq or AES; for theory + diagnostic, not replay.</div></div>
+    <div class="gear-row"><div class="gear-name">Sacrificial laptop or VM</div><div class="gear-cost">$0</div><div>Phase 5 Bad USB target. Never your daily driver.</div></div>
+    <div class="gear-row"><div class="gear-name">USB-A → USB-C cable</div><div class="gear-cost">$5</div><div>Charging + Bad USB connection.</div></div>
+    <div class="gear-row"><div class="gear-name">microSD card 16–32 GB</div><div class="gear-cost">$10</div><div>Almost mandatory. Stores apps, captures, .nfc / .sub files.</div></div>
+  </div>
+
+  <div class="gear-tier">
+    <h3 style="color: var(--warn);">Recommended — unlocks Phases 6 + 7 fully</h3>
+    <p class="caption" style="margin-top: -8px;">Total: ~$150 more.</p>
+    <div class="gear-row"><div class="gear-name">Flipper WiFi Dev Board (ESP32-S2 / S3)</div><div class="gear-cost">~$30</div><div>Phase 6 WiFi. Marauder / Evil Portal / handshake capture.</div></div>
+    <div class="gear-row"><div class="gear-name">NRF24L01+ module + adapter</div><div class="gear-cost">~$10</div><div>Phase 6 MouseJack + NRF24 sniffing.</div></div>
+    <div class="gear-row"><div class="gear-name">CH341A USB programmer + SOIC-8 clip</div><div class="gear-cost">~$15</div><div>Phase 7 SPI flash dumping (in-circuit).</div></div>
+    <div class="gear-row"><div class="gear-name">Bidirectional level shifter (BSS138 4-ch module)</div><div class="gear-cost">~$5</div><div>Phase 7 when target is 5 V or 1.8 V.</div></div>
+    <div class="gear-row"><div class="gear-name">Dupont jumper wire set</div><div class="gear-cost">~$8</div><div>Phase 7 wiring.</div></div>
+    <div class="gear-row"><div class="gear-name">Multimeter (entry-level digital)</div><div class="gear-cost">~$25</div><div>Phase 7 pin identification.</div></div>
+    <div class="gear-row"><div class="gear-name">Faraday bag</div><div class="gear-cost">~$15</div><div>Transport isolation (Phase 0 lab-safety rule).</div></div>
+    <div class="gear-row"><div class="gear-name">Junk-yard router or old IoT device</div><div class="gear-cost">$5–20</div><div>Phase 7 end-to-end practice target.</div></div>
+    <div class="gear-row"><div class="gear-name">DS1990A iButton dongle (legit)</div><div class="gear-cost">~$3</div><div>Phase 4 read target — verify the read path before cloning.</div></div>
+  </div>
+
+  <div class="gear-tier">
+    <h3 style="color: var(--danger);">Pro — only when you're sure you'll use it</h3>
+    <p class="caption" style="margin-top: -8px;">Each item is $100+. Buy after the corresponding curriculum phase shows you need more depth than the Flipper provides.</p>
+    <div class="gear-row"><div class="gear-name">Proxmark3 Easy or RDV4</div><div class="gear-cost">$100 / $300</div><div>Deep NFC card analysis far beyond Flipper. After Phase 3 if HF becomes a focus.</div></div>
+    <div class="gear-row"><div class="gear-name">HackRF One or RTL-SDR Blog V4</div><div class="gear-cost">$30 / $300</div><div>Wideband SDR. Phase 2 + 6 extension. RTL-SDR is the easier entry.</div></div>
+    <div class="gear-row"><div class="gear-name">ChipWhisperer-Lite or -Husky</div><div class="gear-cost">$300+</div><div>Phase 7 advanced — voltage glitch + side-channel. Multi-week learning curve.</div></div>
+    <div class="gear-row"><div class="gear-name">Bench PSU with current display (DPS-150 or equivalent)</div><div class="gear-cost">$100+</div><div>Phase 7 power-glitch experiments + current monitoring.</div></div>
+    <div class="gear-row"><div class="gear-name">USB logic analyzer (Saleae Logic 8 or DSLogic)</div><div class="gear-cost">$100+</div><div>Phase 7 protocol decoding when Flipper's built-in analyzer isn't enough.</div></div>
+    <div class="gear-row"><div class="gear-name">Hot-air rework station</div><div class="gear-cost">~$80</div><div>Phase 7 chip-off work. Doable; not beginner.</div></div>
+  </div>
+
+  <div class="callout">
+    <strong>The pattern:</strong> buy essential up front, recommended after one curriculum phase tells you the Flipper's built-in capability isn't deep enough for what you want, pro only after a real engagement or capstone hits a wall the recommended tier couldn't clear.
+  </div>
+</div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- 4. FIRMWARE ECOSYSTEM -->
+<!-- ============================================================ -->
+<section id="firmware">
+<h2>4. Firmware ecosystem — which one to run</h2>
+<p>Three live forks as of 2026. Pick by what you actually need; switching is non-destructive but each rewrite consumes a study session.</p>
+
+<div class="panel">
+  <div class="grid-2" style="margin-bottom: 16px;">
+    <div class="firmware-card">
+      <h3 style="color: var(--accent);">Official (OFW) — start here</h3>
+      <p style="font-size: 13px;">Flipper Devices' official build. Conservative. The TX allowlist is enforced strictly per region; only well-vetted features ship.</p>
+      <ul style="font-size: 13px; padding-left: 18px;">
+        <li><strong>Pros:</strong> stable; updates frequent; first-party support; legal-default behaviour.</li>
+        <li><strong>Cons:</strong> no hardnested attack; no extended sub-GHz TX bands; smaller app catalogue.</li>
+        <li><strong>Reach for it:</strong> always your first install; revert to it if anything misbehaves.</li>
+      </ul>
+    </div>
+
+    <div class="firmware-card">
+      <h3 style="color: var(--warn);">Momentum</h3>
+      <p style="font-size: 13px;">Successor to the popular Xtreme firmware. Active development, large app catalogue, alternate UI elements, hardnested + extended NFC tooling.</p>
+      <ul style="font-size: 13px; padding-left: 18px;">
+        <li><strong>Pros:</strong> hardnested; extended NFC kit; ships several Phase 6 helpers; large built-in FAP store.</li>
+        <li><strong>Cons:</strong> drops region TX restrictions by default — this is your responsibility legally; minor stability quirks compared to OFW.</li>
+        <li><strong>Reach for it:</strong> when Phase 3 hits hardened MIFARE Classic, or when you want the larger app library for Phase 4-7 helpers.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="firmware-card">
+    <h3 style="color: var(--danger);">Xtreme (legacy)</h3>
+    <p style="font-size: 13px;">The original "everything unlocked" community firmware. Development largely moved into Momentum in 2024–2025 but Xtreme builds still exist and some study guides reference it.</p>
+    <ul style="font-size: 13px; padding-left: 18px;">
+      <li><strong>Pros:</strong> historical reference; some legacy plugins still target it; archive of older app versions.</li>
+      <li><strong>Cons:</strong> slower release cadence than Momentum; some Xtreme-specific apps don't work on current OFW or Momentum.</li>
+      <li><strong>Reach for it:</strong> only to follow a specific Xtreme-era guide. Otherwise prefer Momentum or OFW.</li>
+    </ul>
+  </div>
+
+  <div class="callout warn">
+    <strong>Switching firmware:</strong> backs up the internal storage; reflashing wipes the WB55's user partition (SD card is untouched). Save your <code>.nfc</code> / <code>.sub</code> / <code>.ir</code> captures before each flash. Roll back with the official qFlipper desktop tool if anything misbehaves.
+  </div>
+
+  <div class="callout danger">
+    <strong>Legality note on unlocked TX:</strong> Momentum and Xtreme remove the regional TX allowlist by default. This does <em>not</em> grant a license to transmit outside what your jurisdiction permits — it just removes the firmware's training wheels. FCC Part 15 (US) and CEPT (EU) still apply. The Flipper's TX power is low, but jamming, replay at out-of-scope targets, or operating in licensed bands is still illegal regardless of which firmware is running.
+  </div>
+</div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- 5. QUIZ -->
+<!-- ============================================================ -->
+<section id="quiz">
+<h2>5. Understanding check — 5 questions</h2>
+</section>
+
+<section class="panel" style="margin-top: 8px;" aria-label="Understanding check">
+  <p style="color: var(--muted); font-size: 13px; margin-top: 4px;">Self-graded. Pick an answer, then press <em>Check answers</em>.</p>
+  <div id="phase1-quiz-q"></div>
+  <div class="controls" style="margin-top: 14px;">
+    <button id="phase1-quiz-check" class="primary">Check answers</button>
+    <button id="phase1-quiz-reset">Reset</button>
+    <span id="phase1-quiz-score" style="margin-left:auto; font-family: var(--mono); color: var(--muted);"></span>
+  </div>
+</section>
+
+
+<p style="margin-top: 48px; color: var(--muted); font-size: 12px;">
+  Curriculum source: <span style="opacity:0.55;cursor:default" title="Source lives in the private workspace">01-foundations.md</span> · Back to <a href="index.html">visuals hub</a> · <span style="opacity:0.55;cursor:default" title="Source lives in the private workspace">phase index</span>
+</p>
+
+
+<!-- ============================================================ -->
+<!-- SCRIPTS -->
+<!-- ============================================================ -->
+<script>
+// ============== ANATOMY ==============
+// Two views — top (external) and inside (logical board layout). Same SVG container; we swap markup.
+const COMPONENTS = {
+  // Top view
+  lcd: {
+    view: 'top',
+    name: 'Monochrome LCD (128 × 64)',
+    body: 'The display. ST7565-style transflective LCD with backlight. The whole UI lives in 128×64 pixels — a constraint you feel in every FAP.',
+    phase: 'UI in every phase',
+    hotspot: { type: 'rect', x: 80, y: 50, w: 200, h: 140 }
+  },
+  iButton: {
+    view: 'top',
+    name: 'iButton contact (1-Wire)',
+    body: 'Stainless-steel contact ring on the front face. Same 1-Wire line that\'s also exposed on GPIO pin 17. Reads + emulates DS1990A and intercom variants.',
+    phase: 'Phase 4 iButton · also Phase 7 (GPIO 17)',
+    hotspot: { type: 'circle', cx: 290, cy: 100, r: 16 }
+  },
+  irTx: {
+    view: 'top',
+    name: 'IR transmitter (LED)',
+    body: '~940 nm IR LED on the top edge. Drives the carrier at 30–56 kHz; protocol up to the firmware.',
+    phase: 'Phase 4 IR',
+    hotspot: { type: 'circle', cx: 140, cy: 20, r: 10 }
+  },
+  irRx: {
+    view: 'top',
+    name: 'IR receiver (TSOP)',
+    body: 'TSOP-style 38 kHz bandpass receiver next to the IR LED. Demodulates incoming IR for capture / decode.',
+    phase: 'Phase 4 IR',
+    hotspot: { type: 'circle', cx: 180, cy: 20, r: 10 }
+  },
+  dpad: {
+    view: 'top',
+    name: '5-way d-pad + Back button',
+    body: 'Up / Down / Left / Right / OK on a single tactile d-pad; Back below. The entire navigation surface.',
+    phase: 'UI in every phase',
+    hotspot: { type: 'rect', x: 100, y: 360, w: 160, h: 140 }
+  },
+  usb: {
+    view: 'top',
+    name: 'USB-C (native USB)',
+    body: 'Native USB on the STM32WB55. Charges the Li-Po; carries Bad USB HID frames; mounts as CDC + MTP for file transfer.',
+    phase: 'Phase 5 Bad USB · file transfer everywhere',
+    hotspot: { type: 'rect', x: 165, y: 555, w: 30, h: 25 }
+  },
+  gpio: {
+    view: 'top',
+    name: '18-pin GPIO header',
+    body: 'Side header. UART, SPI, I²C, SWD, 1-Wire, plus 3.3 V / 5 V / GND rails. The hardware-hacking interface.',
+    phase: 'Phase 7 hardware',
+    hotspot: { type: 'rect', x: 320, y: 200, w: 30, h: 280 }
+  },
+  // Inside view
+  stm32: {
+    view: 'inside',
+    name: 'STM32WB55CG (main MCU)',
+    body: 'Dual-core ARM Cortex-M4 (application, ~64 MHz) + Cortex-M0+ (radio coprocessor). 1 MB flash, 256 KB RAM. Native USB. The whole FuriHAL runtime lives here.',
+    phase: 'foundation for everything; BLE in Phase 6',
+    hotspot: { type: 'rect', x: 140, y: 200, w: 90, h: 70 }
+  },
+  cc1101: {
+    view: 'inside',
+    name: 'CC1101 (sub-GHz transceiver)',
+    body: 'TI sub-GHz chip on SPI. Supports 300–348 / 387–464 / 779–928 MHz. ASK/OOK + multiple FSK variants. ~10 mW TX power.',
+    phase: 'Phase 2 sub-GHz',
+    hotspot: { type: 'rect', x: 60, y: 180, w: 60, h: 50 }
+  },
+  st25r: {
+    view: 'inside',
+    name: 'ST25R3916 (NFC frontend)',
+    body: 'NFC reader IC on SPI. Drives the front-side antenna coil. Supports ISO 14443A/B, ISO 15693, FeliCa, full NFC-A/B/F stack.',
+    phase: 'Phase 3 HF NFC',
+    hotspot: { type: 'rect', x: 250, y: 180, w: 60, h: 50 }
+  },
+  nfcAntenna: {
+    view: 'inside',
+    name: 'NFC antenna coil (13.56 MHz)',
+    body: 'Multi-turn coil under the front panel. Inductive coupling field reaches ~4 cm.',
+    phase: 'Phase 3 HF',
+    hotspot: { type: 'rect', x: 60, y: 80, w: 240, h: 60 }
+  },
+  lfAntenna: {
+    view: 'inside',
+    name: 'LF antenna coil (125 kHz)',
+    body: 'Separate large coil for 125 kHz LF RFID. Longer-range (~10 cm) than HF because the wavelength is huge.',
+    phase: 'Phase 3 LF',
+    hotspot: { type: 'rect', x: 60, y: 290, w: 240, h: 40 }
+  },
+  battery: {
+    view: 'inside',
+    name: 'Li-Po battery (2000 mAh)',
+    body: 'Single-cell 3.7 V Li-Po. About a week of standby in light use; a few hours of active radio work.',
+    phase: 'everything',
+    hotspot: { type: 'rect', x: 60, y: 400, w: 240, h: 100 }
+  },
+  sd: {
+    view: 'inside',
+    name: 'microSD slot',
+    body: 'SPI-attached microSD. FAT32. Stores apps, captures, key dictionaries. Effectively required.',
+    phase: 'everything (file storage)',
+    hotspot: { type: 'rect', x: 250, y: 510, w: 60, h: 30 }
+  },
+  buzzer: {
+    view: 'inside',
+    name: 'Piezo buzzer',
+    body: 'Tone-only speaker for UI sounds, the Music Player FAP, and sub-GHz audio "spectrum" cues.',
+    phase: 'UI + Music Player',
+    hotspot: { type: 'rect', x: 60, y: 510, w: 50, h: 30 }
+  }
+};
+
+let currentView = 'top';
+let lastInspected = null;
+
+function renderAnatomy() {
+  const svg = document.getElementById('anatomy-svg');
+  const cap = document.getElementById('view-caption');
+
+  // Frame + body
+  let parts = `
+    <rect x="20" y="10" width="320" height="580" rx="20" fill="#1a232e" stroke="#2a3744" stroke-width="2"/>
+    <text x="180" y="595" text-anchor="middle" font-size="10" fill="#7a8ca0">Approximate proportions, not to scale.</text>
+  `;
+
+  if (currentView === 'top') {
+    cap.textContent = 'Top view: the case as seen looking down. LCD, d-pad, IR window, iButton contact, USB-C port at the bottom, GPIO header on the right side.';
+    parts += `
+      <!-- LCD bezel -->
+      <rect x="80" y="50" width="200" height="140" rx="6" fill="#0a0f14" stroke="#3a4a5e" stroke-width="2"/>
+      <text x="180" y="125" text-anchor="middle" font-size="11" fill="#7a8ca0" font-family="JetBrains Mono, monospace">128 × 64 mono LCD</text>
+
+      <!-- iButton contact -->
+      <circle cx="290" cy="100" r="16" fill="#3a3a3a" stroke="#7a8ca0" stroke-width="2"/>
+      <circle cx="290" cy="100" r="6" fill="#1a232e"/>
+
+      <!-- IR LED + Rx -->
+      <circle cx="140" cy="20" r="6" fill="#ff5a6e" stroke="#3a1a2a" stroke-width="2"/>
+      <circle cx="180" cy="20" r="6" fill="#2a3744" stroke="#7a8ca0" stroke-width="2"/>
+
+      <!-- D-pad -->
+      <circle cx="180" cy="430" r="60" fill="#0a0f14" stroke="#3a4a5e" stroke-width="2"/>
+      <rect x="170" y="380" width="20" height="40" fill="#3a4a5e"/>
+      <rect x="170" y="440" width="20" height="40" fill="#3a4a5e"/>
+      <rect x="130" y="420" width="40" height="20" fill="#3a4a5e"/>
+      <rect x="190" y="420" width="40" height="20" fill="#3a4a5e"/>
+      <circle cx="180" cy="430" r="16" fill="#3a4a5e"/>
+
+      <!-- Back button -->
+      <circle cx="180" cy="525" r="14" fill="#0a0f14" stroke="#3a4a5e" stroke-width="2"/>
+      <text x="180" y="529" text-anchor="middle" font-size="9" fill="#7a8ca0">BACK</text>
+
+      <!-- USB-C -->
+      <rect x="165" y="555" width="30" height="25" rx="3" fill="#2a3744" stroke="#7a8ca0" stroke-width="1"/>
+      <rect x="170" y="560" width="20" height="3" fill="#1a232e"/>
+
+      <!-- GPIO header (right edge, 18 pins) -->
+      <rect x="320" y="200" width="30" height="280" rx="3" fill="#0a0f14" stroke="#3a4a5e" stroke-width="2"/>
+      <g fill="#ffb547">
+    `;
+    for (let i = 0; i < 9; i++) {
+      parts += `<circle cx="328" cy="${215 + i * 30}" r="3"/><circle cx="342" cy="${215 + i * 30}" r="3"/>`;
+    }
+    parts += `</g>`;
+  } else {
+    // Inside / logical view
+    cap.textContent = 'Inside (logical board layout): roughly where the major components sit. Not a literal PCB photo — just a "where does the curriculum live" map.';
+    parts += `
+      <!-- NFC antenna coil at top -->
+      <rect x="60" y="80" width="240" height="60" rx="6" fill="rgba(255,181,71,0.08)" stroke="#ffb547" stroke-width="2" stroke-dasharray="4,3"/>
+      <text x="180" y="115" text-anchor="middle" font-size="11" fill="#ffb547" font-family="JetBrains Mono, monospace">NFC coil (13.56 MHz)</text>
+
+      <!-- CC1101 (left) and ST25R3916 (right) -->
+      <rect x="60" y="180" width="60" height="50" rx="3" fill="#3a1a2a" stroke="#ff5a6e" stroke-width="2"/>
+      <text x="90" y="200" text-anchor="middle" font-size="9" fill="#ff5a6e" font-family="JetBrains Mono, monospace">CC1101</text>
+      <text x="90" y="215" text-anchor="middle" font-size="8" fill="#d6e1ec">sub-GHz</text>
+
+      <rect x="250" y="180" width="60" height="50" rx="3" fill="#3a2a0a" stroke="#ffb547" stroke-width="2"/>
+      <text x="280" y="200" text-anchor="middle" font-size="9" fill="#ffb547" font-family="JetBrains Mono, monospace">ST25R3916</text>
+      <text x="280" y="215" text-anchor="middle" font-size="8" fill="#d6e1ec">NFC</text>
+
+      <!-- STM32WB55 main -->
+      <rect x="140" y="200" width="90" height="70" rx="4" fill="#0a2a1a" stroke="#00d9a0" stroke-width="2"/>
+      <text x="185" y="225" text-anchor="middle" font-size="11" fill="#00d9a0" font-family="JetBrains Mono, monospace" font-weight="bold">STM32WB55</text>
+      <text x="185" y="240" text-anchor="middle" font-size="9" fill="#d6e1ec">M4 + M0+ + BLE</text>
+      <text x="185" y="255" text-anchor="middle" font-size="9" fill="#d6e1ec">1 MB / 256 KB</text>
+
+      <!-- LF antenna coil -->
+      <rect x="60" y="290" width="240" height="40" rx="4" fill="rgba(255,90,110,0.08)" stroke="#ff5a6e" stroke-width="2" stroke-dasharray="4,3"/>
+      <text x="180" y="315" text-anchor="middle" font-size="11" fill="#ff5a6e" font-family="JetBrains Mono, monospace">LF coil (125 kHz)</text>
+
+      <!-- Battery -->
+      <rect x="60" y="400" width="240" height="100" rx="6" fill="rgba(192,132,252,0.08)" stroke="#c084fc" stroke-width="2"/>
+      <text x="180" y="450" text-anchor="middle" font-size="12" fill="#c084fc" font-family="JetBrains Mono, monospace">Li-Po 2000 mAh</text>
+
+      <!-- microSD slot -->
+      <rect x="250" y="510" width="60" height="30" rx="3" fill="#1a232e" stroke="#5eb6ff" stroke-width="2"/>
+      <text x="280" y="530" text-anchor="middle" font-size="9" fill="#5eb6ff" font-family="JetBrains Mono, monospace">microSD</text>
+
+      <!-- Buzzer -->
+      <rect x="60" y="510" width="50" height="30" rx="3" fill="#1a232e" stroke="#e879f9" stroke-width="2"/>
+      <text x="85" y="530" text-anchor="middle" font-size="9" fill="#e879f9" font-family="JetBrains Mono, monospace">Buzzer</text>
+    `;
+  }
+
+  // Hotspots — invisible-ish overlays with focus/hover effect
+  Object.entries(COMPONENTS).filter(([k, c]) => c.view === currentView).forEach(([key, c]) => {
+    const h = c.hotspot;
+    if (h.type === 'circle') {
+      parts += `
+        <g class="hotspot" data-key="${key}" tabindex="0" role="button" aria-label="${c.name}">
+          <circle cx="${h.cx}" cy="${h.cy}" r="${h.r + 4}" fill="transparent" stroke="rgba(0,217,160,0.6)" stroke-dasharray="3,2"/>
+        </g>
+      `;
+    } else {
+      parts += `
+        <g class="hotspot" data-key="${key}" tabindex="0" role="button" aria-label="${c.name}">
+          <rect x="${h.x - 2}" y="${h.y - 2}" width="${h.w + 4}" height="${h.h + 4}" fill="transparent" stroke="rgba(0,217,160,0.6)" stroke-dasharray="3,2" rx="4"/>
+        </g>
+      `;
+    }
+  });
+
+  svg.innerHTML = parts;
+
+  // Wire hotspot interactions
+  svg.querySelectorAll('.hotspot').forEach(el => {
+    const key = el.dataset.key;
+    const activate = () => showComponent(key);
+    el.addEventListener('click', activate);
+    el.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(); }
+    });
+  });
+}
+
+function showComponent(key) {
+  const c = COMPONENTS[key];
+  if (!c) return;
+  lastInspected = key;
+  document.getElementById('anatomy-info').innerHTML = `
+    <div style="color: var(--accent); font-family: var(--mono); font-size: 13px; margin-bottom: 8px;">${c.name}</div>
+    <div style="font-size: 14px; color: var(--text); margin-bottom: 12px;">${c.body}</div>
+    <div style="font-size: 12px; color: var(--muted);"><strong style="color: var(--accent-2);">Curriculum:</strong> ${c.phase}</div>
+  `;
+}
+
+document.querySelectorAll('.view-btn').forEach(b => {
+  b.onclick = () => {
+    document.querySelectorAll('.view-btn').forEach(x => x.classList.remove('primary'));
+    b.classList.add('primary');
+    currentView = b.dataset.view;
+    renderAnatomy();
+    // Clear info or re-show last-inspected if it lives in this view
+    const lastFitsView = lastInspected && COMPONENTS[lastInspected]?.view === currentView;
+    if (!lastFitsView) {
+      document.getElementById('anatomy-info').innerHTML = '<strong style="color: var(--accent);">Click a hotspot</strong> on the left to inspect.';
+    }
+  };
+});
+
+renderAnatomy();
+
+
+// ============== QUIZ ==============
+(() => {
+  const Q = [
+    { q: 'Which chip in the Flipper actually transmits the 433 MHz garage-remote signals you exercise in Phase 2?',
+      a: ['STM32WB55 (built-in radio)', 'CC1101 sub-GHz transceiver, SPI-attached to the MCU', 'ST25R3916 NFC frontend', 'The WiFi dev board'],
+      correct: 1,
+      why: 'The WB55 has its own radio for BLE but doesn\'t cover sub-GHz. The CC1101 sits on SPI off the WB55 and handles the 300–928 MHz bands.' },
+    { q: 'The STM32WB55 is a dual-core chip. What is the second core for?',
+      a: ['A backup application core', 'A wireless radio coprocessor (Cortex-M0+ running the BLE stack)', 'A dedicated NFC decoder', 'A separate Ethernet MAC'],
+      correct: 1,
+      why: 'The M4 runs the application and FuriHAL; the M0+ runs the proprietary radio firmware that handles BLE protocol details. Splitting keeps timing-critical radio code off the application core.' },
+    { q: 'You\'re prepping a Phase 3 lab. Minimum cards you need to buy?',
+      a: ['One T5577 only', 'A pack of T5577 (LF blanks) + a few Magic Mifare Gen1a or Gen2 (HF blanks)', 'A Proxmark3', 'Nothing — you can clone to the Flipper itself'],
+      correct: 1,
+      why: 'T5577 emulates EM4100 / HID Prox for LF cloning; Magic Mifare gives you a writable UID for HF cloning. The Flipper can\'t durably emulate as a card.' },
+    { q: 'You install Momentum firmware to get hardnested. The TX allowlist relaxes by default. What does that legally mean?',
+      a: ['You can now transmit anywhere — Momentum took care of it', 'Local RF regulation still applies; the firmware just removed its training wheels', 'Only the EU bands open up; US stays locked', 'Momentum requires an Amateur Radio license to install'],
+      correct: 1,
+      why: 'FCC Part 15, CEPT, etc. apply regardless of which firmware is running. The "unlock" is firmware-side only. The legality callouts at the top of every phase page are real.' },
+    { q: 'The 18-pin GPIO header exposes pins for UART, SPI, I²C, SWD, 1-Wire, and power. Which phase exercises it most heavily?',
+      a: ['Phase 2 sub-GHz', 'Phase 3 cards', 'Phase 7 hardware hacking', 'Phase 9 capstones'],
+      correct: 2,
+      why: 'Phase 7 is where the Flipper becomes a hardware bench. The 18-pin header is its entire reason to exist.' }
+  ];
+  function render() {
+    document.getElementById('phase1-quiz-q').innerHTML = Q.map((it, i) => `
+      <fieldset style="margin: 12px 0; padding: 12px 14px; border: 1px solid var(--line); border-radius: 6px;">
+        <legend style="padding: 0 8px; color: var(--accent-2); font-weight: 600;">Q${i+1}</legend>
+        <div style="margin-bottom: 8px;">${it.q}</div>
+        ${it.a.map((c, j) => `<label style="display: block; padding: 4px 0; cursor: pointer;"><input type="radio" name="phase1-q${i}" value="${j}" style="margin-right: 6px;">${c}</label>`).join('')}
+        <div id="phase1-why-${i}" style="display: none; margin-top: 8px; padding: 8px 10px; border-radius: 4px; font-size: 13px;"></div>
+      </fieldset>
+    `).join('');
+  }
+  function check() {
+    let n = 0;
+    Q.forEach((it, i) => {
+      const sel = document.querySelector(`input[name="phase1-q${i}"]:checked`);
+      const why = document.getElementById(`phase1-why-${i}`);
+      why.style.display = 'block';
+      if (sel && parseInt(sel.value) === it.correct) {
+        n++;
+        why.innerHTML = `<strong style="color: var(--accent);">✓ Correct.</strong> ${it.why}`;
+        why.style.background = 'rgba(0,217,160,0.08)';
+      } else {
+        why.innerHTML = `<strong style="color: var(--danger);">✗ Not quite.</strong> Correct: <em>${it.a[it.correct]}</em>. ${it.why}`;
+        why.style.background = 'rgba(255,90,110,0.08)';
+      }
+    });
+    document.getElementById('phase1-quiz-score').textContent = `${n} / ${Q.length} correct`;
+  }
+  function reset() {
+    document.querySelectorAll('input[name^="phase1-q"]').forEach(r => r.checked = false);
+    document.querySelectorAll('[id^="phase1-why-"]').forEach(w => { w.style.display = 'none'; w.innerHTML = ''; });
+    document.getElementById('phase1-quiz-score').textContent = '';
+  }
+  document.getElementById('phase1-quiz-check').onclick = check;
+  document.getElementById('phase1-quiz-reset').onclick = reset;
+  render();
+})();
+</script>
+
+</body>
+</html>

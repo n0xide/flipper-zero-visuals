@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Phase 9 — Capstone scenarios (visuals)</title>
+<style>
+  :root {
+    --bg: #0b0f14;
+    --panel: #131a23;
+    --panel-2: #1a232e;
+    --line: #2a3744;
+    --text: #d6e1ec;
+    --muted: #7a8ca0;
+    --accent: #00d9a0;
+    --accent-2: #5eb6ff;
+    --warn: #ffb547;
+    --danger: #ff5a6e;
+    --purple: #c084fc;
+    --pink: #e879f9;
+    --mono: "JetBrains Mono", "Fira Code", Consolas, monospace;
+    --sans: -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.55; }
+  body { max-width: 1180px; margin: 0 auto; padding: 32px 24px 80px; }
+  h1 { font-size: 28px; margin: 0 0 4px; }
+  h2 { font-size: 22px; margin: 0 0 8px; color: var(--accent); border-left: 3px solid var(--accent); padding-left: 12px; }
+  h3 { font-size: 16px; margin: 18px 0 8px; color: var(--accent-2); }
+  p { margin: 8px 0; }
+  a { color: var(--accent-2); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  a:focus-visible { outline: 2px dashed var(--accent); outline-offset: 2px; border-radius: 2px; }
+  .breadcrumb { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 20px; margin: 16px 0 32px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .controls { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; padding: 10px 12px; background: var(--panel-2); border-radius: 6px; margin-bottom: 12px; font-size: 13px; }
+  button { background: var(--panel-2); color: var(--text); border: 1px solid var(--line); padding: 6px 14px; border-radius: 5px; cursor: pointer; font-family: var(--sans); font-size: 13px; transition: all 0.15s; }
+  button:hover, button:focus { border-color: var(--accent); color: var(--accent); outline: none; }
+  button:focus-visible { outline: 2px dashed var(--accent); outline-offset: 2px; }
+  button.primary { background: var(--accent); color: #001a14; border-color: var(--accent); font-weight: 600; }
+  button.active { background: var(--accent-2); color: #001a14; border-color: var(--accent-2); }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-family: var(--mono); margin: 0 2px; }
+  .badge.ok { background: rgba(0,217,160,0.15); color: var(--accent); border: 1px solid var(--accent); }
+  .badge.warn { background: rgba(255,181,71,0.15); color: var(--warn); border: 1px solid var(--warn); }
+  .badge.bad { background: rgba(255,90,110,0.15); color: var(--danger); border: 1px solid var(--danger); }
+  .phase-pill { display: inline-block; padding: 1px 7px; border-radius: 10px; font-size: 11px; font-family: var(--mono); }
+  .phase-2 { background: rgba(255,90,110,0.15); color: #ff5a6e; }
+  .phase-3 { background: rgba(255,181,71,0.15); color: #ffb547; }
+  .phase-4 { background: rgba(192,132,252,0.15); color: #c084fc; }
+  .phase-5 { background: rgba(94,182,255,0.15); color: #5eb6ff; }
+  .phase-6 { background: rgba(0,217,160,0.15); color: #00d9a0; }
+  .phase-7 { background: rgba(232,121,249,0.15); color: #e879f9; }
+  table { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 13px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 500; font-size: 11px; text-transform: uppercase; letter-spacing: 0.6px; }
+  td.mono, .mono { font-family: var(--mono); }
+  .caption { font-size: 12px; color: var(--muted); margin-top: 6px; font-style: italic; }
+  .callout { background: rgba(94,182,255,0.08); border-left: 3px solid var(--accent-2); padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; font-size: 13px; }
+  .callout.warn { background: rgba(255,181,71,0.08); border-color: var(--warn); }
+  .callout.danger { background: rgba(255,90,110,0.08); border-color: var(--danger); }
+  svg { display: block; max-width: 100%; }
+  .nav-toc { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px 18px; margin-bottom: 24px; font-size: 14px; }
+  .nav-toc ol { margin: 6px 0 0; padding-left: 24px; }
+  .nav-toc li { margin: 3px 0; }
+  .hotspot { cursor: pointer; outline: none; }
+  .hotspot:hover circle, .hotspot:hover rect, .hotspot:focus circle, .hotspot:focus rect { stroke-width: 3 !important; }
+  .hotspot:focus-visible { outline: 2px dashed var(--accent); outline-offset: 4px; }
+  .scenario-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; padding: 10px 12px; background: var(--panel-2); border-radius: 6px; }
+  .checklist { font-family: var(--mono); font-size: 12px; line-height: 1.7; padding-left: 4px; }
+  .checklist li { list-style: none; padding-left: 22px; position: relative; margin: 2px 0; }
+  .checklist li::before { content: '☐'; position: absolute; left: 0; color: var(--muted); }
+  @media (max-width: 720px) {
+    body { padding: 18px 12px 60px; }
+    h1 { font-size: 22px; }
+    h2 { font-size: 18px; }
+    h3 { font-size: 14px; }
+    .grid-2 { grid-template-columns: 1fr !important; }
+    .controls { padding: 8px; gap: 8px; font-size: 12px; }
+    .panel { padding: 14px; }
+    .callout { font-size: 12px; padding: 8px 12px; }
+    table { font-size: 12px; }
+    .panel > table, section > table, section > .panel > table { display: block; overflow-x: auto; }
+    svg, canvas { max-width: 100%; height: auto; }
+    nav[aria-label="Phases"] { font-size: 11px; padding: 6px 8px; gap: 4px; }
+    nav[aria-label="Phases"] a { padding: 2px 6px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+    button:hover { transform: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="breadcrumb">
+  <a href="index.html">visuals</a> &nbsp;/&nbsp; Phase 9 &nbsp;/&nbsp; Capstones
+</div>
+
+<nav aria-label="Phases" style="display:flex; gap:6px; flex-wrap:wrap; padding:8px 12px; background:#131a23; border:1px solid #2a3744; border-radius:6px; font-family:'JetBrains Mono',Consolas,monospace; font-size:12px; margin:0 0 20px;">
+  <span style="color:#7a8ca0;">phases:</span>
+  <a href="phase-1-foundations.html" style="color:#5eb6ff;padding:2px 8px;border-radius:3px;text-decoration:none;">1 foundations</a>
+  <a href="phase-2-subghz.html" style="color:#5eb6ff;padding:2px 8px;border-radius:3px;text-decoration:none;">2 sub-GHz</a>
+  <a href="phase-3-cards.html" style="color:#5eb6ff;padding:2px 8px;border-radius:3px;text-decoration:none;">3 cards</a>
+  <a href="phase-4-ir-ibutton.html" style="color:#5eb6ff;padding:2px 8px;border-radius:3px;text-decoration:none;">4 IR + iButton</a>
+  <a href="phase-5-badusb.html" style="color:#5eb6ff;padding:2px 8px;border-radius:3px;text-decoration:none;">5 Bad USB</a>
+  <a href="phase-6-wireless.html" style="color:#5eb6ff;padding:2px 8px;border-radius:3px;text-decoration:none;">6 wireless</a>
+  <a href="phase-7-hardware.html" style="color:#5eb6ff;padding:2px 8px;border-radius:3px;text-decoration:none;">7 hardware</a>
+  <a href="phase-8-defense.html" style="color:#5eb6ff;padding:2px 8px;border-radius:3px;text-decoration:none;">8 defense</a>
+  <a href="phase-9-capstones.html" style="color:#001a14;background:#00d9a0;padding:2px 8px;border-radius:3px;text-decoration:none;font-weight:600;">9 capstones</a>
+  <a href="index.html" style="color:#7a8ca0;padding:2px 8px;margin-left:auto;text-decoration:none;">↑ hub</a>
+</nav>
+
+<h1>Phase 9 — Capstone scenarios</h1>
+<p style="color: var(--muted); margin: 0 0 24px;">Each capstone is a real-shape engagement — a target with multiple attack surfaces from Phases 2–7 simultaneously visible. Pick a scenario, walk the site map, point to surfaces, justify each as in-scope or out-of-scope. Then write the audit report from Phase 8\'s checklist. Five canonical environments: home, office, vehicle, consumer IoT, and operational technology.</p>
+
+<div class="callout warn" style="margin-bottom: 24px;">
+  <strong>Legality boundary — capstones are bigger engagements, with sharper authorization needs.</strong>
+  <ul style="margin: 6px 0 0; padding-left: 18px; font-size: 13px;">
+    <li><strong>Your own home / your own car / your own IoT device:</strong> full scope; document and treat as a personal training engagement.</li>
+    <li><strong>Friend or family\'s home / vehicle:</strong> requires their written permission, naming each surface in scope. Verbal "sure, hack my router" is not sufficient — write it down.</li>
+    <li><strong>Office / corporate environment:</strong> needs the legal entity\'s authorization, not just an employee\'s. Statement of work, scope, time window, rollback plan, named SOC contact.</li>
+    <li><strong>Vehicle dealership / manufacturer:</strong> almost certainly out of scope. Bug bounty programs (Tesla, GM, Ford) define what is allowed and how to disclose.</li>
+    <li><strong>OT / ICS / SCADA:</strong> the strictest tier. Active testing in production is usually never authorized. Lab replicas (with vendor permission), bug bounty programs, or read-only passive observation are the legitimate paths.</li>
+  </ul>
+  Every surface below is taught fully because <em>defenders need to see what an attacker sees</em>. Active testing only after written authorization that names the surface.
+</div>
+
+<div class="nav-toc">
+  <strong style="color: var(--accent);">On this page</strong>
+  <ol>
+    <li><a href="#pick">Pick a scenario</a> — Home · Office · Vehicle · IoT · OT</li>
+    <li><a href="#playbook">Engagement playbook</a> — the structure that applies to every capstone</li>
+    <li><a href="#quiz">Understanding check</a> — 5 questions</li>
+  </ol>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- 1. SCENARIO PICKER -->
+<!-- ============================================================ -->
+<section id="pick">
+<h2>1. Pick a scenario — walk the attack surface</h2>
+<p>Click a tab to switch scenarios. Click any hotspot on the map to see the attack surface, the curriculum phase that taught it, and the matching Phase 8 defense row.</p>
+
+<div class="panel">
+  <div class="scenario-tabs">
+    <button class="sc-tab primary" data-sc="home">🏠 Home</button>
+    <button class="sc-tab" data-sc="office">🏢 Office</button>
+    <button class="sc-tab" data-sc="vehicle">🚗 Vehicle</button>
+    <button class="sc-tab" data-sc="iot">📷 IoT (smart doorbell)</button>
+    <button class="sc-tab" data-sc="ot">⚙️ OT / ICS</button>
+    <span style="margin-left:auto; color: var(--muted); font-size: 12px;">Tab through hotspots; Enter to inspect.</span>
+  </div>
+
+  <div class="grid-2" style="gap: 24px;">
+    <div>
+      <svg viewBox="0 0 600 480" id="scenario-svg" style="background:#0a0f14; border-radius: 8px;"></svg>
+      <div class="caption" id="scenario-caption"></div>
+    </div>
+    <div>
+      <div id="scenario-info" style="background: var(--panel-2); border: 1px solid var(--line); border-radius: 6px; padding: 16px; min-height: 240px;">
+        <strong style="color: var(--accent);">Click a hotspot</strong> on the map to see what attack surface lives there and where to go for defense.
+      </div>
+      <div style="margin-top: 16px;">
+        <h3>Scoping checklist for this engagement</h3>
+        <ul class="checklist" id="scenario-checklist"></ul>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- 2. ENGAGEMENT PLAYBOOK -->
+<!-- ============================================================ -->
+<section id="playbook">
+<h2>2. Engagement playbook — same shape for every capstone</h2>
+<p>Whatever the scenario, the same five-phase flow applies. The findings change; the structure is stable.</p>
+
+<div class="panel">
+  <table>
+    <thead>
+      <tr><th>Phase</th><th>What you do</th><th>Deliverable / artifact</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong style="color: var(--accent);">1. Pre-engagement</strong></td>
+        <td>Sign Statement of Work; agree scope, time window, contact tree, rollback plan. Identify out-of-scope surfaces explicitly.</td>
+        <td>Signed SoW + scope document.</td>
+      </tr>
+      <tr>
+        <td><strong style="color: var(--accent);">2. Passive recon</strong></td>
+        <td>Sight survey; passive RF observation (no TX); photograph relevant surfaces. Identify what tech is deployed (badge format, AP model, lock brand).</td>
+        <td>Site map (this page is a template); inventory of identified surfaces.</td>
+      </tr>
+      <tr>
+        <td><strong style="color: var(--accent);">3. Active testing</strong></td>
+        <td>Per the agreed scope: capture handshakes, attempt card reads with consent, attempt UART connection, etc. Stop and report immediately on anything outside scope.</td>
+        <td>Test logs, evidence captures, findings register.</td>
+      </tr>
+      <tr>
+        <td><strong style="color: var(--accent);">4. Analysis</strong></td>
+        <td>Take captured material to a lab environment. Run offline crack / firmware analysis. Confirm vulnerabilities. Re-rank severity against the threat model.</td>
+        <td>Validated findings list; CVSS scoring.</td>
+      </tr>
+      <tr>
+        <td><strong style="color: var(--accent);">5. Report</strong></td>
+        <td>Write the Phase 8 deliverable checklist sections that apply. Brief the client. Hand over evidence under encrypted transport. Schedule a re-test for any remediations.</td>
+        <td>Final report; remediation owner table; re-test plan.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <strong>The pattern that survives every engagement:</strong> capture passively first, escalate to active only when the scope makes it explicit, and write the defense recommendations as you go. The capstone\'s purpose is to integrate Phases 2-7 into one engagement; the deliverable is the Phase 8 audit report.
+  </div>
+</div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- 3. QUIZ -->
+<!-- ============================================================ -->
+<section id="quiz">
+<h2>3. Understanding check — 5 questions</h2>
+</section>
+
+<section class="panel" style="margin-top: 8px;" aria-label="Understanding check">
+  <p style="color: var(--muted); font-size: 13px; margin-top: 4px;">Self-graded.</p>
+  <div id="phase9-quiz-q"></div>
+  <div class="controls" style="margin-top: 14px;">
+    <button id="phase9-quiz-check" class="primary">Check answers</button>
+    <button id="phase9-quiz-reset">Reset</button>
+    <span id="phase9-quiz-score" style="margin-left:auto; font-family: var(--mono); color: var(--muted);"></span>
+  </div>
+</section>
+
+
+<p style="margin-top: 48px; color: var(--muted); font-size: 12px;">
+  Curriculum source: <span style="opacity:0.55;cursor:default" title="Source lives in the private workspace">09-capstones.md</span> · Back to <a href="index.html">visuals hub</a> · <span style="opacity:0.55;cursor:default" title="Source lives in the private workspace">phase index</span>
+</p>
+
+
+<!-- ============================================================ -->
+<!-- SCRIPTS -->
+<!-- ============================================================ -->
+<script>
+// ============== SCENARIOS ==============
+// Each scenario: a draw function for the site map + an array of hotspots.
+// Each hotspot points to a curriculum phase and a Phase 8 matrix anchor.
+
+const SCENARIOS = {
+  home: {
+    caption: 'Single-family home, top-down floor plan. Each labelled surface maps to one or more curriculum phases.',
+    checklist: [
+      'My own home (or written permission from owner) — confirmed in writing.',
+      'Garage remote: I own it, including any aftermarket replacement.',
+      'Door RFID lock: tested against my own keyfob only, never a neighbour\'s.',
+      'WiFi network: I own the network and have access to the AP admin UI.',
+      'Smart-home devices: each one is purchased and registered to me.',
+      'Family member\'s personal laptop: explicit consent if testing Bad USB.',
+      'Capture window for active TX: under 30 minutes; coordinated with anyone home.'
+    ],
+    draw: () => `
+      <!-- House outline (top-down) -->
+      <rect x="30" y="30" width="540" height="420" rx="14" fill="#1a232e" stroke="#2a3744" stroke-width="2"/>
+
+      <!-- Room dividers -->
+      <line x1="30" y1="180" x2="320" y2="180" stroke="#3a4a5e" stroke-width="1"/>
+      <line x1="320" y1="30" x2="320" y2="180" stroke="#3a4a5e" stroke-width="1"/>
+      <line x1="320" y1="280" x2="570" y2="280" stroke="#3a4a5e" stroke-width="1"/>
+
+      <text x="180" y="50" text-anchor="middle" font-size="12" fill="#7a8ca0" font-family="JetBrains Mono, monospace">Garage</text>
+      <text x="450" y="50" text-anchor="middle" font-size="12" fill="#7a8ca0" font-family="JetBrains Mono, monospace">Living room</text>
+      <text x="180" y="200" text-anchor="middle" font-size="12" fill="#7a8ca0" font-family="JetBrains Mono, monospace">Kitchen / dining</text>
+      <text x="450" y="300" text-anchor="middle" font-size="12" fill="#7a8ca0" font-family="JetBrains Mono, monospace">Bedroom</text>
+
+      <text x="300" y="465" text-anchor="middle" font-size="12" fill="#7a8ca0">↑ Front of house ↑</text>
+    `,
+    hotspots: [
+      { x: 170, y: 90, type: 'circle', r: 18, label: 'Garage door opener', phase: 2, phaseLabel: 'Phase 2 sub-GHz', body: 'Likely 300–400 MHz fixed-code or KeeLoq rolling-code. Capture passively first; identify class before any active test.', defenses: ['fixed-code-replay', 'rolljam'] },
+      { x: 80, y: 380, type: 'circle', r: 18, label: 'Front-door RFID lock', phase: 3, phaseLabel: 'Phase 3 cards', body: 'Could be HID Prox (LF) or MIFARE-based (HF). Identify card format first — that decides which Phase 3 attack tree applies.', defenses: ['em4100-clone', 'mifare-dict-nested'] },
+      { x: 430, y: 100, type: 'circle', r: 18, label: 'Smart TV (IR remote)', phase: 4, phaseLabel: 'Phase 4 IR', body: 'NEC or RC5 protocol typically. Universal-remote-style attack: TV-B-Gone, IR clone. Educational; not a security boundary.', defenses: ['ir-clone', 'tv-b-gone'] },
+      { x: 530, y: 110, type: 'circle', r: 14, label: 'Smart bulb (BLE)', phase: 6, phaseLabel: 'Phase 6 BLE', body: 'Likely BLE-controlled or Zigbee. Check address type — public + static = trackable.', defenses: ['ble-tracking'] },
+      { x: 520, y: 160, type: 'circle', r: 14, label: 'Voice assistant', phase: 6, phaseLabel: 'Phase 6 wireless', body: 'WiFi-connected with BLE setup. Capture the setup handshake; pwn the WiFi PSK; pwn the cloud creds.', defenses: ['wpa2-handshake-crack', 'pmkid'] },
+      { x: 100, y: 240, type: 'circle', r: 16, label: 'Family laptop on table', phase: 5, phaseLabel: 'Phase 5 Bad USB', body: 'Unattended workstation. Bad USB drop, Stage 1 cradle, Stage 2 callback to lab C2. CONSENT required even for a family member.', defenses: ['hid-injection', 'usb-drop'] },
+      { x: 220, y: 240, type: 'circle', r: 14, label: 'Smart fridge / oven', phase: 7, phaseLabel: 'Phase 7 hardware', body: 'WiFi-connected appliances often have UART debug headers. Engineering-mode access if you can open the case.', defenses: ['uart-leak', 'spi-flash-dump'] },
+      { x: 380, y: 250, type: 'circle', r: 16, label: 'WiFi router', phase: 6, phaseLabel: 'Phase 6 wireless', body: 'Test PMF status; capture handshake; check PSK strength; verify WPA3 path. Also a Phase 7 target (UART on most consumer routers).', defenses: ['pmkid', 'deauth-flood', 'wpa2-handshake-crack'] },
+      { x: 430, y: 380, type: 'circle', r: 16, label: 'Smart door lock', phase: 6, phaseLabel: 'Phase 6 BLE', body: 'BLE pairing surface; replay-protection check; companion-app cloud creds.', defenses: ['ble-tracking', 'wpa2-handshake-crack'] },
+      { x: 540, y: 350, type: 'circle', r: 12, label: 'BLE tracker', phase: 6, phaseLabel: 'Phase 6 BLE', body: 'Item tag / keys. Check whether it broadcasts RPA or static random — privacy review.', defenses: ['ble-tracking'] }
+    ]
+  },
+
+  office: {
+    caption: 'Open-plan office floor. Multi-tenant building elements are out of scope by default; only your floor.',
+    checklist: [
+      'Statement of Work signed by an authorised legal-entity rep (not just an employee).',
+      'Time window agreed with SOC contact; SOC briefed before any active test.',
+      'Badge testing: cardholder consent + system-owner authorization for each badge tested.',
+      'Wireless testing: scope limited to your floor; building-wide RF is multi-tenant.',
+      'Workstation Bad USB tests: each owner notified; no production data on test machines.',
+      'Reception / common-area surfaces: building owner authorization required.',
+      'Network egress filtering tests: SOC informed of source IP + window; no live data exfil.'
+    ],
+    draw: () => `
+      <!-- Office floor plan -->
+      <rect x="30" y="30" width="540" height="420" rx="10" fill="#1a232e" stroke="#2a3744" stroke-width="2"/>
+
+      <!-- Lobby (left) -->
+      <line x1="160" y1="30" x2="160" y2="200" stroke="#3a4a5e" stroke-width="1"/>
+      <text x="95" y="120" text-anchor="middle" font-size="12" fill="#7a8ca0" font-family="JetBrains Mono, monospace">Lobby /</text>
+      <text x="95" y="138" text-anchor="middle" font-size="12" fill="#7a8ca0" font-family="JetBrains Mono, monospace">Reception</text>
+
+      <!-- Open workspace (center) -->
+      <text x="320" y="140" text-anchor="middle" font-size="12" fill="#7a8ca0" font-family="JetBrains Mono, monospace">Open workspace</text>
+      <!-- Workstation tiles -->
+      <g fill="#0a0f14" stroke="#3a4a5e" stroke-width="1">
+        <rect x="220" y="180" width="40" height="30" rx="2"/>
+        <rect x="290" y="180" width="40" height="30" rx="2"/>
+        <rect x="360" y="180" width="40" height="30" rx="2"/>
+        <rect x="220" y="240" width="40" height="30" rx="2"/>
+        <rect x="290" y="240" width="40" height="30" rx="2"/>
+        <rect x="360" y="240" width="40" height="30" rx="2"/>
+      </g>
+
+      <!-- Server room (right) -->
+      <line x1="460" y1="30" x2="460" y2="200" stroke="#3a4a5e" stroke-width="1"/>
+      <text x="515" y="120" text-anchor="middle" font-size="11" fill="#7a8ca0" font-family="JetBrains Mono, monospace">Server</text>
+      <text x="515" y="138" text-anchor="middle" font-size="11" fill="#7a8ca0" font-family="JetBrains Mono, monospace">closet</text>
+
+      <!-- Conference room (bottom-left) -->
+      <line x1="30" y1="320" x2="240" y2="320" stroke="#3a4a5e" stroke-width="1"/>
+      <line x1="240" y1="320" x2="240" y2="450" stroke="#3a4a5e" stroke-width="1"/>
+      <text x="135" y="385" text-anchor="middle" font-size="12" fill="#7a8ca0" font-family="JetBrains Mono, monospace">Conference</text>
+
+      <!-- Kitchen/break (bottom-right) -->
+      <line x1="240" y1="320" x2="570" y2="320" stroke="#3a4a5e" stroke-width="1"/>
+      <text x="400" y="385" text-anchor="middle" font-size="12" fill="#7a8ca0" font-family="JetBrains Mono, monospace">Kitchen / break</text>
+
+      <text x="300" y="465" text-anchor="middle" font-size="12" fill="#7a8ca0">↑ Building elevator lobby ↑</text>
+    `,
+    hotspots: [
+      { x: 100, y: 200, type: 'circle', r: 16, label: 'Badge reader (lobby)', phase: 3, phaseLabel: 'Phase 3 cards', body: 'Building access. HID Prox 26-bit, MIFARE Classic, or DESFire. Identify card format passively first.', defenses: ['em4100-clone', 'mifare-dict-nested'] },
+      { x: 90, y: 60, type: 'circle', r: 14, label: 'Reception phone + visitor PC', phase: 5, phaseLabel: 'Phase 5 Bad USB', body: 'Often unattended. Bad USB drop, visitor-credential phishing. Reception staff training is key.', defenses: ['usb-drop', 'hid-injection'] },
+      { x: 240, y: 195, type: 'circle', r: 12, label: 'Unattended workstation', phase: 5, phaseLabel: 'Phase 5 Bad USB', body: 'Bad USB Stage 1→2 chain. Check screen-lock policy + USB port allowlist + EDR HID rules.', defenses: ['hid-injection'] },
+      { x: 310, y: 195, type: 'circle', r: 12, label: 'Wireless KB/mouse dongle', phase: 6, phaseLabel: 'Phase 6 NRF24', body: 'MouseJack target if NRF24-based. Logitech / Microsoft / Dell legacy receivers. Replace with Bluetooth.', defenses: ['mousejack'] },
+      { x: 515, y: 170, type: 'circle', r: 16, label: 'Server-closet door', phase: 3, phaseLabel: 'Phase 3 cards', body: 'Typically a stronger card system. Tailgating + badge-format check. Test from inside scope only.', defenses: ['mifare-dict-nested'] },
+      { x: 380, y: 100, type: 'circle', r: 14, label: 'Ceiling WiFi APs', phase: 6, phaseLabel: 'Phase 6 wireless', body: 'PMF status, WPA3 readiness, PSK vs 802.1X. Verify guest segregation.', defenses: ['pmkid', 'deauth-flood', 'evil-twin'] },
+      { x: 130, y: 380, type: 'circle', r: 14, label: 'Conference room AV + IR projector', phase: 4, phaseLabel: 'Phase 4 IR', body: 'IR remotes for projector. Mostly nuisance class but documents the surface for the report.', defenses: ['ir-clone', 'tv-b-gone'] },
+      { x: 350, y: 360, type: 'circle', r: 14, label: 'Networked printer / MFP', phase: 7, phaseLabel: 'Phase 7 hardware', body: 'Default creds, UART debug, firmware-update channel. Many printers store scanned-doc cache.', defenses: ['uart-leak', 'hardcoded-keys'] },
+      { x: 450, y: 360, type: 'circle', r: 12, label: 'Smart fridge / vending NFC', phase: 3, phaseLabel: 'Phase 3 cards', body: 'Often MIFARE Classic-based for payment. Easy lab demo of contactless cloning.', defenses: ['mifare-dict-nested'] }
+    ]
+  },
+
+  vehicle: {
+    caption: 'Top-down view of a car. The attack surfaces are radios + ports, not the engine.',
+    checklist: [
+      'My own vehicle, or written permission from owner; VIN noted in the SoW.',
+      'No on-road testing — engagement is parked, ignition optional per test.',
+      'TPMS tests: do not transmit; passive capture only unless explicitly authorized.',
+      'Key fob: capture from MY key only; never a neighbour\'s vehicle.',
+      'OBD-II + ECU work: in a controlled bay, with the manufacturer\'s service mode if available.',
+      'Infotainment WiFi / BT: my pairing only; my phone in the device list.',
+      'Anything broadcast (TPMS, key fob) confined to a Faraday-bag setup where possible.'
+    ],
+    draw: () => `
+      <!-- Top-down car body -->
+      <rect x="180" y="60" width="240" height="360" rx="80" fill="#1a232e" stroke="#3a4a5e" stroke-width="2"/>
+      <!-- Windshield -->
+      <path d="M 200 120 Q 300 100, 400 120 L 400 180 L 200 180 Z" fill="#0a0f14" opacity="0.6"/>
+      <!-- Rear window -->
+      <path d="M 200 360 Q 300 380, 400 360 L 400 320 L 200 320 Z" fill="#0a0f14" opacity="0.6"/>
+      <!-- Roof line -->
+      <rect x="200" y="200" width="200" height="100" fill="#0a0f14" opacity="0.4"/>
+      <!-- Wheels -->
+      <rect x="160" y="100" width="30" height="60" rx="6" fill="#0a0f14" stroke="#7a8ca0" stroke-width="1"/>
+      <rect x="160" y="320" width="30" height="60" rx="6" fill="#0a0f14" stroke="#7a8ca0" stroke-width="1"/>
+      <rect x="410" y="100" width="30" height="60" rx="6" fill="#0a0f14" stroke="#7a8ca0" stroke-width="1"/>
+      <rect x="410" y="320" width="30" height="60" rx="6" fill="#0a0f14" stroke="#7a8ca0" stroke-width="1"/>
+
+      <text x="300" y="50" text-anchor="middle" font-size="12" fill="#7a8ca0">← front of car</text>
+      <text x="300" y="445" text-anchor="middle" font-size="12" fill="#7a8ca0">← rear of car</text>
+
+      <!-- Driver seat label -->
+      <text x="245" y="245" text-anchor="middle" font-size="10" fill="#7a8ca0" font-family="JetBrains Mono, monospace">driver</text>
+      <text x="355" y="245" text-anchor="middle" font-size="10" fill="#7a8ca0" font-family="JetBrains Mono, monospace">pass.</text>
+    `,
+    hotspots: [
+      { x: 70, y: 240, type: 'circle', r: 16, label: 'Key fob (pocket / kitchen)', phase: 2, phaseLabel: 'Phase 2 sub-GHz', body: '315 MHz (US) or 433 MHz (EU) rolling code. KeeLoq-class or modern AES. RollJam target conceptually; not in scope against an owned vehicle except passively.', defenses: ['rolljam', 'keeloq-dpa'] },
+      { x: 175, y: 130, type: 'circle', r: 12, label: 'TPMS (front-left tire)', phase: 2, phaseLabel: 'Phase 2 sub-GHz', body: '315 / 433 MHz unencrypted broadcast every ~60s. Privacy: trackable per-tire ID.', defenses: ['rolljam'] },
+      { x: 425, y: 130, type: 'circle', r: 12, label: 'TPMS (front-right tire)', phase: 2, phaseLabel: 'Phase 2 sub-GHz', body: '315 / 433 MHz unencrypted broadcast every ~60s. Privacy: trackable per-tire ID.', defenses: ['rolljam'] },
+      { x: 175, y: 350, type: 'circle', r: 12, label: 'TPMS (rear-left tire)', phase: 2, phaseLabel: 'Phase 2 sub-GHz', body: '315 / 433 MHz unencrypted broadcast.', defenses: ['rolljam'] },
+      { x: 425, y: 350, type: 'circle', r: 12, label: 'TPMS (rear-right tire)', phase: 2, phaseLabel: 'Phase 2 sub-GHz', body: '315 / 433 MHz unencrypted broadcast.', defenses: ['rolljam'] },
+      { x: 300, y: 150, type: 'circle', r: 14, label: 'Infotainment (BT + WiFi)', phase: 6, phaseLabel: 'Phase 6 wireless', body: 'BT pairing replay, infotainment WiFi hotspot, app-store SoC. Many surface CVEs over the years.', defenses: ['wpa2-handshake-crack', 'ble-tracking'] },
+      { x: 250, y: 230, type: 'circle', r: 12, label: 'OBD-II port (under steering)', phase: 7, phaseLabel: 'Phase 7 hardware', body: 'CAN bus access. Engine + body controllers reachable. Tuning + diagnostic and (depending on vehicle) lock-control.', defenses: ['uart-leak', 'uboot-shell'] },
+      { x: 300, y: 220, type: 'circle', r: 12, label: 'NFC unlock (B-pillar / handle)', phase: 3, phaseLabel: 'Phase 3 cards', body: 'Modern vehicles: NFC-as-key for phone-as-key features. Apple/Google CCC standard.', defenses: ['mifare-dict-nested'] },
+      { x: 360, y: 350, type: 'circle', r: 12, label: 'Aftermarket dashcam (BLE)', phase: 6, phaseLabel: 'Phase 6 BLE', body: 'Cheap dashcams with no auth on BLE config interface. Firmware update side-channel.', defenses: ['ble-tracking'] }
+    ]
+  },
+
+  iot: {
+    caption: 'Anatomy of a typical consumer smart-doorbell. Half the attack surface is radios; the other half is the PCB inside.',
+    checklist: [
+      'Device purchased and registered to me, with the manufacturer\'s app account.',
+      'Firmware updates accepted via the official path (so I\'m testing a current version).',
+      'Hardware teardown: my unit only; manufacturer warranty implications noted.',
+      'WiFi PSK / BLE captures performed against the device on my dedicated test SSID.',
+      'Cloud reverse-engineering: respect ToS or use a bug-bounty program where one exists.',
+      'Vendor disclosure: any novel vulns go to the vendor with a 90-day embargo.',
+      'No tests against a device deployed on someone else\'s property.'
+    ],
+    draw: () => `
+      <!-- Doorbell front-face outline -->
+      <rect x="80" y="40" width="180" height="380" rx="32" fill="#1a232e" stroke="#3a4a5e" stroke-width="2"/>
+      <!-- Camera -->
+      <circle cx="170" cy="100" r="32" fill="#0a0f14" stroke="#7a8ca0" stroke-width="2"/>
+      <circle cx="170" cy="100" r="18" fill="#1a232e" stroke="#3a4a5e"/>
+      <circle cx="170" cy="100" r="6" fill="#0a0f14"/>
+      <!-- LED ring -->
+      <circle cx="170" cy="200" r="50" fill="none" stroke="#3a4a5e" stroke-width="2"/>
+      <text x="170" y="205" text-anchor="middle" font-size="11" fill="#7a8ca0">DOORBELL</text>
+      <text x="170" y="220" text-anchor="middle" font-size="11" fill="#7a8ca0">BUTTON</text>
+      <!-- Mic grille -->
+      <rect x="140" y="290" width="60" height="20" rx="4" fill="#0a0f14" stroke="#3a4a5e"/>
+
+      <text x="170" y="440" text-anchor="middle" font-size="11" fill="#7a8ca0">← outward face →</text>
+
+      <!-- "Inside" exploded view on the right -->
+      <rect x="320" y="40" width="240" height="380" rx="10" fill="#0a0f14" stroke="#2a3744" stroke-width="2" stroke-dasharray="4,3"/>
+      <text x="440" y="58" text-anchor="middle" font-size="11" fill="#7a8ca0" font-family="JetBrains Mono, monospace">interior PCB (exploded)</text>
+
+      <!-- SoC -->
+      <rect x="360" y="100" width="80" height="60" rx="4" fill="#0a2a1a" stroke="#00d9a0" stroke-width="2"/>
+      <text x="400" y="125" text-anchor="middle" font-size="11" fill="#00d9a0" font-family="JetBrains Mono, monospace">SoC</text>
+      <text x="400" y="142" text-anchor="middle" font-size="9" fill="#d6e1ec">ESP / RTL / ARM</text>
+
+      <!-- Flash -->
+      <rect x="470" y="100" width="60" height="40" rx="4" fill="#3a2a0a" stroke="#ffb547" stroke-width="2"/>
+      <text x="500" y="125" text-anchor="middle" font-size="10" fill="#ffb547" font-family="JetBrains Mono, monospace">SPI flash</text>
+
+      <!-- Radios -->
+      <rect x="360" y="200" width="80" height="50" rx="4" fill="#3a1a2a" stroke="#ff5a6e" stroke-width="2"/>
+      <text x="400" y="220" text-anchor="middle" font-size="10" fill="#ff5a6e" font-family="JetBrains Mono, monospace">WiFi</text>
+      <text x="400" y="237" text-anchor="middle" font-size="9" fill="#d6e1ec">+ BLE</text>
+
+      <!-- UART header -->
+      <rect x="470" y="200" width="60" height="30" rx="3" fill="#1a232e" stroke="#5eb6ff" stroke-width="2"/>
+      <text x="500" y="220" text-anchor="middle" font-size="9" fill="#5eb6ff" font-family="JetBrains Mono, monospace">UART hdr</text>
+
+      <!-- Cloud arrow -->
+      <line x1="400" y1="280" x2="400" y2="340" stroke="#5eb6ff" stroke-width="2" stroke-dasharray="3,2" marker-end="url(#iot-arrow)"/>
+      <text x="400" y="365" text-anchor="middle" font-size="10" fill="#5eb6ff">cloud API</text>
+      <text x="400" y="380" text-anchor="middle" font-size="9" fill="#7a8ca0">+ mobile app</text>
+
+      <defs><marker id="iot-arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#5eb6ff"/></marker></defs>
+    `,
+    hotspots: [
+      { x: 170, y: 100, type: 'circle', r: 30, label: 'Camera + mic input', phase: 6, phaseLabel: 'Phase 6 wireless', body: 'Privacy review: what packets leave the device on motion / sound trigger? Cloud telemetry surface.', defenses: ['wpa2-handshake-crack'] },
+      { x: 170, y: 200, type: 'circle', r: 25, label: 'Doorbell button (trigger)', phase: 6, phaseLabel: 'Phase 6 wireless', body: 'Triggers cloud event. Look for an unauthenticated wake-on-press handler in the firmware.', defenses: ['hardcoded-keys'] },
+      { x: 400, y: 130, type: 'rect', x_real: 360, y_real: 100, w: 80, h: 60, label: 'SoC', phase: 7, phaseLabel: 'Phase 7 hardware', body: 'Main MCU / SoC. SWD or JTAG headers? Check RDP level.', defenses: ['swd-read', 'voltage-glitch'] },
+      { x: 500, y: 120, type: 'rect', x_real: 470, y_real: 100, w: 60, h: 40, label: 'SPI flash chip', phase: 7, phaseLabel: 'Phase 7 hardware', body: 'SOIC-8 SPI flash. CH341A + clip = full firmware dump. binwalk for hardcoded secrets.', defenses: ['spi-flash-dump', 'hardcoded-keys'] },
+      { x: 400, y: 225, type: 'rect', x_real: 360, y_real: 200, w: 80, h: 50, label: 'WiFi + BLE radios', phase: 6, phaseLabel: 'Phase 6 wireless', body: 'BLE pairing surface during setup; WiFi PSK in firmware; PMKID attack possibility against any AP it talks to.', defenses: ['pmkid', 'ble-tracking'] },
+      { x: 500, y: 215, type: 'rect', x_real: 470, y_real: 200, w: 60, h: 30, label: 'UART debug header', phase: 7, phaseLabel: 'Phase 7 hardware', body: 'Almost always 115200 8N1. Boot log → root password leak → /etc/passwd dump.', defenses: ['uart-leak', 'uboot-shell'] },
+      { x: 400, y: 355, type: 'circle', r: 16, label: 'Cloud API + companion app', phase: 6, phaseLabel: 'Phase 6 + 5', body: 'OAuth flow, JWT inspection, mobile app reverse-engineering. The biggest attack surface is the cloud side, not the device.', defenses: ['stage2-callback', 'hardcoded-keys'] }
+    ]
+  },
+
+  ot: {
+    caption: 'Operational Technology floor — plant automation. Most testing here is lab-only or read-only-passive.',
+    checklist: [
+      'NEVER active-test on production plant equipment without explicit C-suite + vendor authorization.',
+      'Use a lab replica (vendor PLC + HMI + I/O simulator) instead of the production floor.',
+      'Bug bounty programs (Siemens, Schneider, Rockwell) are the legitimate disclosure path.',
+      'Air-gapped engineering workstation = treat the network as part of the asset.',
+      'Wireless instrumentation (LoRa / proprietary 900 MHz) — passive only.',
+      'USB on HMI panels: trip-into-fault potential. Treat as production downtime risk.',
+      'Cellular backhaul: never test against carrier infrastructure.'
+    ],
+    draw: () => `
+      <!-- Plant floor diagram -->
+      <rect x="30" y="30" width="540" height="420" rx="10" fill="#1a232e" stroke="#2a3744" stroke-width="2"/>
+
+      <!-- Control room (top-left) -->
+      <line x1="240" y1="30" x2="240" y2="200" stroke="#3a4a5e" stroke-width="1"/>
+      <line x1="30" y1="200" x2="240" y2="200" stroke="#3a4a5e" stroke-width="1"/>
+      <text x="135" y="100" text-anchor="middle" font-size="12" fill="#7a8ca0" font-family="JetBrains Mono, monospace">Control room</text>
+
+      <!-- Engineering workstation (top-right) -->
+      <line x1="240" y1="200" x2="570" y2="200" stroke="#3a4a5e" stroke-width="1"/>
+      <text x="405" y="100" text-anchor="middle" font-size="12" fill="#7a8ca0" font-family="JetBrains Mono, monospace">Engineering /</text>
+      <text x="405" y="118" text-anchor="middle" font-size="12" fill="#7a8ca0" font-family="JetBrains Mono, monospace">offices</text>
+
+      <!-- Plant floor (bottom) -->
+      <text x="300" y="280" text-anchor="middle" font-size="12" fill="#7a8ca0" font-family="JetBrains Mono, monospace">Plant floor — PLCs + RTUs + I/O</text>
+
+      <!-- Machinery icons -->
+      <g fill="#0a0f14" stroke="#3a4a5e" stroke-width="1">
+        <rect x="80" y="320" width="60" height="80" rx="3"/>
+        <rect x="200" y="320" width="60" height="80" rx="3"/>
+        <rect x="320" y="320" width="60" height="80" rx="3"/>
+        <rect x="440" y="320" width="60" height="80" rx="3"/>
+      </g>
+      <text x="300" y="430" text-anchor="middle" font-size="10" fill="#7a8ca0">machinery / process lines</text>
+    `,
+    hotspots: [
+      { x: 110, y: 130, type: 'circle', r: 16, label: 'HMI panel (control-room)', phase: 5, phaseLabel: 'Phase 5 Bad USB', body: 'Often industrial Windows; USB ports rarely allowlisted. Bad USB is plausible — but a trip-into-fault on the HMI can halt production. Lab-only.', defenses: ['hid-injection', 'usb-drop'] },
+      { x: 180, y: 170, type: 'circle', r: 14, label: 'Badge access (control-room door)', phase: 3, phaseLabel: 'Phase 3 cards', body: 'Often the same building badge as offices; physical-security gap if not segregated.', defenses: ['em4100-clone', 'mifare-dict-nested'] },
+      { x: 400, y: 145, type: 'circle', r: 14, label: 'Engineering workstation', phase: 5, phaseLabel: 'Phase 5 Bad USB', body: 'Where the PLC ladder logic and HMI projects are edited. Higher impact than a regular office machine.', defenses: ['hid-injection', 'stage2-callback'] },
+      { x: 500, y: 150, type: 'circle', r: 14, label: 'Cellular / LoRa backhaul', phase: 6, phaseLabel: 'Phase 6 wireless', body: 'Some plants send process data over LoRa or cellular. Passive observation is the legitimate path.', defenses: ['wpa2-handshake-crack'] },
+      { x: 110, y: 360, type: 'circle', r: 14, label: 'PLC (machine 1)', phase: 7, phaseLabel: 'Phase 7 hardware', body: 'Most PLCs have a Modbus or proprietary serial diagnostic port. Lab replica only for active testing.', defenses: ['uart-leak', 'hardcoded-keys'] },
+      { x: 230, y: 360, type: 'circle', r: 14, label: 'PLC (machine 2)', phase: 7, phaseLabel: 'Phase 7 hardware', body: 'Same family + lab-only constraint.', defenses: ['uart-leak'] },
+      { x: 350, y: 360, type: 'circle', r: 14, label: 'Wireless instrument (sensor)', phase: 6, phaseLabel: 'Phase 6 wireless', body: 'ISA100 / WirelessHART / proprietary 900 MHz. Passive capture only; transmissions back to the gateway out of scope.', defenses: ['wpa2-handshake-crack'] },
+      { x: 470, y: 360, type: 'circle', r: 14, label: 'RTU (remote-terminal unit)', phase: 7, phaseLabel: 'Phase 7 hardware', body: 'Often older hardware; UART debug or unauthenticated serial protocol.', defenses: ['uart-leak', 'uboot-shell'] },
+      { x: 100, y: 80, type: 'circle', r: 12, label: 'Network switch / backplane', phase: 6, phaseLabel: 'Phase 6 wireless', body: 'OT vs IT segmentation check. Default-creds + flat-network smell-test.', defenses: ['hardcoded-keys'] }
+    ]
+  }
+};
+
+let currentScenario = 'home';
+let lastHotspotKey = null;
+
+function renderScenario() {
+  const sc = SCENARIOS[currentScenario];
+  document.getElementById('scenario-caption').textContent = sc.caption;
+
+  // Draw the base map
+  let parts = sc.draw();
+
+  // Add hotspots
+  sc.hotspots.forEach((h, i) => {
+    if (h.type === 'circle') {
+      parts += `
+        <g class="hotspot" data-idx="${i}" tabindex="0" role="button" aria-label="${h.label}">
+          <circle cx="${h.x}" cy="${h.y}" r="${h.r + 4}" fill="transparent" stroke="rgba(0,217,160,0.6)" stroke-dasharray="3,2"/>
+          <circle cx="${h.x}" cy="${h.y}" r="3" fill="#00d9a0"/>
+        </g>
+      `;
+    } else if (h.type === 'rect') {
+      parts += `
+        <g class="hotspot" data-idx="${i}" tabindex="0" role="button" aria-label="${h.label}">
+          <rect x="${h.x_real - 2}" y="${h.y_real - 2}" width="${h.w + 4}" height="${h.h + 4}" fill="transparent" stroke="rgba(0,217,160,0.6)" stroke-dasharray="3,2" rx="4"/>
+        </g>
+      `;
+    }
+  });
+
+  document.getElementById('scenario-svg').innerHTML = parts;
+
+  // Checklist
+  document.getElementById('scenario-checklist').innerHTML = sc.checklist.map(c => `<li>${c}</li>`).join('');
+
+  // Reset info panel
+  document.getElementById('scenario-info').innerHTML = '<strong style="color: var(--accent);">Click a hotspot</strong> on the map to see the attack surface and its Phase 8 defense row.';
+  lastHotspotKey = null;
+
+  // Wire interactions
+  document.querySelectorAll('#scenario-svg .hotspot').forEach(el => {
+    const idx = parseInt(el.dataset.idx);
+    const activate = () => showHotspot(idx);
+    el.addEventListener('click', activate);
+    el.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(); }
+    });
+  });
+}
+
+function showHotspot(idx) {
+  const sc = SCENARIOS[currentScenario];
+  const h = sc.hotspots[idx];
+  if (!h) return;
+  lastHotspotKey = idx;
+  const defLinks = h.defenses.map(id => `<a href="phase-8-defense.html#a=${id}">${id} →</a>`).join('<br>');
+  document.getElementById('scenario-info').innerHTML = `
+    <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px;">
+      <span class="phase-pill phase-${h.phase}">${h.phaseLabel}</span>
+    </div>
+    <div style="color: var(--accent); font-family: var(--mono); font-size: 13px; margin-bottom: 8px;">${h.label}</div>
+    <div style="font-size: 14px; color: var(--text); margin-bottom: 14px;">${h.body}</div>
+    <div style="font-size: 12px; color: var(--muted); margin-bottom: 4px;">Phase 8 defense row(s):</div>
+    <div style="font-size: 13px;">${defLinks}</div>
+  `;
+}
+
+document.querySelectorAll('.sc-tab').forEach(b => {
+  b.onclick = () => {
+    document.querySelectorAll('.sc-tab').forEach(x => x.classList.remove('primary'));
+    b.classList.add('primary');
+    currentScenario = b.dataset.sc;
+    renderScenario();
+  };
+});
+
+renderScenario();
+
+
+// ============== QUIZ ==============
+(() => {
+  const Q = [
+    { q: 'You\'re hired for a corporate-office capstone. The receptionist verbally consents to "yeah, plug your USB in." Are you authorised to run a Bad USB test on her workstation?',
+      a: ['Yes — she\'s the user of the machine', 'No — the legal-entity (employer) owns the machine and the data, and must authorise in writing', 'Yes — if you don\'t exfil anything', 'Yes — if you only run for 30 seconds'],
+      correct: 1,
+      why: 'The corporate entity owns the asset. Even with the user\'s cooperation, you need company authorization. The legality callouts at the top of every phase exist for exactly this kind of trap.' },
+    { q: 'For a home capstone against your own house, which attack surface is plausibly out of scope?',
+      a: ['Your own garage remote (Phase 2)', 'Your own WiFi router (Phase 6)', 'Your neighbour\'s smart bulb visible from your window', 'Your own iButton door fob (Phase 4)'],
+      correct: 2,
+      why: 'Anything you own — full scope, including testing how readable it is from outside. The neighbour\'s anything is not yours; visible from your window doesn\'t make it in-scope.' },
+    { q: 'During an OT capstone, you find a vulnerable firmware on a production PLC. The right next step is…',
+      a: ['Exploit it to demonstrate impact', 'Document the finding; do not exploit on production; coordinate with vendor disclosure', 'Quietly patch it without telling the client', 'Post the CVE on Twitter'],
+      correct: 1,
+      why: 'Active exploitation on production OT can halt a process. Documentation + vendor disclosure under a 90-day embargo is the protected research path. Lab-replica testing came earlier; production stays read-only.' },
+    { q: 'In the vehicle capstone, the TPMS sensors broadcast unencrypted IDs. What\'s the right scope?',
+      a: ['Active-replay them to spoof another car\'s tires', 'Capture passively from MY vehicle; document the privacy implication; do not transmit', 'Capture from any vehicle in the parking lot', 'Not in scope — TPMS is encrypted'],
+      correct: 1,
+      why: 'TPMS broadcasts are NOT encrypted. The privacy implication (per-tire trackable ID) is real and reportable. Active replay against your own vehicle is technically possible but adds nothing to the audit; capturing any other vehicle\'s is illegal interception.' },
+    { q: 'You complete a smart-doorbell capstone and find hardcoded API keys in the SPI flash dump. What does Phase 8 say to recommend?',
+      a: ['Encrypt the flash with a key burned into firmware', 'Pre-release CI scan for hardcoded secrets + ship per-device keys provisioned at manufacture', 'Move the keys to RAM only', 'Disable the UART output'],
+      correct: 1,
+      why: 'Phase 8 attack id <code>hardcoded-keys</code> calls out exactly this remediation. Encrypting the flash with a firmware-resident key just relocates the secret. Per-device provisioning makes a single dump compromise just one device, and rotation possible.' }
+  ];
+  function render() {
+    document.getElementById('phase9-quiz-q').innerHTML = Q.map((it, i) => `
+      <fieldset style="margin: 12px 0; padding: 12px 14px; border: 1px solid var(--line); border-radius: 6px;">
+        <legend style="padding: 0 8px; color: var(--accent-2); font-weight: 600;">Q${i+1}</legend>
+        <div style="margin-bottom: 8px;">${it.q}</div>
+        ${it.a.map((c, j) => `<label style="display: block; padding: 4px 0; cursor: pointer;"><input type="radio" name="phase9-q${i}" value="${j}" style="margin-right: 6px;">${c}</label>`).join('')}
+        <div id="phase9-why-${i}" style="display: none; margin-top: 8px; padding: 8px 10px; border-radius: 4px; font-size: 13px;"></div>
+      </fieldset>
+    `).join('');
+  }
+  function check() {
+    let n = 0;
+    Q.forEach((it, i) => {
+      const sel = document.querySelector(`input[name="phase9-q${i}"]:checked`);
+      const why = document.getElementById(`phase9-why-${i}`);
+      why.style.display = 'block';
+      if (sel && parseInt(sel.value) === it.correct) {
+        n++;
+        why.innerHTML = `<strong style="color: var(--accent);">✓ Correct.</strong> ${it.why}`;
+        why.style.background = 'rgba(0,217,160,0.08)';
+      } else {
+        why.innerHTML = `<strong style="color: var(--danger);">✗ Not quite.</strong> Correct: <em>${it.a[it.correct]}</em>. ${it.why}`;
+        why.style.background = 'rgba(255,90,110,0.08)';
+      }
+    });
+    document.getElementById('phase9-quiz-score').textContent = `${n} / ${Q.length} correct`;
+  }
+  function reset() {
+    document.querySelectorAll('input[name^="phase9-q"]').forEach(r => r.checked = false);
+    document.querySelectorAll('[id^="phase9-why-"]').forEach(w => { w.style.display = 'none'; w.innerHTML = ''; });
+    document.getElementById('phase9-quiz-score').textContent = '';
+  }
+  document.getElementById('phase9-quiz-check').onclick = check;
+  document.getElementById('phase9-quiz-reset').onclick = reset;
+  render();
+})();
+</script>
+
+</body>
+</html>
