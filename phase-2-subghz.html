@@ -449,7 +449,7 @@
 
   <details>
     <summary>Side note — KeeLoq's historical break (Eisenbarth et al., 2008)</summary>
-    <p style="font-size: 13px;">Academic teams extracted the <em>manufacturer master key</em> from a single receiver via differential power analysis (a side-channel attack on the receiver, not the cipher itself). With the master key + a serial number from a captured packet, you can derive any remote's 64-bit secret in that brand's ecosystem and clone arbitrarily. Patched in modern variants by using per-deployment masters rather than a globally-shared master.</p>
+    <p style="font-size: 13px;">Academic teams (Eisenbarth / Kasper / Paar, 2008) extracted the <em>manufacturer master key</em> from a single receiver via differential power analysis (a side-channel attack on the receiver, not the cipher itself). Because the master key was identical across that vendor's entire receiver fleet, one extraction broke the brand's whole ecosystem — given the master + a serial from any captured packet, you derive any remote's 64-bit secret. Patched in modern variants by switching to per-vendor or per-batch master keys, and later by replacing KeeLoq with AES-based rolling code entirely.</p>
   </details>
 </div>
 </section>
@@ -459,7 +459,7 @@
 <!-- 6. ROLLJAM ATTACK TIMELINE -->
 <!-- ============================================================ -->
 <section id="rolljam">
-<h2>6. RollJam — the only practical attack on naive rolling codes</h2>
+<h2>6. RollJam — the canonical practical attack on naive rolling codes</h2>
 <p>Samy Kamkar's 2015 attack against rolling-code remotes that lack timestamps. Step through the sequence below.</p>
 
 <div class="panel">
@@ -546,8 +546,9 @@
       <tr><th>Real-world keyspace</th><th>Bits</th><th>Codes</th><th>Time @ 10/s</th><th>Verdict</th></tr>
     </thead>
     <tbody>
-      <tr><td>PT2262 with 3-state pins</td><td>~13</td><td>~8,192</td><td>~14 min</td><td><span class="badge warn">borderline</span></td></tr>
-      <tr><td>Holtek HT12 (12-bit address)</td><td>12</td><td>4,096</td><td>~7 min</td><td><span class="badge bad">trivial</span></td></tr>
+      <tr><td>PT2262, full 12 tri-state pins</td><td>~19</td><td>531,441 (3¹²)</td><td>~14.7 hr</td><td><span class="badge warn">overnight job</span></td></tr>
+      <tr><td>PT2262 used as 2-state (typical install)</td><td>12</td><td>4,096</td><td>~7 min</td><td><span class="badge bad">trivial</span></td></tr>
+      <tr><td>Holtek HT12E (8 addr + 4 data)</td><td>12</td><td>4,096</td><td>~7 min</td><td><span class="badge bad">trivial</span></td></tr>
       <tr><td>HID Prox 26-bit (with known facility)</td><td>16</td><td>65,536</td><td>~1.8 hr</td><td><span class="badge warn">feasible</span></td></tr>
       <tr><td>EM4100 40-bit serial</td><td>40</td><td>1.1 × 10¹²</td><td>~3,500 years</td><td><span class="badge ok">impractical</span></td></tr>
       <tr><td>Princeton 24-bit raw</td><td>24</td><td>16.7 M</td><td>~19 days</td><td><span class="badge ok">infeasible in session</span></td></tr>
@@ -594,7 +595,7 @@
     { q: 'The 32-bit cipher block in an HCS301 KeeLoq transmission is built from…',
       a: ['32 bits of raw counter', '16-bit counter + 4-bit button + 12-bit serial', '16-bit sync counter + 4-bit button + 2-bit overflow + 10-bit discrimination', '32 bits of plaintext serial number'],
       correct: 2,
-      why: 'Microchip\'s DS40149E datasheet decomposes the encrypted block exactly as 16 + 4 + 2 + 10. The button is also re-transmitted plaintext for routing — that\'s why "4-bit button" appears twice in the 66-bit frame.' }
+      why: 'Microchip\'s HCS301 datasheet (DS21143C) decomposes the encrypted block exactly as 16 + 4 + 2 + 10. The button is also re-transmitted plaintext for routing — that\'s why "4-bit button" appears twice in the 66-bit frame.' }
   ];
   function render() {
     document.getElementById('phase2-quiz-q').innerHTML = Q.map((it, i) => `

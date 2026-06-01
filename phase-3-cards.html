@@ -472,8 +472,8 @@
     <strong>Caveats on the "SECURE" box:</strong>
     <ul style="margin: 6px 0 0; padding-left: 18px; font-size: 13px;">
       <li><strong>MIFARE Plus</strong> ships in three Security Levels. <em>SL1</em> is backwards-compatible with Crypto1 and clonable like a Classic; <em>SL3</em> is AES-only and unclonable. A "Plus" card by name tells you nothing — the deployment chooses the level.</li>
-      <li><strong>Ultralight C</strong> uses 3DES with a 16-byte key; <strong>NTAG21x</strong> uses CMAC signatures + password protection + a one-way mirrored counter. Different chips, similar form factor — emulation only fools naive readers, signature validation catches clones.</li>
-      <li><strong>"Magic" Mifare</strong>: Gen1a = "backdoor" UID command, Gen2 / CUID = UID rewritable through normal write, Gen3 = direct block-0 write outside auth, Gen4 = programmable ATQA/SAK/config (advanced spoofing).</li>
+      <li><strong>Ultralight C</strong> uses 3DES with a 16-byte key; <strong>NTAG21x</strong> uses an <strong>ECDSA originality signature</strong> (NXP curve, secp128r1) + password protection (PWD/PACK) + a one-way mirrored counter. Different chips, similar form factor — emulation only fools naive readers, signature validation catches clones. (CMAC + SUN belong to NTAG 424 DNA, not 213/215/216.)</li>
+      <li><strong>"Magic" Mifare</strong>: Gen1a = undocumented "backdoor" command pair for block-0 write; Gen2 / CUID = block 0 rewritable through normal MIFARE write after auth; Gen3 = dedicated APDU command changes UID (block 0 updates automatically, ATQA/SAK fixed); Gen4 = programmable ATQA/SAK/config (most flexible spoofing).</li>
     </ul>
   </div>
 </div>
@@ -514,7 +514,7 @@
 <!-- ============================================================ -->
 <section id="crypto1-attacks">
 <h2>5. The Crypto1 attack ladder — when to use which</h2>
-<p>Four distinct attacks. They're not alternatives — they're rungs of a ladder. Try cheap things first; escalate only on failure.</p>
+<p>Five distinct attacks (matrix below). They're not alternatives — they're rungs of a ladder. Try cheap things first; escalate only on failure.</p>
 
 <div class="panel">
   <svg viewBox="0 0 1100 480">
@@ -566,7 +566,7 @@
     </g>
 
     <line x1="550" y1="405" x2="550" y2="430" stroke="#7a8ca0" stroke-width="1.5" marker-end="url(#card-arrow)"/>
-    <text x="555" y="423" font-size="11" fill="#ffb547" font-style="italic">if no key known and reader access available →</text>
+    <text x="555" y="423" font-size="11" fill="#ffb547" font-style="italic">alternative path: reader available, card not → mfkey32 (see matrix for darkside, when neither is)</text>
 
     <!-- Step 4: mfkey32 (branching to side) -->
     <g>
@@ -608,7 +608,8 @@
         <text x="60" y="325" fill="#d6e1ec">     keystream</text>
         <text x="60" y="350" fill="#ffb547">All five attacks below</text>
         <text x="60" y="365" fill="#ffb547">exploit one or both.</text>
-        <text x="60" y="385" fill="#7a8ca0">Nohl/Plötz/Tews 2008.</text>
+        <text x="60" y="385" fill="#7a8ca0">Nohl/Plötz 2008;</text>
+        <text x="60" y="398" fill="#7a8ca0">Garcia/Tews et al. 2008-09.</text>
       </g>
     </g>
   </svg>

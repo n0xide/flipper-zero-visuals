@@ -221,6 +221,7 @@
   <pre id="ducky-script"><span class="comment">REM Stage 1 — open RUN, launch PowerShell reverse shell</span>
 <span class="comment">REM Lab-only; canonical payload, AV catches on default Windows</span>
 
+<span class="keyword">KEYBOARD_LAYOUT</span> <span class="modifier">US</span>          <span class="comment">  ← always first; tells firmware which scan-code map to send</span>
 <span class="keyword">DELAY</span> <span class="number">1000</span>                  <span class="comment">  ← let host settle after USB enumerate</span>
 <span class="keyword">GUI</span> <span class="modifier">r</span>                       <span class="comment">  ← Windows-key + R → opens RUN dialog</span>
 <span class="keyword">DELAY</span> <span class="number">500</span>                   <span class="comment">  ← RUN takes ~300ms to appear</span>
@@ -366,11 +367,11 @@
     </thead>
     <tbody>
       <tr><td>USB port disable</td><td>Windows GPO (Removable Storage Access), <code>USBGuard</code> (Linux), epoxy on the port (SCIF)</td><td>All physical-USB attacks</td><td>None — port disabled</td><td><span class="badge bad">rare</span> — only in kiosks/SCIFs</td></tr>
-      <tr><td>VID/PID allowlist</td><td><code>USBGuard</code> with policy, Windows Defender Device Control, <a href="https://github.com/JLospinoso/beamgun" target="_blank" rel="noopener">BeamGun</a> (alerts on new HID)</td><td>Naive Flipper (declares Hak5 VID/PID)</td><td>Custom firmware spoofs an allowed VID/PID (e.g. Dell mouse 413C:301A)</td><td><span class="badge bad">rare</span> — most enterprises don't bother</td></tr>
+      <tr><td>VID/PID allowlist</td><td><code>USBGuard</code> with policy, Windows Defender Device Control, <a href="https://github.com/JLospinoso/beamgun" target="_blank" rel="noopener">BeamGun</a> <em>(reference impl; unmaintained since ~2020)</em></td><td>Naive Flipper (declares Hak5 VID/PID)</td><td>Custom firmware spoofs an allowed VID/PID (e.g. Dell mouse 413C:301A)</td><td><span class="badge bad">rare</span> — most enterprises don't bother</td></tr>
       <tr><td>EDR HID rules</td><td>CrowdStrike Falcon, Microsoft Defender for Endpoint, SentinelOne (rules on "new HID + rapid keystroke + suspicious process spawn")</td><td>Catches sustained typing floods</td><td>Type slower (~150 ms/char); shorten Stage 1 to a single line</td><td><span class="badge ok">common</span> — most managed enterprise endpoints</td></tr>
       <tr><td>PowerShell CLM + AMSI</td><td>Microsoft Defender ASR rules, Constrained Language Mode via WDAC, AppLocker policies</td><td>Canonical PS payloads (IWR + IEX, downloads, reflection)</td><td>AMSI bypass techniques, LOLBins (mshta, cmd, wmic, regsvr32)</td><td><span class="badge warn">enterprise</span> — most have it on by default in Defender</td></tr>
-      <tr><td>App allowlisting (WDAC)</td><td>Microsoft WDAC / AppLocker, Carbon Black App Control, Airlock Digital</td><td>Unsigned Stage 2 binaries</td><td>Use signed Microsoft tools, living-off-the-land binaries</td><td><span class="badge bad">uncommon</span> — high operational burden, used in regulated environments</td></tr>
-      <tr><td>Network egress filter</td><td>Palo Alto NGFW, Zscaler ZIA, Cisco Umbrella DNS, corporate Squid proxy</td><td>Callback to unknown C2</td><td>DNS-tunneled C2, allowed cloud SaaS as C2 (Slack, Dropbox webhooks)</td><td><span class="badge warn">enterprise</span> — usually domain-level egress, not full SNI</td></tr>
+      <tr><td>App allowlisting (WDAC)</td><td>Microsoft WDAC <em>(renamed "App Control for Business" in Win11 24H2)</em> / AppLocker, Carbon Black App Control, Airlock Digital</td><td>Unsigned Stage 2 binaries</td><td>Use signed Microsoft tools, living-off-the-land binaries</td><td><span class="badge bad">uncommon</span> — high operational burden, used in regulated environments</td></tr>
+      <tr><td>Network egress filter</td><td>Palo Alto NGFW, Zscaler ZIA, Cisco Umbrella DNS <em>(now "Cisco Secure Access — DNS Defense")</em>, corporate Squid proxy</td><td>Callback to unknown C2</td><td>DNS-tunneled C2, allowed cloud SaaS as C2 (Slack, Dropbox webhooks)</td><td><span class="badge warn">enterprise</span> — usually domain-level egress, not full SNI</td></tr>
     </tbody>
   </table>
   <div class="callout">

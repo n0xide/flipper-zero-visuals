@@ -244,7 +244,7 @@
   </div>
 
   <div class="callout warn">
-    <strong>The crack:</strong> after capturing all 4 frames, the attacker has Anonce, Snonce, both MAC addresses, and the MIC. Run <code>hashcat -m 22000 capture.hccapx wordlist.txt</code> — for each candidate passphrase, derive the PMK, compute the PTK, recompute MIC. Match = PSK found. Speed depends on PSK strength (see §6).
+    <strong>The crack:</strong> after capturing all 4 frames, the attacker has Anonce, Snonce, both MAC addresses, and the MIC. Convert the capture to the current unified format with <code>hcxpcapngtool</code> (.hc22000), then run <code>hashcat -m 22000 capture.hc22000 wordlist.txt</code> — for each candidate passphrase, derive the PMK, compute the PTK, recompute MIC. Match = PSK found. <em>Note</em>: the old <code>.hccapx</code> format was for hashcat mode <code>-m 2500</code>, deprecated in favor of <code>-m 22000</code> which handles both 4-way handshakes and PMKIDs. Speed depends on PSK strength (see §6).
   </div>
 
   <h3 style="margin-top: 22px;">Shortcut: PMKID attack (Steube, 2018) — no client, no handshake</h3>
@@ -275,7 +275,7 @@
     <!-- Offline crack box -->
     <rect x="780" y="60" width="280" height="80" rx="8" fill="#3a2a0a" stroke="#ffb547" stroke-width="2"/>
     <text x="920" y="88" text-anchor="middle" font-size="14" fill="#ffb547" font-weight="bold">Offline crack — same as handshake</text>
-    <text x="920" y="108" text-anchor="middle" font-size="11" fill="#d6e1ec" font-family="JetBrains Mono, monospace">hashcat -m 22000 cap.hccapx wordlist</text>
+    <text x="920" y="108" text-anchor="middle" font-size="11" fill="#d6e1ec" font-family="JetBrains Mono, monospace">hashcat -m 22000 cap.hc22000 wordlist</text>
     <text x="920" y="124" text-anchor="middle" font-size="10" fill="#7a8ca0">same PSK-strength rules from §6 apply</text>
 
     <line x1="670" y1="100" x2="780" y2="100" stroke="#ffb547" stroke-width="2" marker-end="url(#pmkid-arrow-amber)"/>
@@ -628,7 +628,7 @@
       correct: 1,
       why: 'During pairing the device shares an IRK with the peer. The peer runs AES over the prand half of any RPA to test whether it matches; outsiders without the IRK see only noise.' },
     { q: 'A MouseJack attack against an enterprise-issued wireless keyboard requires…',
-      a: ['Physical access to the keyboard', 'BLE pairing first', 'A vulnerable NRF24 USB receiver (Logitech / Microsoft / Dell, pre-patch)', 'An unpatched Windows version'],
+      a: ['Physical access to the keyboard', 'BLE pairing first', 'A vulnerable NRF24 USB receiver (Logitech / Microsoft / Lenovo / HP, pre-patch)', 'An unpatched Windows version'],
       correct: 2,
       why: 'MouseJack injects keystrokes into the receiver dongle over NRF24 at ~30 m. No physical access, no pairing, the OS sees them as legitimate HID input. The vulnerability is in the receiver firmware — Bluetooth replacements close it.' }
   ];
@@ -881,9 +881,11 @@ function updatePSK(skipHash) {
   let verdict;
   if (worstS < 60) verdict = '<span style="color: var(--danger);">trivially cracked</span>';
   else if (worstS < 3600) verdict = '<span style="color: var(--danger);">cracked within an hour</span>';
-  else if (worstS < 86400) verdict = '<span style="color: var(--warn);">overnight job — vulnerable</span>';
+  else if (worstS < 86400) verdict = '<span style="color: var(--danger);">overnight job — vulnerable</span>';
+  else if (worstS < 86400 * 30) verdict = '<span style="color: var(--warn);">days to weeks — vulnerable to motivated attacker</span>';
   else if (worstS < 86400 * 365) verdict = '<span style="color: var(--warn);">weeks–months — borderline</span>';
-  else if (worstS < 86400 * 365 * 1000) verdict = '<span style="color: var(--accent);">years — safe</span>';
+  else if (worstS < 86400 * 365 * 100) verdict = '<span style="color: var(--accent);">years — safe vs single attacker</span>';
+  else if (worstS < 86400 * 365 * 1e9) verdict = '<span style="color: var(--accent);">millennia — safe vs nation-state-scale brute force</span>';
   else verdict = '<span style="color: var(--accent);">cryptographic — safe</span>';
   document.getElementById('psk-verdict').innerHTML = verdict;
 

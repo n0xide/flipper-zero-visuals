@@ -215,7 +215,7 @@
         <td>Pulse width (long burst = 1, short burst = 0)</td>
         <td>2.4 ms lead-in + 7-bit cmd + 5-bit addr (12-bit) or extended 15/20-bit</td>
         <td>~1 kbps</td>
-        <td>Sony — TVs, audio, BluRay, PlayStation 1/2/3 IR. Repeats every 45 ms while pressed.</td>
+        <td>Sony — TVs, audio, BluRay; PS2 DVD remote and PS3 BD remote IR receiver (PS1 had no native IR support). Repeats every 45 ms while pressed.</td>
       </tr>
       <tr>
         <td><strong style="color: var(--purple);">Pronto</strong></td>
@@ -261,7 +261,7 @@
       <tr>
         <td>Brute-force a TV power-off (any brand)</td>
         <td><span class="badge warn">slow but works</span></td>
-        <td>"TV-B-Gone" mode — cycles through ~200 known "Power" codes across all brands. Takes ~30s; one will hit. Famously turns off TVs in airports / waiting rooms.</td>
+        <td>"TV-B-Gone" mode (Mitch Altman, 2004) — cycles through ~250+ known "Power" codes across all brands. Takes ~30s; one will hit. Famously turns off TVs in airports / waiting rooms.</td>
       </tr>
       <tr>
         <td>Decode a captured remote signal</td>
@@ -524,7 +524,7 @@
     { q: 'The Flipper auto-classifies a captured IR signal as NEC, RC5, SIRC, or unknown by…',
       a: ['The carrier frequency alone', 'The lead-in shape (NEC 9+4.5 ms, SIRC 2.4 ms, RC5 no lead-in)', 'The number of bits', 'A USB descriptor from the original remote'],
       correct: 1,
-      why: 'Carrier frequency narrows the field but isn\'t unique (NEC and Pronto can share 38 kHz). The lead-in pattern is each protocol\'s fingerprint.' }
+      why: 'Carrier frequency narrows the field (38 vs 36 vs 40 kHz) but the lead-in pattern is each protocol\'s real fingerprint: NEC\'s 9+4.5 ms pair, SIRC\'s 2.4 ms, RC5\'s no-lead-in. Pronto is a raw transport so its carrier varies per import.' }
   ];
   function render() {
     document.getElementById('phase4-quiz-q').innerHTML = Q.map((it, i) => `
