@@ -28,6 +28,7 @@
   p { margin: 8px 0; }
   a { color: var(--accent-2); text-decoration: none; }
   a:hover { text-decoration: underline; }
+  a:focus-visible { outline: 2px dashed var(--accent); outline-offset: 2px; border-radius: 2px; }
   .breadcrumb { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
   .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 20px; margin: 16px 0 32px; }
   .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
@@ -36,7 +37,8 @@
   .swatch { width: 14px; height: 14px; border-radius: 3px; }
   .controls { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; padding: 10px 12px; background: var(--panel-2); border-radius: 6px; margin-bottom: 12px; font-size: 13px; }
   button { background: var(--panel-2); color: var(--text); border: 1px solid var(--line); padding: 6px 14px; border-radius: 5px; cursor: pointer; font-family: var(--sans); font-size: 13px; transition: all 0.15s; }
-  button:hover { border-color: var(--accent); color: var(--accent); }
+  button:hover, button:focus { border-color: var(--accent); color: var(--accent); outline: none; }
+  button:focus-visible { outline: 2px dashed var(--accent); outline-offset: 2px; }
   button.primary { background: var(--accent); color: #001a14; border-color: var(--accent); font-weight: 600; }
   button.active { background: var(--accent-2); color: #001a14; border-color: var(--accent-2); }
   .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-family: var(--mono); margin: 0 2px; }
@@ -66,6 +68,11 @@
     svg, canvas { max-width: 100%; height: auto; }
     nav[aria-label="Phases"] { font-size: 11px; padding: 6px 8px; gap: 4px; }
     nav[aria-label="Phases"] a { padding: 2px 6px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+    .phase-card:hover, button:hover { transform: none !important; }
+    .pin:focus { outline-style: solid; }
   }
   .nav-toc { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px 18px; margin-bottom: 24px; font-size: 14px; }
   .nav-toc ol { margin: 6px 0 0; padding-left: 24px; }
@@ -579,6 +586,91 @@
 </div>
 </section>
 
+
+<section class="panel" style="margin-top: 32px;" aria-label="Understanding check">
+  <h2 style="margin-top: 0;">Understanding check — 5 questions</h2>
+  <p style="color: var(--muted); font-size: 13px; margin-top: 4px;">Self-graded. Pick an answer, then press <em>Check answers</em>.</p>
+  <div id="phase7-quiz-q"></div>
+  <div class="controls" style="margin-top: 14px;">
+    <button id="phase7-quiz-check" class="primary">Check answers</button>
+    <button id="phase7-quiz-reset">Reset</button>
+    <span id="phase7-quiz-score" style="margin-left:auto; font-family: var(--mono); color: var(--muted);"></span>
+  </div>
+</section>
+<script>
+(() => {
+  const Q = [
+    { q: 'You wire the Flipper\'s UART pins to a target board\'s serial header. Which pairing actually works?',
+      a: ['Flipper TX → target TX, Flipper RX → target RX', 'Flipper TX → target RX, Flipper RX → target TX (crossover)', 'Both go to GND', 'Doesn\'t matter — UART auto-detects direction'],
+      correct: 1,
+      why: 'TX is an output, RX is an input. Connecting two outputs together fights; you need TX→RX, RX→TX. Same as every "null modem" cable.' },
+    { q: 'You probe a SOIC-8 SPI flash. Pin 1 (the dot/notch indicator) is at the upper-left. What\'s at pin 5 (diagonally opposite)?',
+      a: ['/CS', 'DI (MOSI)', '/WP', 'VCC'],
+      correct: 1,
+      why: 'Standard Winbond / Macronix layout: 1=/CS, 2=DO, 3=/WP, 4=GND across the top-down left side; 5=DI, 6=CLK, 7=/HOLD, 8=VCC bottom-up the right side. Pin 5 = DI / MOSI.' },
+    { q: 'An STM32 chip is fused to RDP Level 1. What can a debugger read via SWD?',
+      a: ['Flash and RAM, freely', 'Nothing — SWD is entirely disabled', 'RAM yes, flash no (read attempt triggers mass-erase)', 'Only the option bytes'],
+      correct: 2,
+      why: 'Level 1: SWD still attaches, RAM is readable, but reading flash triggers a mass-erase. Level 2 is the one that disables debug entirely and is irreversible.' },
+    { q: 'On the Flipper\'s 18-pin GPIO header, pin 17 is labelled "1W". What is it?',
+      a: ['Alternate UART TX', '1-Wire / iButton bus (same line the back contact reads)', 'Reserved for future expansion', '+1.8V power output'],
+      correct: 1,
+      why: 'Pin 17 is the 1-Wire bus shared with the back iButton contact. It stays active even in DFU mode — a quirk worth knowing.' },
+    { q: 'To dump SPI flash off a powered-down target, the canonical tool combination is…',
+      a: ['Logic analyzer + Wireshark', 'CH341A USB programmer + SOIC-8 clip + flashrom', 'Flipper Bad USB + custom payload', 'nmap + nikto'],
+      correct: 1,
+      why: 'The CH341A is the standard ~$5 USB SPI programmer; the SOIC-8 clip ($10) bridges to the chip in-circuit; flashrom drives both. A Flipper SPI Flash Reader FAP exists but the CH341A stack is the deeper bench tool.' }
+  ];
+  function render() {
+    document.getElementById('phase7-quiz-q').innerHTML = Q.map((it, i) => `
+      <fieldset style="margin: 12px 0; padding: 12px 14px; border: 1px solid var(--line); border-radius: 6px;">
+        <legend style="padding: 0 8px; color: var(--accent-2); font-weight: 600;">Q${i+1}</legend>
+        <div style="margin-bottom: 8px;">${it.q}</div>
+        ${it.a.map((c, j) => `<label style="display: block; padding: 4px 0; cursor: pointer;"><input type="radio" name="phase7-q${i}" value="${j}" style="margin-right: 6px;">${c}</label>`).join('')}
+        <div id="phase7-why-${i}" style="display: none; margin-top: 8px; padding: 8px 10px; border-radius: 4px; font-size: 13px;"></div>
+      </fieldset>
+    `).join('');
+  }
+  function check() {
+    let n = 0;
+    Q.forEach((it, i) => {
+      const sel = document.querySelector(`input[name="phase7-q${i}"]:checked`);
+      const why = document.getElementById(`phase7-why-${i}`);
+      why.style.display = 'block';
+      if (sel && parseInt(sel.value) === it.correct) {
+        n++;
+        why.innerHTML = `<strong style="color: var(--accent);">✓ Correct.</strong> ${it.why}`;
+        why.style.background = 'rgba(0,217,160,0.08)';
+      } else {
+        why.innerHTML = `<strong style="color: var(--danger);">✗ Not quite.</strong> Correct: <em>${it.a[it.correct]}</em>. ${it.why}`;
+        why.style.background = 'rgba(255,90,110,0.08)';
+      }
+    });
+    document.getElementById('phase7-quiz-score').textContent = `${n} / ${Q.length} correct`;
+  }
+  function reset() {
+    document.querySelectorAll('input[name^="phase7-q"]').forEach(r => r.checked = false);
+    document.querySelectorAll('[id^="phase7-why-"]').forEach(w => { w.style.display = 'none'; w.innerHTML = ''; });
+    document.getElementById('phase7-quiz-score').textContent = '';
+  }
+  document.getElementById('phase7-quiz-check').onclick = check;
+  document.getElementById('phase7-quiz-reset').onclick = reset;
+  render();
+})();
+</script>
+
+<div class="callout" style="margin-top: 32px;">
+  <strong>Defenses for the attacks above</strong> — see the Phase 8 matrix:
+  <ul style="margin: 6px 0 0; padding-left: 18px; font-size: 13px;">
+    <li><a href="phase-8-defense.html#a=uart-leak">UART boot-log credential disclosure →</a></li>
+    <li><a href="phase-8-defense.html#a=uboot-shell">U-Boot interrupt + init=/bin/sh →</a></li>
+    <li><a href="phase-8-defense.html#a=spi-flash-dump">SPI flash dump (SOIC-8 / chip-off) →</a></li>
+    <li><a href="phase-8-defense.html#a=swd-read">SWD/JTAG read on RDP-0 chip →</a></li>
+    <li><a href="phase-8-defense.html#a=voltage-glitch">Voltage glitch →</a></li>
+    <li><a href="phase-8-defense.html#a=hardcoded-keys">Hardcoded creds / keys in firmware →</a></li>
+    <li><a href="phase-8-defense.html#phase=7">all Phase 7 attacks (filtered matrix) →</a></li>
+  </ul>
+</div>
 
 <p style="margin-top: 48px; color: var(--muted); font-size: 12px;">
   Curriculum source: <span style="opacity:0.55;cursor:default" title="Source lives in the private workspace">07-gpio-hardware-hacking.md</span> · Back to <a href="index.html">visuals hub</a> · <span style="opacity:0.55;cursor:default" title="Source lives in the private workspace">phase index</span>
@@ -1133,6 +1225,10 @@ function renderChain() {
   CHAIN_STEPS.forEach(step => {
     const card = document.createElement('div');
     card.style.cssText = 'background: var(--panel-2); border: 1px solid var(--line); padding: 12px 16px; margin-bottom: 8px; border-radius: 6px; cursor: pointer; transition: all 0.15s; display: flex; gap: 14px;';
+    card.setAttribute('tabindex', '0');
+    card.setAttribute('role', 'button');
+    card.setAttribute('aria-expanded', 'false');
+    card.setAttribute('aria-label', `Step ${step.num}: ${step.title}. Activate to expand.`);
     card.innerHTML = `
       <div style="background: var(--accent); color: #001a14; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; flex-shrink: 0;">${step.num}</div>
       <div style="flex: 1;">
@@ -1145,10 +1241,16 @@ function renderChain() {
       </div>
       <div style="color: var(--muted); font-size: 12px; align-self: flex-start;">▼</div>
     `;
-    card.onclick = () => {
+    const toggle = () => {
       const d = card.querySelector('.chain-detail');
-      d.style.display = d.style.display === 'block' ? 'none' : 'block';
+      const expanded = d.style.display === 'block';
+      d.style.display = expanded ? 'none' : 'block';
+      card.setAttribute('aria-expanded', expanded ? 'false' : 'true');
     };
+    card.onclick = toggle;
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+    });
     container.appendChild(card);
   });
 }

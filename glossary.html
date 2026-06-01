@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Glossary — Flipper Zero curriculum visuals</title>
+<style>
+  :root {
+    --bg: #0b0f14;
+    --panel: #131a23;
+    --panel-2: #1a232e;
+    --line: #2a3744;
+    --text: #d6e1ec;
+    --muted: #7a8ca0;
+    --accent: #00d9a0;
+    --accent-2: #5eb6ff;
+    --warn: #ffb547;
+    --danger: #ff5a6e;
+    --purple: #c084fc;
+    --mono: "JetBrains Mono", "Fira Code", Consolas, monospace;
+    --sans: -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.55; }
+  body { max-width: 1180px; margin: 0 auto; padding: 32px 24px 80px; }
+  h1 { font-size: 28px; margin: 0 0 4px; }
+  h2 { font-size: 18px; margin: 32px 0 8px; color: var(--accent); border-left: 3px solid var(--accent); padding-left: 12px; }
+  a { color: var(--accent-2); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  a:focus-visible { outline: 2px dashed var(--accent); outline-offset: 2px; border-radius: 2px; }
+  .breadcrumb { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+  .controls { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; padding: 10px 12px; background: var(--panel-2); border-radius: 6px; margin-bottom: 16px; font-size: 13px; }
+  input[type="search"] { background: var(--panel-2); border: 1px solid var(--line); color: var(--text); padding: 8px 12px; border-radius: 4px; font-family: var(--mono); font-size: 13px; min-width: 280px; }
+  input[type="search"]:focus { border-color: var(--accent); outline: none; }
+  .term { display: grid; grid-template-columns: 200px 1fr; gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+  .term-name { font-family: var(--mono); font-weight: 600; color: var(--accent); font-size: 14px; }
+  .term-name code { color: var(--accent-2); }
+  .term-tag { display: inline-block; padding: 1px 7px; border-radius: 10px; font-size: 10px; font-family: var(--mono); margin-left: 4px; vertical-align: middle; background: var(--panel-2); color: var(--muted); border: 1px solid var(--line); }
+  .term-tag.rf { background: rgba(255,90,110,0.12); color: #ff5a6e; border-color: #ff5a6e; }
+  .term-tag.card { background: rgba(255,181,71,0.12); color: #ffb547; border-color: #ffb547; }
+  .term-tag.wifi { background: rgba(0,217,160,0.12); color: #00d9a0; border-color: #00d9a0; }
+  .term-tag.ble { background: rgba(94,182,255,0.12); color: #5eb6ff; border-color: #5eb6ff; }
+  .term-tag.hw { background: rgba(232,121,249,0.12); color: #e879f9; border-color: #e879f9; }
+  .term-tag.attack { background: rgba(192,132,252,0.12); color: #c084fc; border-color: #c084fc; }
+  .term-tag.defense { background: rgba(0,217,160,0.12); color: #00d9a0; border-color: #00d9a0; }
+  .term-tag.crypto { background: rgba(255,90,110,0.12); color: #ff5a6e; border-color: #ff5a6e; }
+  .term-tag.usb { background: rgba(94,182,255,0.12); color: #5eb6ff; border-color: #5eb6ff; }
+  .term-body { color: var(--text); font-size: 14px; }
+  .term-body code { background: var(--panel-2); padding: 1px 5px; border-radius: 3px; font-size: 12px; color: var(--accent-2); }
+  .term-body em { color: var(--muted); font-style: normal; font-size: 12px; }
+  .term-refs { margin-top: 6px; font-size: 12px; color: var(--muted); }
+  .term-refs a { margin-right: 10px; }
+  .toc { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px 18px; margin-bottom: 24px; font-size: 13px; }
+  .toc-letters { display: flex; gap: 6px; flex-wrap: wrap; }
+  .toc-letters a { font-family: var(--mono); padding: 3px 9px; background: var(--panel-2); border-radius: 3px; color: var(--accent-2); }
+  .toc-letters a.empty { color: var(--muted); opacity: 0.5; pointer-events: none; }
+  .empty-state { color: var(--muted); text-align: center; padding: 40px 0; font-style: italic; }
+  @media (max-width: 720px) {
+    body { padding: 18px 12px 60px; }
+    h1 { font-size: 22px; }
+    h2 { font-size: 16px; }
+    .term { grid-template-columns: 1fr; gap: 4px; }
+    input[type="search"] { min-width: 0; width: 100%; }
+    nav[aria-label="Phases"] { font-size: 11px; padding: 6px 8px; gap: 4px; }
+    nav[aria-label="Phases"] a { padding: 2px 6px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="breadcrumb">
+  <a href="index.html">visuals</a> &nbsp;/&nbsp; Glossary
+</div>
+
+<nav aria-label="Phases" style="display:flex; gap:6px; flex-wrap:wrap; padding:8px 12px; background:#131a23; border:1px solid #2a3744; border-radius:6px; font-family:'JetBrains Mono',Consolas,monospace; font-size:12px; margin:0 0 20px;">
+  <span style="color:#7a8ca0;">phases:</span>
+  <a href="phase-2-subghz.html" style="color:#5eb6ff;padding:2px 8px;border-radius:3px;text-decoration:none;">2 sub-GHz</a>
+  <a href="phase-3-cards.html" style="color:#5eb6ff;padding:2px 8px;border-radius:3px;text-decoration:none;">3 cards</a>
+  <a href="phase-4-ir-ibutton.html" style="color:#5eb6ff;padding:2px 8px;border-radius:3px;text-decoration:none;">4 IR + iButton</a>
+  <a href="phase-5-badusb.html" style="color:#5eb6ff;padding:2px 8px;border-radius:3px;text-decoration:none;">5 Bad USB</a>
+  <a href="phase-6-wireless.html" style="color:#5eb6ff;padding:2px 8px;border-radius:3px;text-decoration:none;">6 wireless</a>
+  <a href="phase-7-hardware.html" style="color:#5eb6ff;padding:2px 8px;border-radius:3px;text-decoration:none;">7 hardware</a>
+  <a href="phase-8-defense.html" style="color:#5eb6ff;padding:2px 8px;border-radius:3px;text-decoration:none;">8 defense</a>
+  <a href="index.html" style="color:#7a8ca0;padding:2px 8px;margin-left:auto;text-decoration:none;">↑ hub</a>
+</nav>
+
+<h1>Glossary</h1>
+<p style="color: var(--muted); margin: 0 0 24px;">Every acronym used across the visuals, in one searchable list. Tagged by domain. Each entry links to the phase(s) where it appears.</p>
+
+<div class="controls">
+  <label for="g-search">Search:</label>
+  <input id="g-search" type="search" placeholder="e.g. PMKID, RDP, Crypto1, hashcat…" autocomplete="off" autofocus>
+  <span style="color: var(--muted); margin-left: auto;" id="g-count"></span>
+</div>
+
+<div class="toc">
+  <strong style="color: var(--accent);">Jump to letter</strong>
+  <div class="toc-letters" id="toc-letters"></div>
+</div>
+
+<div id="g-results"></div>
+
+<p style="margin-top: 48px; color: var(--muted); font-size: 12px;">
+  Back to <a href="index.html">visuals hub</a> · <span style="opacity:0.55;cursor:default" title="Source lives in the private workspace">phase index</span>
+</p>
+
+<script>
+const TERMS = [
+  // RF / sub-GHz
+  { term: 'ASK', tags: ['rf'], def: 'Amplitude-Shift Keying. The RF carrier is "loud" for a 1, "quiet" or off for a 0. OOK is the on/off-only special case.', refs: [['Phase 2', 'phase-2-subghz.html#modulation']] },
+  { term: 'OOK', tags: ['rf'], def: 'On-Off Keying. ASK with two states: carrier on = 1, carrier off = 0. Used by every cheap fixed-code remote.', refs: [['Phase 2', 'phase-2-subghz.html#modulation']] },
+  { term: 'FSK', tags: ['rf'], def: 'Frequency-Shift Keying. The carrier shifts between two frequencies for 0 and 1. More robust to amplitude noise than ASK; used by KeeLoq FSK variants and Z-Wave.', refs: [['Phase 2', 'phase-2-subghz.html#modulation']] },
+  { term: 'NRZ', tags: ['rf'], def: 'Non-Return-to-Zero. Bit encoding where 1 = high level, 0 = low level for the whole bit period. No mid-bit transitions; requires a separate clock or agreed bit rate.', refs: [['Phase 2', 'phase-2-subghz.html#encoding']] },
+  { term: 'Manchester', tags: ['rf'], def: 'Bit encoding where every bit has a mid-bit transition. G.E. Thomas convention (the one most RF remotes use): 1 = high→low, 0 = low→high. IEEE 802.3 Ethernet uses the opposite. Self-clocking.', refs: [['Phase 2', 'phase-2-subghz.html#encoding']] },
+  { term: 'PWM', tags: ['rf'], def: 'Pulse-Width Modulation, used as a bit encoding: long pulse = 1, short pulse = 0 (or vice versa). Common in NEC IR and some sub-GHz remotes.', refs: [['Phase 2', 'phase-2-subghz.html#encoding'], ['Phase 4', 'phase-4-ir-ibutton.html#ir-protocols']] },
+  { term: 'ISM band', tags: ['rf'], def: 'Industrial, Scientific, and Medical radio bands — unlicensed for low-power use in most jurisdictions. Flipper-relevant ones: 315 MHz (US auto), 433 MHz (worldwide), 868 MHz (EU), 915 MHz (US/Americas).', refs: [['Phase 2', 'phase-2-subghz.html#bands']] },
+  { term: 'KeeLoq', tags: ['rf','crypto','attack'], def: 'Microchip\'s rolling-code cipher used in HCS300/301/360 transmitters and many garage / car remotes. 32-bit block cipher, 528-round NLFSR, 64-bit key. Famous side-channel breaks (Eisenbarth 2008) — but the cipher itself is still safe when keys are per-deployment.', refs: [['Phase 2', 'phase-2-subghz.html#keeloq'], ['Phase 8 defense', 'phase-8-defense.html#a=keeloq-dpa']] },
+  { term: 'NLFSR', tags: ['crypto'], def: 'Non-Linear Feedback Shift Register. A stream-cipher building block where the next state bit comes from a non-linear function of current state bits. Used in Crypto1 and KeeLoq.', refs: [['Phase 2', 'phase-2-subghz.html#keeloq'], ['Phase 3', 'phase-3-cards.html#crypto1-attacks']] },
+  { term: 'RollJam', tags: ['rf','attack'], def: 'Replay attack against rolling-code remotes (Samy Kamkar, 2015). Attacker jams the receiver, captures the first press, lets the second press through, then later replays the first stashed press. Works against receivers with permissive counter windows.', refs: [['Phase 2', 'phase-2-subghz.html#rolljam'], ['Phase 8 defense', 'phase-8-defense.html#a=rolljam']] },
+  { term: 'CC1101', tags: ['rf'], def: 'TI sub-GHz transceiver chip used in the Flipper Zero. Supports 300–348, 387–464, 779–928 MHz with OOK/2-FSK/4-FSK/MSK modulation.', refs: [['Phase 2', 'phase-2-subghz.html#bands']] },
+
+  // Cards
+  { term: 'LF RFID', tags: ['card'], def: 'Low-Frequency RFID (125 kHz). Long-range read (~10 cm), low data rate, no security model in the protocol. EM4100, HID Prox, Indala live here.', refs: [['Phase 3', 'phase-3-cards.html#lf-vs-hf']] },
+  { term: 'HF NFC', tags: ['card'], def: 'High-Frequency Near-Field Communication (13.56 MHz). Short range (~4 cm), supports challenge-response crypto (MIFARE DESFire, Plus SL3, NTAG signatures).', refs: [['Phase 3', 'phase-3-cards.html#lf-vs-hf']] },
+  { term: 'EM4100', tags: ['card'], def: '64-bit LF RFID tag protocol: 9-bit header + 40 data bits with row/column parity + 1 stop bit. No security; readable and cloneable trivially.', refs: [['Phase 3', 'phase-3-cards.html#em4100']] },
+  { term: 'MIFARE Classic', tags: ['card','crypto','attack'], def: 'NXP HF NFC card family using Crypto1. 1k = 16 sectors × 4 blocks × 16 bytes. Each sector has its own Key A / Key B. Broken (Nohl/Plötz/Tews, 2008); should not be deployed in new builds.', refs: [['Phase 3', 'phase-3-cards.html#mifare-memory']] },
+  { term: 'Crypto1', tags: ['card','crypto'], def: 'MIFARE Classic\'s proprietary stream cipher (48-bit LFSR + nonlinear filter). Broken via predictable PRNG + auth-leakage. All of: dictionary, nested, hardnested, mfkey32, darkside attacks exploit one or both weaknesses.', refs: [['Phase 3', 'phase-3-cards.html#crypto1-attacks']] },
+  { term: 'MIFARE DESFire', tags: ['card','crypto'], def: 'NXP\'s secure successor to MIFARE Classic. EV1/2/3 use AES (sometimes 3DES). Treated as unclonable; current-best-practice for new builds.', refs: [['Phase 3', 'phase-3-cards.html#nfc-family']] },
+  { term: 'NTAG21x', tags: ['card'], def: 'NXP NFC-Forum Type 2 tags (NTAG213/215/216). Use CMAC signatures + password protection + a one-way mirrored counter. Distinct from Ultralight C (which uses 3DES).', refs: [['Phase 3', 'phase-3-cards.html#nfc-family']] },
+  { term: 'UID', tags: ['card'], def: 'Unique Identifier — the serial number burned into a card at manufacture. Used by readers to identify the card before any cryptographic exchange. On Magic Mifare cards the UID is rewritable.', refs: [['Phase 3', 'phase-3-cards.html#mifare-memory']] },
+  { term: 'ATQA / SAK', tags: ['card'], def: 'Answer To Request (Type A) and Select Acknowledge — ISO 14443A frames the card returns during anti-collision. Used to identify card type (Classic 1k vs 4k vs DESFire) before attacks branch.', refs: [['Phase 3', 'phase-3-cards.html#nfc-family']] },
+  { term: 'EMV', tags: ['card'], def: 'Europay / MasterCard / Visa — the standard for chip payment cards. Flipper can read PAN + expiry on contactless EMV; cannot replay a transaction (cryptogram requires issuer key).', refs: [['Phase 3', 'phase-3-cards.html#emv']] },
+  { term: 'PAN', tags: ['card'], def: 'Primary Account Number — the 16-digit number on the face of a payment card. Readable from EMV contactless.', refs: [['Phase 3', 'phase-3-cards.html#emv']] },
+  { term: 'AID', tags: ['card'], def: 'Application Identifier. Selects an application within a smartcard (e.g., Visa = A000000003, MasterCard = A000000004). Sent via SELECT APDU.', refs: [['Phase 3', 'phase-3-cards.html#emv']] },
+  { term: 'APDU', tags: ['card'], def: 'Application Protocol Data Unit. ISO 7816 / 14443 command-response format used by smartcards (and EMV). CLA / INS / P1 / P2 / Lc / data / Le.', refs: [['Phase 3', 'phase-3-cards.html#emv']] },
+  { term: 'T5577', tags: ['card'], def: 'Rewritable LF RFID chip used as a blank for EM4100 / HID Prox cloning. Password-protect locks are a common gotcha when accidentally engaged.', refs: [['Phase 3', 'phase-3-cards.html#clone-workflow']] },
+  { term: 'Magic Mifare', tags: ['card','attack'], def: 'Counterfeit MIFARE Classic chips that allow UID rewrite. Gen1a uses an undocumented "backdoor" command, Gen2 / CUID rewrites via normal write, Gen3 supports direct block-0 write outside auth, Gen4 lets you program ATQA/SAK/config.', refs: [['Phase 3', 'phase-3-cards.html#nfc-family']] },
+  { term: 'Hardnested', tags: ['attack','card'], def: 'Crypto1 attack variant for MIFARE Classic EV1 / "hardened" cards that fixed the predictable PRNG. CPU-heavy but still feasible in seconds per sector with at least one known key.', refs: [['Phase 3', 'phase-3-cards.html#crypto1-attacks']] },
+  { term: 'mfkey32', tags: ['attack','card'], def: 'Reader-side Crypto1 attack — recovers a key from two captured reader auth attempts when you have the reader but not a card. Flipper "Detect Reader" mode collects the nonces; desktop mfkey32 runs the offline computation.', refs: [['Phase 3', 'phase-3-cards.html#crypto1-attacks']] },
+  { term: 'Darkside', tags: ['attack','card'], def: 'Crypto1 attack that exploits parity-bit leakage from failed authentication attempts. Works against MIFARE Classic when no key is known and no reader is available — the "blackbox" case. Slow (~minutes); usually chained into nested for full key recovery (Garcia et al., 2009).', refs: [['Phase 3', 'phase-3-cards.html#crypto1-attacks']] },
+
+  // IR + iButton
+  { term: '1-Wire', tags: ['hw'], def: 'Dallas Semiconductor single-wire bus (1 data line + GND). Slave parasite-powers off the data line during idle-high. DS1990A iButton is the canonical device.', refs: [['Phase 4', 'phase-4-ir-ibutton.html#ibutton-physics']] },
+  { term: 'DS1990A', tags: ['hw'], def: 'Dallas iButton serial-number-only chip (family code 0x01, 48-bit serial, CRC-8). Factory-burned ROM, no auth. RW1990 is the rewritable clone.', refs: [['Phase 4', 'phase-4-ir-ibutton.html#ibutton-read']] },
+  { term: 'NEC IR', tags: ['rf'], def: '38 kHz IR protocol with 9 ms + 4.5 ms lead-in then 32-bit payload (8-bit addr + ~addr + 8-bit cmd + ~cmd). Used by most consumer TVs and set-top boxes.', refs: [['Phase 4', 'phase-4-ir-ibutton.html#ir-protocols']] },
+  { term: 'RC5', tags: ['rf'], def: '36 kHz Philips IR protocol. 14-bit Manchester-encoded frame including a toggle bit so receivers can tell "repeat" from "two distinct presses".', refs: [['Phase 4', 'phase-4-ir-ibutton.html#ir-protocols']] },
+  { term: 'SIRC', tags: ['rf'], def: 'Sony 40 kHz IR protocol. 2.4 ms lead-in, pulse-width-encoded data (long burst = 1, short = 0), 12/15/20-bit variants. Repeats every 45 ms while button held.', refs: [['Phase 4', 'phase-4-ir-ibutton.html#ir-protocols']] },
+  { term: 'Pronto', tags: ['rf'], def: 'Philips Pronto remote\'s hex transport format. Header carries carrier frequency + per-block repeat counts; payload is raw burst/gap pairs in carrier cycles. Lingua franca on RemoteCentral.', refs: [['Phase 4', 'phase-4-ir-ibutton.html#ir-protocols']] },
+
+  // Bad USB
+  { term: 'HID', tags: ['usb'], def: 'Human Interface Device — the USB device class for keyboards, mice, joysticks. The OS auto-loads HID drivers without prompting; this is the foundation Bad USB rests on.', refs: [['Phase 5', 'phase-5-badusb.html#premise']] },
+  { term: 'Ducky Script', tags: ['usb'], def: 'Scripting language for Hak5 USB Rubber Ducky payloads. Flipper Bad USB app implements a subset: <code>DELAY</code>, <code>STRING</code>, <code>GUI r</code>, <code>ENTER</code>, <code>KEYBOARD_LAYOUT US</code>, etc.', refs: [['Phase 5', 'phase-5-badusb.html#ducky']] },
+  { term: 'Stage 1 / Stage 2', tags: ['usb','attack'], def: 'Bad USB payload pattern. Stage 1 is the small (<300 byte) bootstrap typed by the Flipper; it fetches Stage 2 (the real payload) from a C2 over HTTPS. Lets the Flipper deliver arbitrarily large payloads in seconds.', refs: [['Phase 5', 'phase-5-badusb.html#chain']] },
+  { term: 'AMSI', tags: ['defense'], def: 'Antimalware Scan Interface (Microsoft). Hooks scripting engines (PowerShell, VBScript, JScript, .NET, WMI) at parse time so AV can inspect plaintext payloads before execution. Bypasses exist but each adds complexity.', refs: [['Phase 5', 'phase-5-badusb.html#defense']] },
+  { term: 'CLM', tags: ['defense'], def: 'Constrained Language Mode (PowerShell). Restricts to a safe subset of language features — no <code>Add-Type</code>, no reflection, no COM. Combined with WDAC, blocks almost every canonical PowerShell payload.', refs: [['Phase 5', 'phase-5-badusb.html#defense']] },
+  { term: 'WDAC', tags: ['defense'], def: 'Windows Defender Application Control. Application allowlisting at OS level. Replaces AppLocker for modern deployments. Heavy operational burden — typically deployed only on critical machines.', refs: [['Phase 5', 'phase-5-badusb.html#defense']] },
+  { term: 'BeamGun', tags: ['defense'], def: 'Open-source utility that detects and alerts on new HID device additions (e.g., a Bad USB plugged in while screen is locked). Complements EDR HID rules.', refs: [['Phase 5', 'phase-5-badusb.html#defense']] },
+  { term: 'USBGuard', tags: ['defense'], def: 'Linux USB device allowlist daemon. Enforces VID/PID + descriptor-based policy at the kernel level; new devices are blocked until approved.', refs: [['Phase 5', 'phase-5-badusb.html#defense']] },
+
+  // Wireless
+  { term: 'BLE', tags: ['ble'], def: 'Bluetooth Low Energy. The "advertising" mode that broadcasts addresses is the source of most BLE privacy concerns.', refs: [['Phase 6', 'phase-6-wireless.html#ble-addresses']] },
+  { term: 'RPA', tags: ['ble'], def: 'Resolvable Private Address. Random BLE address that rotates frequently (Apple ~15 min, Android varies); paired peers can resolve back to identity via stored IRK + AES.', refs: [['Phase 6', 'phase-6-wireless.html#ble-addresses']] },
+  { term: 'NRPA', tags: ['ble'], def: 'Non-Resolvable Private Address. Random BLE address that rotates per advertisement; no peer can resolve. Maximum privacy — used by COVID exposure-notification apps.', refs: [['Phase 6', 'phase-6-wireless.html#ble-addresses']] },
+  { term: 'IRK', tags: ['ble','crypto'], def: 'Identity Resolving Key. AES key shared between a BLE device and its bonded peer; used to verify whether a Resolvable Private Address belongs to a known identity.', refs: [['Phase 6', 'phase-6-wireless.html#ble-addresses']] },
+  { term: 'PMK', tags: ['wifi','crypto'], def: 'Pairwise Master Key. Derived once from PSK + SSID via PBKDF2-SHA1 (4096 iter). Cached for the lifetime of association.', refs: [['Phase 6', 'phase-6-wireless.html#wifi-handshake']] },
+  { term: 'PSK', tags: ['wifi','crypto'], def: 'Pre-Shared Key — the WiFi passphrase the user types. Combined with SSID to derive PMK. The thing offline-cracking attacks ultimately recover.', refs: [['Phase 6', 'phase-6-wireless.html#wifi-chart']] },
+  { term: 'PTK', tags: ['wifi','crypto'], def: 'Pairwise Transient Key. Derived per-session from PMK + ANonce + SNonce + MAC addresses. Splits into KCK (for MIC), KEK (for GTK encryption), TK (for traffic encryption).', refs: [['Phase 6', 'phase-6-wireless.html#wifi-handshake']] },
+  { term: 'GTK', tags: ['wifi','crypto'], def: 'Group Temporal Key — the broadcast/multicast key shared with all stations. Delivered in M3 of the 4-way handshake, encrypted under KEK.', refs: [['Phase 6', 'phase-6-wireless.html#wifi-handshake']] },
+  { term: 'MIC', tags: ['wifi','crypto'], def: 'Message Integrity Code. HMAC-style authenticator on EAPOL frames during the 4-way handshake, computed with KCK. The MIC is what hashcat ultimately matches against candidate PSKs.', refs: [['Phase 6', 'phase-6-wireless.html#wifi-handshake']] },
+  { term: 'PMKID', tags: ['wifi','attack'], def: 'PMK Identifier (HMAC-SHA1 of "PMK Name" + AP MAC + STA MAC, truncated to 128 bits). Many APs leak it in the first <code>EAPOL-Key</code> frame of association attempts — no client / no handshake required. Cracked the same way as a 4-way capture (Steube 2018, hashcat -m 22000).', refs: [['Phase 6', 'phase-6-wireless.html#wifi-handshake'], ['Phase 8 defense', 'phase-8-defense.html#a=pmkid']] },
+  { term: 'PMF', tags: ['wifi','defense'], def: 'Protected Management Frames (802.11w, 2009). Cryptographically authenticates management frames including deauth/disassoc. Mandatory in WPA3, optional in WPA2. When off, deauth attacks work.', refs: [['Phase 6', 'phase-6-wireless.html#pmf']] },
+  { term: 'WPA3', tags: ['wifi','defense'], def: 'Latest WiFi security standard. Replaces PSK exchange with Dragonfly / SAE (a PAKE) — captures become useless for offline cracking. Mandates PMF.', refs: [['Phase 6', 'phase-6-wireless.html#pmf']] },
+  { term: 'SAE', tags: ['wifi','crypto'], def: 'Simultaneous Authentication of Equals — WPA3\'s PAKE-based handshake. Resists offline dictionary attacks because no offline-checkable material is exchanged.', refs: [['Phase 6', 'phase-6-wireless.html#wifi-handshake']] },
+  { term: 'KRACK', tags: ['wifi','attack'], def: 'Key Reinstallation Attack (Vanhoef 2017). Nonce-reuse against the WPA2 4-way handshake — forces PTK reinstallation, lets attacker replay/decrypt traffic. Patches shipped 2017-2018 by most vendors.', refs: [['Phase 6', 'phase-6-wireless.html#wifi-handshake'], ['Phase 8 defense', 'phase-8-defense.html#a=krack']] },
+  { term: 'Dragonblood', tags: ['wifi','attack'], def: 'Set of WPA3 SAE vulnerabilities published 2019: side-channel leaks during the password element derivation + downgrade attacks. Mostly patched by 2021.', refs: [['Phase 6', 'phase-6-wireless.html#wifi-handshake']] },
+  { term: 'OWE', tags: ['wifi','defense'], def: 'Opportunistic Wireless Encryption. Replaces "open" guest networks with an unauthenticated Diffie-Hellman exchange — passive sniffers can\'t read the traffic, but you still don\'t authenticate the AP.', refs: [['Phase 6', 'phase-6-wireless.html#wifi-handshake']] },
+  { term: 'hashcat', tags: ['wifi','attack'], def: 'GPU password cracker. <code>-m 22000</code> is the unified WPA*-EAPOL-PBKDF2 mode that handles both 4-way captures and PMKIDs. Modern consumer GPUs do 0.5 – 2 Mh/s; rented cloud rigs (8× A100) push 10 Mh/s.', refs: [['Phase 6', 'phase-6-wireless.html#wifi-chart']] },
+  { term: 'MouseJack', tags: ['wifi','attack'], def: 'NRF24 keystroke-injection family (Bastille 2016). Exploits unencrypted keyboard packets in Logitech / Microsoft / Dell wireless KB+mouse dongles. ~30 m range with a proper antenna.', refs: [['Phase 6', 'phase-6-wireless.html#mousejack'], ['Phase 8 defense', 'phase-8-defense.html#a=mousejack']] },
+  { term: 'NRF24', tags: ['ble','rf'], def: 'Nordic Semiconductor 2.4 GHz proprietary transceiver chip (NRF24L01). Used in legacy wireless KB/mouse dongles; not BLE. Flipper supports it via a plug-in module.', refs: [['Phase 6', 'phase-6-wireless.html#mousejack']] },
+
+  // Hardware
+  { term: 'UART', tags: ['hw'], def: 'Universal Asynchronous Receiver/Transmitter. Two-wire serial bus (TX, RX) + GND. No clock; both ends must agree on baud. Most embedded debug headers are UART at 115200 / 8N1.', refs: [['Phase 7', 'phase-7-hardware.html#bus-compare']] },
+  { term: 'SPI', tags: ['hw'], def: 'Serial Peripheral Interface. 4-wire synchronous bus (MOSI, MISO, SCK, /CS) + GND. Master drives clock; multiple slaves via separate CS lines. Speeds: 1–50+ MHz. Used by flash chips, displays, sensors.', refs: [['Phase 7', 'phase-7-hardware.html#bus-compare']] },
+  { term: 'I²C', tags: ['hw'], def: 'Inter-Integrated Circuit. 2-wire synchronous bus (SDA, SCL) + GND. Multi-drop, open-drain (pull-ups required), 7-bit addressing. Speeds: 100 kHz / 400 kHz / 1 MHz. Used by EEPROMs, RTCs, IMUs.', refs: [['Phase 7', 'phase-7-hardware.html#bus-compare']] },
+  { term: 'SWD', tags: ['hw'], def: 'Serial Wire Debug. ARM\'s 2-wire (SWCLK + SWDIO) debug interface. Replaces the 4+ wire JTAG. Used to halt, single-step, read/write memory of Cortex-M chips.', refs: [['Phase 7', 'phase-7-hardware.html#gpio']] },
+  { term: 'JTAG', tags: ['hw'], def: 'Joint Test Action Group standard — the 4+ wire predecessor to SWD (TCK, TMS, TDI, TDO + optional TRST). Most modern Cortex-M chips support both SWD and JTAG on the same pads.', refs: [['Phase 7', 'phase-7-hardware.html#gpio']] },
+  { term: 'RDP', tags: ['hw','defense'], def: 'Read-Out Protection (STM32 terminology). Level 0 = open; Level 1 = blocks flash read via SWD but mass-erase resets to 0; Level 2 = irreversible, debug disabled entirely. Other vendors: NXP CRP, Nordic APPROTECT.', refs: [['Phase 7', 'phase-7-hardware.html#rdp']] },
+  { term: 'SOIC-8', tags: ['hw'], def: 'Small-Outline Integrated Circuit, 8 pins. The standard package for serial SPI flash (W25Qxx, MX25L, AT25). Easily clipped in-circuit with a $10 SOIC-8 clip + CH341A programmer.', refs: [['Phase 7', 'phase-7-hardware.html#flash']] },
+  { term: 'CH341A', tags: ['hw'], def: 'USB-to-multiprotocol chip (SPI / I²C / UART) on a ~$5 programmer board. The go-to tool for SOIC-8 SPI flash dumping with <code>flashrom</code>.', refs: [['Phase 7', 'phase-7-hardware.html#flash']] },
+  { term: 'flashrom', tags: ['hw'], def: 'Open-source CLI tool for reading/writing/erasing SPI flash chips via a wide range of programmers (CH341A, Bus Pirate, RPi). <code>flashrom -p ch341a_spi -r dump.bin</code>.', refs: [['Phase 7', 'phase-7-hardware.html#flash']] },
+  { term: 'binwalk', tags: ['hw'], def: 'Firmware-analysis tool: scans a binary for known file-system / compression / executable headers. <code>binwalk -e dump.bin</code> extracts everything it finds.', refs: [['Phase 7', 'phase-7-hardware.html#attack-chain']] },
+  { term: 'U-Boot', tags: ['hw'], def: 'Universal Boot Loader. The dominant bootloader on embedded Linux devices. Vulnerable: most ship with an unauthenticated interactive console accessible during the autoboot countdown.', refs: [['Phase 7', 'phase-7-hardware.html#attack-chain']] },
+  { term: 'ChipWhisperer', tags: ['hw','attack'], def: 'Open-source hardware platform for voltage/clock glitching and side-channel power analysis. Used to defeat RDP on chips that lack hardware glitch detectors.', refs: [['Phase 7', 'phase-7-hardware.html#rdp']] },
+  { term: 'FAP', tags: ['rf'], def: 'Flipper Application Package — third-party Flipper Zero apps installable via Momentum / Xtreme / unofficial firmwares. Examples used in this curriculum: <em>SubGHz Bruteforcer</em>, <em>Mfkey32</em>, <em>I²C Tools</em>, <em>UART Terminal</em>, <em>PicoPass</em>.', refs: [['Phase 3', 'phase-3-cards.html'], ['Phase 7', 'phase-7-hardware.html']] },
+
+  // Defense / blue-team
+  { term: 'EDR', tags: ['defense'], def: 'Endpoint Detection and Response. Process tree + file + registry + network telemetry per host. Catches the bulk of Bad USB Stage 2 payloads and persistence. Examples: CrowdStrike Falcon, Microsoft Defender for Endpoint, SentinelOne.', refs: [['Phase 5', 'phase-5-badusb.html#defense'], ['Phase 8', 'phase-8-defense.html#detection-layers']] },
+  { term: 'NTA', tags: ['defense'], def: 'Network Traffic Analysis. Flow + TLS metadata + DNS-based detection of unusual destinations and protocols. Catches C2 callbacks where EDR didn\'t. Examples: Zeek, Suricata, Darktrace, Vectra.', refs: [['Phase 8', 'phase-8-defense.html#detection-layers']] },
+  { term: 'WIDS', tags: ['defense','wifi'], def: 'Wireless Intrusion Detection System. Monitors RF for deauth storms, rogue APs (evil twin), spurious management frames. Often integrated into enterprise AP controllers.', refs: [['Phase 6', 'phase-6-wireless.html#pmf']] },
+  { term: 'CFAA', tags: ['defense'], def: 'Computer Fraud and Abuse Act (US, 18 USC §1030). The federal statute that criminalizes unauthorized access to computer systems. The reason every phase opens with a legality callout.', refs: [['Phase 5', 'phase-5-badusb.html'], ['Phase 8', 'phase-8-defense.html']] },
+];
+
+// Build alphabetical TOC and search
+function renderTerms(filter) {
+  const q = (filter || '').toLowerCase().trim();
+  const matching = !q ? TERMS : TERMS.filter(t =>
+    t.term.toLowerCase().includes(q) ||
+    t.def.toLowerCase().includes(q) ||
+    t.tags.some(tag => tag.includes(q))
+  );
+
+  const byLetter = {};
+  matching.forEach(t => {
+    const L = t.term[0].toUpperCase();
+    (byLetter[L] = byLetter[L] || []).push(t);
+  });
+
+  const letters = Object.keys(byLetter).sort();
+  const sections = letters.map(L => {
+    const entries = byLetter[L].sort((a, b) => a.term.localeCompare(b.term));
+    return `<section><h2 id="L-${L}">${L}</h2>` + entries.map(t => `
+      <div class="term" id="t-${t.term.replace(/\s+/g, '-').toLowerCase()}">
+        <div>
+          <div class="term-name">${t.term}</div>
+          <div style="margin-top:4px;">${t.tags.map(tag => `<span class="term-tag ${tag}">${tag}</span>`).join('')}</div>
+        </div>
+        <div class="term-body">
+          ${t.def}
+          ${t.refs.length ? `<div class="term-refs">Used in: ${t.refs.map(([label, href]) => `<a href="${href}">${label}</a>`).join('')}</div>` : ''}
+        </div>
+      </div>
+    `).join('') + '</section>';
+  }).join('');
+
+  document.getElementById('g-results').innerHTML = sections || '<div class="empty-state">No terms match your search.</div>';
+  document.getElementById('g-count').textContent = `${matching.length} of ${TERMS.length} terms`;
+
+  // Alphabet TOC
+  const allLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  document.getElementById('toc-letters').innerHTML = allLetters.split('').map(L =>
+    letters.includes(L) ? `<a href="#L-${L}">${L}</a>` : `<a class="empty">${L}</a>`
+  ).join('');
+}
+
+document.getElementById('g-search').addEventListener('input', e => renderTerms(e.target.value));
+renderTerms('');
+</script>
+
+</body>
+</html>

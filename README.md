@@ -4,9 +4,16 @@ Interactive HTML visualizations for a self-taught Flipper Zero curriculum
 covering Sub-GHz, card technologies (LF + HF NFC), IR + iButton, Bad USB,
 wireless (BLE / WiFi / NRF24), GPIO + hardware hacking, and the blue-team
 defense matrix that ties it all together. ~42 visualizations across 7 phase
-pages plus a hub index — all self-contained, offline-capable. Every phase
-opens with a legality callout so the reader knows which workflows are public
-practice and which need authorization.
+pages plus a hub index and a glossary — all self-contained, offline-capable.
+Every phase opens with a legality callout so the reader knows which workflows
+are public practice and which need authorization, ends with a 5-question
+understanding check, and cross-links to the Phase 8 defense matrix for every
+attack class taught.
+
+Calculator state (Phase 2 brute-force, Phase 6 PSK, Phase 8 filter/sort)
+serialises into the URL hash — links are shareable. Keyboard-first
+navigation throughout (GPIO pins, MIFARE sectors, matrix headers, audit-chain
+steps), and `prefers-reduced-motion` honoured on every page.
 
 **Live site:** <https://n0xide.github.io/flipper-zero-visuals/>
 
@@ -21,7 +28,8 @@ practice and which need authorization.
 | `phase-5-badusb.html` | 05 | HID injection premise (USB enumeration); annotated Ducky Script; Stage 1 → Stage 2 chain (8-step animated); 6-ring defense onion with named products (USBGuard, BeamGun, Defender ASR); keyboard-layout footgun (live US/AZERTY/QWERTZ/Dvorak transliteration) |
 | `phase-6-wireless.html` | 06 | BLE address types + tracking sim; WPA2 4-way handshake step-through; PMKID-attack flow; PMF on/off comparison; evil twin diagram; MouseJack; PSK crack-time calculator (length × charset × GPU rate) |
 | `phase-7-hardware.html` | 07 | Keyboard-accessible 18-pin GPIO header (canonical pinout); UART/SPI/I²C wiring + timing; SOIC-8 SPI flash dumping + CH341A; 8-step audit chain; ARM Cortex-M RDP levels; voltage / level-shift matrix |
-| `phase-8-defense.html` | 08 | Sortable attack→defense matrix (30 rows across Phases 2-7, filterable by phase, sortable by cost); detection-layer breakdown (physical / RF / EDR / network / access / USB / tamper); 7-section audit deliverable checklist; remediation priority list |
+| `phase-8-defense.html` | 08 | Sortable attack→defense matrix (30 rows across Phases 2-7, filterable by phase, sortable by cost, deep-linkable per row); detection-layer breakdown (physical / RF / EDR / network / access / USB / tamper); 7-section audit deliverable checklist; remediation priority list |
+| `glossary.html` | All | Searchable glossary of every acronym used across the curriculum (PMKID, RDP, Crypto1, hashcat, IRK, MIC, PTK, GTK, FAP, SWD, …). Tagged by domain. Each entry links back to the phase(s) where it appears. |
 
 All visualizations are interactive — sliders, animated waveforms, clickable diagrams.
 

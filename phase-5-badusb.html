@@ -28,12 +28,14 @@
   p { margin: 8px 0; }
   a { color: var(--accent-2); text-decoration: none; }
   a:hover { text-decoration: underline; }
+  a:focus-visible { outline: 2px dashed var(--accent); outline-offset: 2px; border-radius: 2px; }
   .breadcrumb { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
   .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 20px; margin: 16px 0 32px; }
   .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   .controls { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; padding: 10px 12px; background: var(--panel-2); border-radius: 6px; margin-bottom: 12px; font-size: 13px; }
   button { background: var(--panel-2); color: var(--text); border: 1px solid var(--line); padding: 6px 14px; border-radius: 5px; cursor: pointer; font-family: var(--sans); font-size: 13px; transition: all 0.15s; }
-  button:hover { border-color: var(--accent); color: var(--accent); }
+  button:hover, button:focus { border-color: var(--accent); color: var(--accent); outline: none; }
+  button:focus-visible { outline: 2px dashed var(--accent); outline-offset: 2px; }
   button.primary { background: var(--accent); color: #001a14; border-color: var(--accent); font-weight: 600; }
   .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-family: var(--mono); margin: 0 2px; }
   .badge.ok { background: rgba(0,217,160,0.15); color: var(--accent); border: 1px solid var(--accent); }
@@ -62,6 +64,10 @@
     svg, canvas { max-width: 100%; height: auto; }
     nav[aria-label="Phases"] { font-size: 11px; padding: 6px 8px; gap: 4px; }
     nav[aria-label="Phases"] a { padding: 2px 6px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+    .phase-card:hover, button:hover { transform: none !important; }
   }
   .nav-toc { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px 18px; margin-bottom: 24px; font-size: 14px; }
   .nav-toc ol { margin: 6px 0 0; padding-left: 24px; }
@@ -408,6 +414,89 @@
 </section>
 
 
+<section class="panel" style="margin-top: 32px;" aria-label="Understanding check">
+  <h2 style="margin-top: 0;">Understanding check — 5 questions</h2>
+  <p style="color: var(--muted); font-size: 13px; margin-top: 4px;">Self-graded. Pick an answer, then press <em>Check answers</em>.</p>
+  <div id="phase5-quiz-q"></div>
+  <div class="controls" style="margin-top: 14px;">
+    <button id="phase5-quiz-check" class="primary">Check answers</button>
+    <button id="phase5-quiz-reset">Reset</button>
+    <span id="phase5-quiz-score" style="margin-left:auto; font-family: var(--mono); color: var(--muted);"></span>
+  </div>
+</section>
+<script>
+(() => {
+  const Q = [
+    { q: 'What makes "plug the Flipper into a USB port and have it type a payload" work without any user prompt?',
+      a: ['Flipper firmware exploits USB enumeration', 'The OS auto-loads HID drivers and trusts any keyboard at the moment of enumeration', 'BIOS allows arbitrary code execution from any USB device', 'Bad USB requires admin to be logged in first'],
+      correct: 1,
+      why: 'There is no protocol-level authentication on USB HID. Plugging in a keyboard is, by design, immediately able to type. Bad USB just makes the Flipper look like a keyboard.' },
+    { q: 'Your Stage 1 payload runs against a French AZERTY target while the Flipper assumes US QWERTY. What happens to powershell -nop -c "iwr ..."?',
+      a: ['Payload runs normally — the OS auto-translates', 'Most non-letter characters land as something else (e.g., - becomes ), " becomes %); PowerShell errors out immediately', 'The Flipper detects layout and adapts on the fly', 'Only the quotes are mangled; the rest runs'],
+      correct: 1,
+      why: 'USB HID sends scan codes (positions), not characters. The OS layout driver maps positions to characters. AZERTY assigns symbols to entirely different keys than QWERTY does. The visual in §5 of this page is a live demo.' },
+    { q: 'Why use a Stage 1 → Stage 2 payload chain instead of typing the whole payload?',
+      a: ['Flipper firmware throttles output after 5 seconds', 'Stage 1 stays small enough to be typed in <2 s; Stage 2 fetches the real payload from a C2 server', 'USB enumeration randomly fails 50% of the time', 'Defender ASR blocks long payloads'],
+      correct: 1,
+      why: 'Even at 100 ms/char, typing 80 KB of payload via HID would take 2+ hours of physical access. A 300-byte downloader cradle types in seconds and pulls the real payload over HTTPS.' },
+    { q: 'Which layer of the defense onion stops the BROADEST set of Bad USB attacks at the entry point?',
+      a: ['PowerShell Constrained Language Mode + AMSI', 'EDR HID-injection rules', 'USB port disable (Group Policy / physical block)', 'Network egress filter'],
+      correct: 2,
+      why: 'Disabling the port stops every USB attack at that layer — 100% coverage. The deeper rings (CLM, AMSI, WDAC) only matter if something already made it past the port. Rare in normal enterprises; standard in SCIFs / kiosks.' },
+    { q: 'AMSI (Antimalware Scan Interface) protects against canonical PowerShell payloads by…',
+      a: ['Inspecting all outbound network traffic from powershell.exe', 'Hooking the scripting engine at parse time so AV scans plaintext payloads before they execute', 'Blocking based on the script\'s file hash', 'Sandboxing every PowerShell process'],
+      correct: 1,
+      why: 'AMSI sits between the script host (PowerShell, VBScript, JScript, .NET, WMI) and the AV product. Even fully in-memory payloads pass through it as plaintext, so signature-based AV gets a chance to inspect them.' }
+  ];
+  function render() {
+    document.getElementById('phase5-quiz-q').innerHTML = Q.map((it, i) => `
+      <fieldset style="margin: 12px 0; padding: 12px 14px; border: 1px solid var(--line); border-radius: 6px;">
+        <legend style="padding: 0 8px; color: var(--accent-2); font-weight: 600;">Q${i+1}</legend>
+        <div style="margin-bottom: 8px;">${it.q}</div>
+        ${it.a.map((c, j) => `<label style="display: block; padding: 4px 0; cursor: pointer;"><input type="radio" name="phase5-q${i}" value="${j}" style="margin-right: 6px;">${c}</label>`).join('')}
+        <div id="phase5-why-${i}" style="display: none; margin-top: 8px; padding: 8px 10px; border-radius: 4px; font-size: 13px;"></div>
+      </fieldset>
+    `).join('');
+  }
+  function check() {
+    let n = 0;
+    Q.forEach((it, i) => {
+      const sel = document.querySelector(`input[name="phase5-q${i}"]:checked`);
+      const why = document.getElementById(`phase5-why-${i}`);
+      why.style.display = 'block';
+      if (sel && parseInt(sel.value) === it.correct) {
+        n++;
+        why.innerHTML = `<strong style="color: var(--accent);">✓ Correct.</strong> ${it.why}`;
+        why.style.background = 'rgba(0,217,160,0.08)';
+      } else {
+        why.innerHTML = `<strong style="color: var(--danger);">✗ Not quite.</strong> Correct: <em>${it.a[it.correct]}</em>. ${it.why}`;
+        why.style.background = 'rgba(255,90,110,0.08)';
+      }
+    });
+    document.getElementById('phase5-quiz-score').textContent = `${n} / ${Q.length} correct`;
+  }
+  function reset() {
+    document.querySelectorAll('input[name^="phase5-q"]').forEach(r => r.checked = false);
+    document.querySelectorAll('[id^="phase5-why-"]').forEach(w => { w.style.display = 'none'; w.innerHTML = ''; });
+    document.getElementById('phase5-quiz-score').textContent = '';
+  }
+  document.getElementById('phase5-quiz-check').onclick = check;
+  document.getElementById('phase5-quiz-reset').onclick = reset;
+  render();
+})();
+</script>
+
+<div class="callout" style="margin-top: 32px;">
+  <strong>Defenses for the attacks above</strong> — see the Phase 8 matrix:
+  <ul style="margin: 6px 0 0; padding-left: 18px; font-size: 13px;">
+    <li><a href="phase-8-defense.html#a=hid-injection">Stage 1 HID injection / PowerShell cradle →</a></li>
+    <li><a href="phase-8-defense.html#a=usb-drop">USB drop (parking-lot) →</a></li>
+    <li><a href="phase-8-defense.html#a=layout-mismatch">Keyboard-layout mismatch →</a></li>
+    <li><a href="phase-8-defense.html#a=stage2-callback">Stage 2 fileless C2 callback →</a></li>
+    <li><a href="phase-8-defense.html#phase=5">all Phase 5 attacks (filtered matrix) →</a></li>
+  </ul>
+</div>
+
 <p style="margin-top: 48px; color: var(--muted); font-size: 12px;">
   Curriculum source: <span style="opacity:0.55;cursor:default" title="Source lives in the private workspace">05-bad-usb.md</span> · Back to <a href="index.html">visuals hub</a> · <span style="opacity:0.55;cursor:default" title="Source lives in the private workspace">phase index</span>
 </p>
@@ -531,6 +620,12 @@ document.getElementById('stage-reset').onclick = () => {
 };
 document.getElementById('stage-play').onclick = () => {
   if (stagePlayTimer) { clearInterval(stagePlayTimer); stagePlayTimer = null; return; }
+  // Honour prefers-reduced-motion: jump to the final state instead of animating
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    stageIdx = STAGE_STEPS.length - 1;
+    renderStage();
+    return;
+  }
   stagePlayTimer = setInterval(() => {
     if (stageIdx >= STAGE_STEPS.length - 1) {
       clearInterval(stagePlayTimer); stagePlayTimer = null; return;

@@ -28,11 +28,14 @@
   p { margin: 8px 0; }
   a { color: var(--accent-2); text-decoration: none; }
   a:hover { text-decoration: underline; }
+  a:focus-visible { outline: 2px dashed var(--accent); outline-offset: 2px; border-radius: 2px; }
   .breadcrumb { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
   .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 20px; margin: 16px 0 32px; }
   .controls { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; padding: 10px 12px; background: var(--panel-2); border-radius: 6px; margin-bottom: 12px; font-size: 13px; }
   button { background: var(--panel-2); color: var(--text); border: 1px solid var(--line); padding: 6px 14px; border-radius: 5px; cursor: pointer; font-family: var(--sans); font-size: 13px; transition: all 0.15s; }
-  button:hover { border-color: var(--accent); color: var(--accent); }
+  button:hover, button:focus { border-color: var(--accent); color: var(--accent); outline: none; }
+  button:focus-visible { outline: 2px dashed var(--accent); outline-offset: 2px; }
+  th[tabindex]:focus-visible { outline: 2px dashed var(--accent); outline-offset: -2px; }
   button.primary { background: var(--accent); color: #001a14; border-color: var(--accent); font-weight: 600; }
   button.active { background: var(--accent-2); color: #001a14; border-color: var(--accent-2); }
   .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-family: var(--mono); margin: 0 2px; }
@@ -68,6 +71,10 @@
     svg, canvas { max-width: 100%; height: auto; }
     nav[aria-label="Phases"] { font-size: 11px; padding: 6px 8px; gap: 4px; }
     nav[aria-label="Phases"] a { padding: 2px 6px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+    .phase-card:hover, button:hover { transform: none !important; }
   }
   .nav-toc { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px 18px; margin-bottom: 24px; font-size: 14px; }
   .nav-toc ol { margin: 6px 0 0; padding-left: 24px; }
@@ -399,6 +406,78 @@
 </section>
 
 
+<section class="panel" style="margin-top: 32px;" aria-label="Understanding check">
+  <h2 style="margin-top: 0;">Understanding check — 5 questions</h2>
+  <p style="color: var(--muted); font-size: 13px; margin-top: 4px;">Self-graded. Pick an answer, then press <em>Check answers</em>. Tests defender judgment, not memorization.</p>
+  <div id="phase8-quiz-q"></div>
+  <div class="controls" style="margin-top: 14px;">
+    <button id="phase8-quiz-check" class="primary">Check answers</button>
+    <button id="phase8-quiz-reset">Reset</button>
+    <span id="phase8-quiz-score" style="margin-left:auto; font-family: var(--mono); color: var(--muted);"></span>
+  </div>
+</section>
+<script>
+(() => {
+  const Q = [
+    { q: 'Your audit of a mid-tier consumer IoT product finds hardcoded API credentials in the SPI flash dump. The most durable fix is…',
+      a: ['Encrypt the flash and bury the key in firmware', 'Pre-release CI scan for hardcoded secrets, then ship per-device keys provisioned at manufacture', 'Disable UART output and add tamper seals', 'Move all firmware to a remote server and stream on boot'],
+      correct: 1,
+      why: 'Encrypting the flash with a key shipped in firmware just moves the secret. Per-device provisioning means even a successful flash dump only compromises one device, and rotation becomes possible.' },
+    { q: 'You can fund only ONE WiFi-side hardening this quarter. Which gives the broadest defensive return?',
+      a: ['Enable PMF + migrate to WPA3 on every AP', 'Roll out enterprise 802.1X with cert auth', 'Replace all WiFi controllers with new vendor', 'Increase PSK complexity policy from 12 to 16 chars'],
+      correct: 0,
+      why: 'PMF + WPA3 is a config change that closes the entire deauth-class surface and makes captures useless. 802.1X is better but is a deployment program; the others are local-optimum or chasing the wrong threat.' },
+    { q: 'A WPA2 deployment uses a 15-character random PSK. Hashcat speed = 2 Mh/s. Time-to-crack worst case is closest to…',
+      a: ['A few days', 'A few years', 'Trillions of years — cryptographic infeasibility', 'Trivial — minutes'],
+      correct: 2,
+      why: '62^15 / 2e6 ≈ 1.4e22 seconds ≈ 4 × 10^14 years. Length beats complexity — once you cross the ~12-random-char threshold, attacker compute is not the bottleneck for any realistic adversary.' },
+    { q: 'You recommend enabling PMF on every AP. Which attack does this NOT defend against?',
+      a: ['Deauth flood', 'Disassociation spoofing', 'Evil-twin / rogue-AP credential capture', 'CSA (Channel Switch Announcement) injection'],
+      correct: 2,
+      why: 'PMF authenticates management frames between AP and client. Evil twin is the attacker putting up a different AP that clients voluntarily join — PMF on the real AP doesn\'t reach the rogue. EAP-TLS (no PSK to phish) is the right defense.' },
+    { q: 'Which is the right framing of an audit deliverable\'s executive summary?',
+      a: ['Every CVE found with CVSS scores', 'Top 3 findings + top 3 recommendations in plain English, each with budget tag and named owner', 'Full network captures + screenshots', 'A vendor-specific compliance checklist'],
+      correct: 1,
+      why: 'The exec summary is what the decision-maker reads. Specific findings + specific actions + named owners + budget tags is what they can act on. The CVEs / screenshots belong in the appendix.' }
+  ];
+  function render() {
+    document.getElementById('phase8-quiz-q').innerHTML = Q.map((it, i) => `
+      <fieldset style="margin: 12px 0; padding: 12px 14px; border: 1px solid var(--line); border-radius: 6px;">
+        <legend style="padding: 0 8px; color: var(--accent-2); font-weight: 600;">Q${i+1}</legend>
+        <div style="margin-bottom: 8px;">${it.q}</div>
+        ${it.a.map((c, j) => `<label style="display: block; padding: 4px 0; cursor: pointer;"><input type="radio" name="phase8-q${i}" value="${j}" style="margin-right: 6px;">${c}</label>`).join('')}
+        <div id="phase8-why-${i}" style="display: none; margin-top: 8px; padding: 8px 10px; border-radius: 4px; font-size: 13px;"></div>
+      </fieldset>
+    `).join('');
+  }
+  function check() {
+    let n = 0;
+    Q.forEach((it, i) => {
+      const sel = document.querySelector(`input[name="phase8-q${i}"]:checked`);
+      const why = document.getElementById(`phase8-why-${i}`);
+      why.style.display = 'block';
+      if (sel && parseInt(sel.value) === it.correct) {
+        n++;
+        why.innerHTML = `<strong style="color: var(--accent);">✓ Correct.</strong> ${it.why}`;
+        why.style.background = 'rgba(0,217,160,0.08)';
+      } else {
+        why.innerHTML = `<strong style="color: var(--danger);">✗ Not quite.</strong> Correct: <em>${it.a[it.correct]}</em>. ${it.why}`;
+        why.style.background = 'rgba(255,90,110,0.08)';
+      }
+    });
+    document.getElementById('phase8-quiz-score').textContent = `${n} / ${Q.length} correct`;
+  }
+  function reset() {
+    document.querySelectorAll('input[name^="phase8-q"]').forEach(r => r.checked = false);
+    document.querySelectorAll('[id^="phase8-why-"]').forEach(w => { w.style.display = 'none'; w.innerHTML = ''; });
+    document.getElementById('phase8-quiz-score').textContent = '';
+  }
+  document.getElementById('phase8-quiz-check').onclick = check;
+  document.getElementById('phase8-quiz-reset').onclick = reset;
+  render();
+})();
+</script>
+
 <p style="margin-top: 48px; color: var(--muted); font-size: 12px;">
   Curriculum source: <span style="opacity:0.55;cursor:default" title="Source lives in the private workspace">08-defense.md</span> · Back to <a href="index.html">visuals hub</a> · <span style="opacity:0.55;cursor:default" title="Source lives in the private workspace">phase index</span>
 </p>
@@ -409,55 +488,84 @@
 <!-- ============================================================ -->
 <script>
 // ============== ATTACK → DEFENSE MATRIX DATA ==============
+// `id` is a stable slug for deep-linking from other phases (#a=fixed-code-replay).
 const ATTACKS = [
   // Phase 2 — sub-GHz
-  { phase: 2, attack: 'Fixed-code replay (PT2262, HT12, Princeton 24-bit)', detection: 'Same code transmitted twice in unusual rhythm; RF receiver logs', hardening: 'Replace fixed-code remotes with rolling-code (KeeLoq, AES). Existing perimeter: add a second factor (PIN keypad + remote).', cost: 'cheap' },
-  { phase: 2, attack: 'RollJam against rolling-code (vulnerable receivers)', detection: 'Door receives code with counter older than expected; jamming on band briefly noticed', hardening: 'Tight counter rejection window; AES-based rolling instead of legacy KeeLoq; receiver alerts on rejected-old-counter events.', cost: 'med' },
-  { phase: 2, attack: 'Brute force on small keyspaces (HT12 4096 codes)', detection: 'Burst of malformed codes — receiver logs auth failures', hardening: 'Rate-limit at receiver (n bad codes → mute window). Replace 12-bit systems entirely.', cost: 'cheap' },
-  { phase: 2, attack: 'KeeLoq master-key extraction (DPA, lab attack)', detection: 'Indistinguishable on wire from legitimate use — implied by clone presence', hardening: 'Per-deployment master keys (not vendor-shared); modern KeeLoq AES variants.', cost: 'exp' },
+  { id: 'fixed-code-replay', phase: 2, attack: 'Fixed-code replay (PT2262, HT12, Princeton 24-bit)', detection: 'Same code transmitted twice in unusual rhythm; RF receiver logs', hardening: 'Replace fixed-code remotes with rolling-code (KeeLoq, AES). Existing perimeter: add a second factor (PIN keypad + remote).', cost: 'cheap' },
+  { id: 'rolljam', phase: 2, attack: 'RollJam against rolling-code (vulnerable receivers)', detection: 'Door receives code with counter older than expected; jamming on band briefly noticed', hardening: 'Tight counter rejection window; AES-based rolling instead of legacy KeeLoq; receiver alerts on rejected-old-counter events.', cost: 'med' },
+  { id: 'sub-ghz-brute', phase: 2, attack: 'Brute force on small keyspaces (HT12 4096 codes)', detection: 'Burst of malformed codes — receiver logs auth failures', hardening: 'Rate-limit at receiver (n bad codes → mute window). Replace 12-bit systems entirely.', cost: 'cheap' },
+  { id: 'keeloq-dpa', phase: 2, attack: 'KeeLoq master-key extraction (DPA, lab attack)', detection: 'Indistinguishable on wire from legitimate use — implied by clone presence', hardening: 'Per-deployment master keys (not vendor-shared); modern KeeLoq AES variants.', cost: 'exp' },
 
   // Phase 3 — cards
-  { phase: 3, attack: 'EM4100 / HID Prox 26-bit clone', detection: 'Door read happens at "wrong" location/time relative to original cardholder', hardening: 'Replace LF prox with HF DESFire EV2/EV3 (AES) or iCLASS Seos. Add badge-photo verification on entry.', cost: 'med' },
-  { phase: 3, attack: 'MIFARE Classic dictionary + nested (Crypto1)', detection: 'Successful access from a duplicated UID at unexpected reader', hardening: 'Migrate to MIFARE DESFire EV1/2/3 or Plus SL3 (AES). Until migration: monitor for duplicate UIDs in access logs.', cost: 'med' },
-  { phase: 3, attack: 'MIFARE Classic hardnested (against hardened cards)', detection: 'Sustained reader-side query bursts during attack', hardening: 'Same as above — replacement. Hardened-Classic was a partial fix; full DESFire migration is the durable answer.', cost: 'med' },
-  { phase: 3, attack: 'mfkey32 (reader-side attack)', detection: 'Reader sees unusual auth attempt patterns from non-deployed UIDs', hardening: 'Reader firmware patched (where vendors have released fixes); migrate to AES card systems.', cost: 'med' },
-  { phase: 3, attack: 'Darkside (Crypto1 parity-bit leak, blackbox case)', detection: 'Card sees thousands of failed auth attempts — telemetry from on-card counters', hardening: 'Migrate off Crypto1. Until then: rotate sector keys quarterly.', cost: 'med' },
-  { phase: 3, attack: 'EMV passive PAN harvest', detection: 'None on the contactless interface — the card complies with spec', hardening: 'Educate users; cards in RFID-blocking sleeves; issuer-side: per-transaction tokens (visible to cardholder, not stored card-side).', cost: 'cheap' },
+  { id: 'em4100-clone', phase: 3, attack: 'EM4100 / HID Prox 26-bit clone', detection: 'Door read happens at "wrong" location/time relative to original cardholder', hardening: 'Replace LF prox with HF DESFire EV2/EV3 (AES) or iCLASS Seos. Add badge-photo verification on entry.', cost: 'med' },
+  { id: 'mifare-dict-nested', phase: 3, attack: 'MIFARE Classic dictionary + nested (Crypto1)', detection: 'Successful access from a duplicated UID at unexpected reader', hardening: 'Migrate to MIFARE DESFire EV1/2/3 or Plus SL3 (AES). Until migration: monitor for duplicate UIDs in access logs.', cost: 'med' },
+  { id: 'mifare-hardnested', phase: 3, attack: 'MIFARE Classic hardnested (against hardened cards)', detection: 'Sustained reader-side query bursts during attack', hardening: 'Same as above — replacement. Hardened-Classic was a partial fix; full DESFire migration is the durable answer.', cost: 'med' },
+  { id: 'mfkey32', phase: 3, attack: 'mfkey32 (reader-side attack)', detection: 'Reader sees unusual auth attempt patterns from non-deployed UIDs', hardening: 'Reader firmware patched (where vendors have released fixes); migrate to AES card systems.', cost: 'med' },
+  { id: 'darkside', phase: 3, attack: 'Darkside (Crypto1 parity-bit leak, blackbox case)', detection: 'Card sees thousands of failed auth attempts — telemetry from on-card counters', hardening: 'Migrate off Crypto1. Until then: rotate sector keys quarterly.', cost: 'med' },
+  { id: 'emv-passive-read', phase: 3, attack: 'EMV passive PAN harvest', detection: 'None on the contactless interface — the card complies with spec', hardening: 'Educate users; cards in RFID-blocking sleeves; issuer-side: per-transaction tokens (visible to cardholder, not stored card-side).', cost: 'cheap' },
 
   // Phase 4 — IR + iButton
-  { phase: 4, attack: 'IR remote clone (TV, AC, projector)', detection: 'Two devices controlling the same target — visible to the user if both used at once', hardening: 'Not a security boundary; treat IR as convenience signaling, not auth. For IR-controlled access systems: replace with authenticated channels.', cost: 'cheap' },
-  { phase: 4, attack: 'TV-B-Gone IR jamming / power-off', detection: 'Mass simultaneous power-off of public TVs', hardening: 'Acceptance: TVs in public spaces are inherently vulnerable. For critical signage: hardwire override / wall-power-cycle policy.', cost: 'cheap' },
-  { phase: 4, attack: 'iButton DS1990A clone (RW1990 blank)', detection: 'Door read at unexpected time/location vs cardholder activity', hardening: 'Two-factor: iButton + keypad PIN. Long term: migrate intercom systems to RFID with crypto.', cost: 'med' },
+  { id: 'ir-clone', phase: 4, attack: 'IR remote clone (TV, AC, projector)', detection: 'Two devices controlling the same target — visible to the user if both used at once', hardening: 'Not a security boundary; treat IR as convenience signaling, not auth. For IR-controlled access systems: replace with authenticated channels.', cost: 'cheap' },
+  { id: 'tv-b-gone', phase: 4, attack: 'TV-B-Gone IR jamming / power-off', detection: 'Mass simultaneous power-off of public TVs', hardening: 'Acceptance: TVs in public spaces are inherently vulnerable. For critical signage: hardwire override / wall-power-cycle policy.', cost: 'cheap' },
+  { id: 'ibutton-clone', phase: 4, attack: 'iButton DS1990A clone (RW1990 blank)', detection: 'Door read at unexpected time/location vs cardholder activity', hardening: 'Two-factor: iButton + keypad PIN. Long term: migrate intercom systems to RFID with crypto.', cost: 'med' },
 
   // Phase 5 — Bad USB
-  { phase: 5, attack: 'Stage 1 HID injection → PowerShell cradle', detection: 'EDR: new HID device + rapid keystroke + powershell.exe spawn within 5s', hardening: 'Defense onion: USB device-control + EDR HID rules + PowerShell CLM + AMSI.', cost: 'cheap' },
-  { phase: 5, attack: 'USB drop (parking-lot variant)', detection: 'User report + EDR USB-add event', hardening: 'User training: report unknown USB; physical port blockers in sensitive areas.', cost: 'cheap' },
-  { phase: 5, attack: 'Keyboard-layout mismatched payload (still typing, garbage output)', detection: 'Failed login attempts, malformed commands in shell history', hardening: 'Audit can use the failure noise as a tripwire; defense layers remain the onion above.', cost: 'cheap' },
-  { phase: 5, attack: 'Stage 2 fileless C2 callback', detection: 'Network egress to new domain from non-browser process', hardening: 'Egress filter + DNS monitoring + EDR network module. Allowlist outbound destinations where feasible.', cost: 'med' },
+  { id: 'hid-injection', phase: 5, attack: 'Stage 1 HID injection → PowerShell cradle', detection: 'EDR: new HID device + rapid keystroke + powershell.exe spawn within 5s', hardening: 'Defense onion: USB device-control + EDR HID rules + PowerShell CLM + AMSI.', cost: 'cheap' },
+  { id: 'usb-drop', phase: 5, attack: 'USB drop (parking-lot variant)', detection: 'User report + EDR USB-add event', hardening: 'User training: report unknown USB; physical port blockers in sensitive areas.', cost: 'cheap' },
+  { id: 'layout-mismatch', phase: 5, attack: 'Keyboard-layout mismatched payload (still typing, garbage output)', detection: 'Failed login attempts, malformed commands in shell history', hardening: 'Audit can use the failure noise as a tripwire; defense layers remain the onion above.', cost: 'cheap' },
+  { id: 'stage2-callback', phase: 5, attack: 'Stage 2 fileless C2 callback', detection: 'Network egress to new domain from non-browser process', hardening: 'Egress filter + DNS monitoring + EDR network module. Allowlist outbound destinations where feasible.', cost: 'med' },
 
   // Phase 6 — wireless
-  { phase: 6, attack: 'BLE tracking (public/random static addresses)', detection: 'Privacy review: do issued devices ever leak public addresses?', hardening: 'Procure devices that use Random Private Resolvable addresses; verify before deployment.', cost: 'cheap' },
-  { phase: 6, attack: 'WPA2 4-way-handshake capture + offline crack', detection: 'Repeated deauth/reassoc on a single SSID', hardening: 'Strong PSK (12+ random chars), or 802.1X with cert auth (no PSK), or WPA3-SAE.', cost: 'med' },
-  { phase: 6, attack: 'PMKID attack (no-handshake variant)', detection: 'Anomalous association attempts from MACs not in DHCP lease history', hardening: 'AP firmware patch (most vendors shipped fixes); strong PSK; or 802.1X.', cost: 'cheap' },
-  { phase: 6, attack: 'Deauth flood (PMF off)', detection: 'Burst of deauth frames seen on WIDS', hardening: 'Enable PMF on every AP. WPA3 mandates it.', cost: 'cheap' },
-  { phase: 6, attack: 'Evil-twin AP / captive-portal credential capture', detection: 'WIDS rogue-AP alert (same SSID on attacker-controlled BSSID, higher RSSI than expected)', hardening: 'EAP-TLS (no passwords to phish); user training to recognize captive-portal red flags.', cost: 'med' },
-  { phase: 6, attack: 'MouseJack (NRF24 keystroke injection)', detection: 'EDR: HID input arriving with no foreground app focus / off-hour bursts', hardening: 'Replace NRF24 dongles with Bluetooth (encrypted) or wired peripherals.', cost: 'med' },
-  { phase: 6, attack: 'KRACK (nonce reuse against 4-way handshake)', detection: 'Most clients log KRACK-flag warnings if vulnerable; depends on OS', hardening: 'Patch all clients and APs (most vendors shipped fixes 2017-2018).', cost: 'cheap' },
+  { id: 'ble-tracking', phase: 6, attack: 'BLE tracking (public/random static addresses)', detection: 'Privacy review: do issued devices ever leak public addresses?', hardening: 'Procure devices that use Random Private Resolvable addresses; verify before deployment.', cost: 'cheap' },
+  { id: 'wpa2-handshake-crack', phase: 6, attack: 'WPA2 4-way-handshake capture + offline crack', detection: 'Repeated deauth/reassoc on a single SSID', hardening: 'Strong PSK (12+ random chars), or 802.1X with cert auth (no PSK), or WPA3-SAE.', cost: 'med' },
+  { id: 'pmkid', phase: 6, attack: 'PMKID attack (no-handshake variant)', detection: 'Anomalous association attempts from MACs not in DHCP lease history', hardening: 'AP firmware patch (most vendors shipped fixes); strong PSK; or 802.1X.', cost: 'cheap' },
+  { id: 'deauth-flood', phase: 6, attack: 'Deauth flood (PMF off)', detection: 'Burst of deauth frames seen on WIDS', hardening: 'Enable PMF on every AP. WPA3 mandates it.', cost: 'cheap' },
+  { id: 'evil-twin', phase: 6, attack: 'Evil-twin AP / captive-portal credential capture', detection: 'WIDS rogue-AP alert (same SSID on attacker-controlled BSSID, higher RSSI than expected)', hardening: 'EAP-TLS (no passwords to phish); user training to recognize captive-portal red flags.', cost: 'med' },
+  { id: 'mousejack', phase: 6, attack: 'MouseJack (NRF24 keystroke injection)', detection: 'EDR: HID input arriving with no foreground app focus / off-hour bursts', hardening: 'Replace NRF24 dongles with Bluetooth (encrypted) or wired peripherals.', cost: 'med' },
+  { id: 'krack', phase: 6, attack: 'KRACK (nonce reuse against 4-way handshake)', detection: 'Most clients log KRACK-flag warnings if vulnerable; depends on OS', hardening: 'Patch all clients and APs (most vendors shipped fixes 2017-2018).', cost: 'cheap' },
 
   // Phase 7 — hardware
-  { phase: 7, attack: 'UART boot-log credential disclosure', detection: 'None on the device — must be physically present', hardening: 'Disable UART output in production firmware; physical tamper-evident seal on case.', cost: 'cheap' },
-  { phase: 7, attack: 'U-Boot interrupt + init=/bin/sh', detection: 'None — device is unplugged during the attack', hardening: 'Lock U-Boot console (password or CONFIG_SILENT_CONSOLE); enable signed boot.', cost: 'cheap' },
-  { phase: 7, attack: 'SPI flash dump (SOIC-8 clip / chip-off)', detection: 'Tamper-evident seal disturbed; case-intrusion switch tripped', hardening: 'Encrypted flash (firmware encrypted at rest, key in SoC TrustZone). Tamper sensors on case.', cost: 'exp' },
-  { phase: 7, attack: 'SWD/JTAG read (RDP 0 chip)', detection: 'None — chip allows the read by design', hardening: 'Set RDP to Level 1 minimum on production silicon; Level 2 for high-value.', cost: 'cheap' },
-  { phase: 7, attack: 'Voltage glitch (defeat RDP / secure boot)', detection: 'On-chip glitch detectors (where present)', hardening: 'Use SoCs with hardware glitch detection (e.g. NXP K-series secure variants, STM32 Trust). Defense-in-depth: signed boot + attestation.', cost: 'exp' },
-  { phase: 7, attack: 'Hardcoded creds / keys in firmware', detection: 'binwalk + grep on a copy of firmware (continuous CI test)', hardening: 'Pre-release scan for hardcoded secrets; ship per-device keys provisioned at manufacture.', cost: 'cheap' },
+  { id: 'uart-leak', phase: 7, attack: 'UART boot-log credential disclosure', detection: 'None on the device — must be physically present', hardening: 'Disable UART output in production firmware; physical tamper-evident seal on case.', cost: 'cheap' },
+  { id: 'uboot-shell', phase: 7, attack: 'U-Boot interrupt + init=/bin/sh', detection: 'None — device is unplugged during the attack', hardening: 'Lock U-Boot console (password or CONFIG_SILENT_CONSOLE); enable signed boot.', cost: 'cheap' },
+  { id: 'spi-flash-dump', phase: 7, attack: 'SPI flash dump (SOIC-8 clip / chip-off)', detection: 'Tamper-evident seal disturbed; case-intrusion switch tripped', hardening: 'Encrypted flash (firmware encrypted at rest, key in SoC TrustZone). Tamper sensors on case.', cost: 'exp' },
+  { id: 'swd-read', phase: 7, attack: 'SWD/JTAG read (RDP 0 chip)', detection: 'None — chip allows the read by design', hardening: 'Set RDP to Level 1 minimum on production silicon; Level 2 for high-value.', cost: 'cheap' },
+  { id: 'voltage-glitch', phase: 7, attack: 'Voltage glitch (defeat RDP / secure boot)', detection: 'On-chip glitch detectors (where present)', hardening: 'Use SoCs with hardware glitch detection (e.g. NXP K-series secure variants, STM32 Trust). Defense-in-depth: signed boot + attestation.', cost: 'exp' },
+  { id: 'hardcoded-keys', phase: 7, attack: 'Hardcoded creds / keys in firmware', detection: 'binwalk + grep on a copy of firmware (continuous CI test)', hardening: 'Pre-release scan for hardcoded secrets; ship per-device keys provisioned at manufacture.', cost: 'cheap' },
 ];
 
 let activeFilter = 'all';
 let sortCol = 'phase';
 let sortDir = 'asc';
+let deepLinkId = null;
 
-function renderMatrix() {
+// Restore state from URL hash. Accepts:
+//   #a=<id>           — scroll/highlight that attack row
+//   #phase=<n>        — filter to phase n
+//   #sort=<col>,<dir> — sort by col/dir (dir = asc | desc)
+//   Combinations: #phase=6&sort=cost,asc&a=pmkid
+(() => {
+  const h = (window.location.hash || '').replace(/^#/, '');
+  const params = new URLSearchParams(h.replace(/&/g, '&'));
+  if (params.has('phase')) {
+    const p = params.get('phase');
+    if (p === 'all' || ATTACKS.some(a => String(a.phase) === p)) activeFilter = p;
+  }
+  if (params.has('sort')) {
+    const [col, dir] = params.get('sort').split(',');
+    if (['phase','attack','detection','hardening','cost'].includes(col)) sortCol = col;
+    if (dir === 'asc' || dir === 'desc') sortDir = dir;
+  }
+  if (params.has('a')) deepLinkId = params.get('a');
+})();
+
+function writeHash() {
+  const parts = [];
+  if (activeFilter !== 'all') parts.push('phase=' + activeFilter);
+  if (sortCol !== 'phase' || sortDir !== 'asc') parts.push('sort=' + sortCol + ',' + sortDir);
+  history.replaceState(null, '', parts.length ? '#' + parts.join('&') : window.location.pathname);
+}
+
+function renderMatrix(skipHash) {
   const tbody = document.getElementById('matrix-body');
   let rows = ATTACKS.slice();
   if (activeFilter !== 'all') rows = rows.filter(r => String(r.phase) === activeFilter);
@@ -468,7 +576,7 @@ function renderMatrix() {
   });
 
   tbody.innerHTML = rows.map(r => `
-    <tr>
+    <tr id="a-${r.id}">
       <td><span class="phase-pill phase-${r.phase}">P${r.phase}</span></td>
       <td><strong>${r.attack}</strong></td>
       <td>${r.detection}</td>
@@ -481,9 +589,27 @@ function renderMatrix() {
     th.classList.remove('sort-asc', 'sort-desc');
     if (th.dataset.col === sortCol) th.classList.add(sortDir === 'asc' ? 'sort-asc' : 'sort-desc');
   });
+
+  // If a deep-link targeted a specific row, scroll + flash it (first paint only).
+  if (deepLinkId) {
+    const row = document.getElementById('a-' + deepLinkId);
+    if (row) {
+      row.scrollIntoView({behavior: 'smooth', block: 'center'});
+      row.style.outline = '2px solid var(--accent)';
+      row.style.outlineOffset = '-2px';
+      setTimeout(() => { row.style.outline = ''; }, 3000);
+    }
+    deepLinkId = null;
+  }
+
+  if (!skipHash) writeHash();
 }
 
 document.querySelectorAll('.phase-filter').forEach(b => {
+  if (b.dataset.phase === activeFilter) {
+    document.querySelectorAll('.phase-filter').forEach(x => x.classList.remove('primary'));
+    b.classList.add('primary');
+  }
   b.onclick = () => {
     activeFilter = b.dataset.phase;
     document.querySelectorAll('.phase-filter').forEach(x => x.classList.remove('primary'));
@@ -493,15 +619,22 @@ document.querySelectorAll('.phase-filter').forEach(b => {
 });
 
 document.querySelectorAll('#matrix-table th').forEach(th => {
-  th.onclick = () => {
+  th.setAttribute('tabindex', '0');
+  th.setAttribute('role', 'button');
+  th.setAttribute('aria-label', 'Sort by ' + th.textContent.trim());
+  const activate = () => {
     const col = th.dataset.col;
     if (sortCol === col) { sortDir = sortDir === 'asc' ? 'desc' : 'asc'; }
     else { sortCol = col; sortDir = 'asc'; }
     renderMatrix();
   };
+  th.onclick = activate;
+  th.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(); }
+  });
 });
 
-renderMatrix();
+renderMatrix(true);
 </script>
 
 </body>

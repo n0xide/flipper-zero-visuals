@@ -28,12 +28,14 @@
   p { margin: 8px 0; }
   a { color: var(--accent-2); text-decoration: none; }
   a:hover { text-decoration: underline; }
+  a:focus-visible { outline: 2px dashed var(--accent); outline-offset: 2px; border-radius: 2px; }
   .breadcrumb { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
   .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 20px; margin: 16px 0 32px; }
   .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   .controls { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; padding: 10px 12px; background: var(--panel-2); border-radius: 6px; margin-bottom: 12px; font-size: 13px; }
   button { background: var(--panel-2); color: var(--text); border: 1px solid var(--line); padding: 6px 14px; border-radius: 5px; cursor: pointer; font-family: var(--sans); font-size: 13px; transition: all 0.15s; }
-  button:hover { border-color: var(--accent); color: var(--accent); }
+  button:hover, button:focus { border-color: var(--accent); color: var(--accent); outline: none; }
+  button:focus-visible { outline: 2px dashed var(--accent); outline-offset: 2px; }
   button.primary { background: var(--accent); color: #001a14; border-color: var(--accent); font-weight: 600; }
   button.active { background: var(--accent-2); color: #001a14; border-color: var(--accent-2); }
   .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-family: var(--mono); margin: 0 2px; }
@@ -64,6 +66,10 @@
     svg, canvas { max-width: 100%; height: auto; }
     nav[aria-label="Phases"] { font-size: 11px; padding: 6px 8px; gap: 4px; }
     nav[aria-label="Phases"] a { padding: 2px 6px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+    .phase-card:hover, button:hover { transform: none !important; }
   }
   .nav-toc { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px 18px; margin-bottom: 24px; font-size: 14px; }
   .nav-toc ol { margin: 6px 0 0; padding-left: 24px; }
@@ -482,6 +488,88 @@
 </div>
 </section>
 
+
+<section class="panel" style="margin-top: 32px;" aria-label="Understanding check">
+  <h2 style="margin-top: 0;">Understanding check — 5 questions</h2>
+  <p style="color: var(--muted); font-size: 13px; margin-top: 4px;">Self-graded. Pick an answer, then press <em>Check answers</em>.</p>
+  <div id="phase4-quiz-q"></div>
+  <div class="controls" style="margin-top: 14px;">
+    <button id="phase4-quiz-check" class="primary">Check answers</button>
+    <button id="phase4-quiz-reset">Reset</button>
+    <span id="phase4-quiz-score" style="margin-left:auto; font-family: var(--mono); color: var(--muted);"></span>
+  </div>
+</section>
+<script>
+(() => {
+  const Q = [
+    { q: 'Why do IR remotes modulate their LED at ~38 kHz instead of just blinking on and off?',
+      a: ['38 kHz is the only legal IR frequency', 'To reject ambient IR sources (sun, fluorescents, body heat) via a bandpass receiver', 'It maps to a wavelength visible to humans', 'It\'s required by HDMI CEC'],
+      correct: 1,
+      why: 'A 38 kHz bandpass filter on the receiver throws away everything that isn\'t in that narrow band — exactly the noise from sunlight, fluorescent ballasts, and other IR sources. Without the carrier you couldn\'t distinguish a "1" bit from a window.' },
+    { q: 'The DS1990A iButton\'s 64-bit ROM is laid out as…',
+      a: ['8-bit family code + 48-bit unique serial + 8-bit CRC', '16-bit family + 32-bit data + 16-bit CRC', '64 bits of factory-encrypted serial', '8-bit family + 56-bit serial (no CRC)'],
+      correct: 0,
+      why: 'Family code 0x01 identifies a DS1990A. Then 48 bits of unique serial. Then CRC-8 over those 56 bits. Nothing else. No challenge, no auth, no rotation.' },
+    { q: 'Your apartment intercom uses iButton. You clone your own fob to a $1 RW1990 for backup. Legal?',
+      a: ['No — possession of cloning gear is restricted', 'Yes — it\'s your fob and your apartment', 'Only if the property manager signs off', 'Only if you destroy the original first'],
+      correct: 1,
+      why: 'Your hardware, your access right, your clone. The legal line is who you point it at: cloning your coworker\'s fob would be unauthorized access.' },
+    { q: 'In a 1-Wire READ time slot, the slave indicates a "0" bit by…',
+      a: ['Transmitting at a higher voltage', 'Holding the DATA line LOW through the slot after the master\'s initial low pulse', 'Releasing DATA early', 'Inverting the parity bit'],
+      correct: 1,
+      why: 'The master starts every read slot by pulling DATA low for 1–15 μs. The slave then decides the bit value by either continuing to hold low (= 0) or releasing immediately so the pull-up wins (= 1). Single wire, simultaneous direction control.' },
+    { q: 'The Flipper auto-classifies a captured IR signal as NEC, RC5, SIRC, or unknown by…',
+      a: ['The carrier frequency alone', 'The lead-in shape (NEC 9+4.5 ms, SIRC 2.4 ms, RC5 no lead-in)', 'The number of bits', 'A USB descriptor from the original remote'],
+      correct: 1,
+      why: 'Carrier frequency narrows the field but isn\'t unique (NEC and Pronto can share 38 kHz). The lead-in pattern is each protocol\'s fingerprint.' }
+  ];
+  function render() {
+    document.getElementById('phase4-quiz-q').innerHTML = Q.map((it, i) => `
+      <fieldset style="margin: 12px 0; padding: 12px 14px; border: 1px solid var(--line); border-radius: 6px;">
+        <legend style="padding: 0 8px; color: var(--accent-2); font-weight: 600;">Q${i+1}</legend>
+        <div style="margin-bottom: 8px;">${it.q}</div>
+        ${it.a.map((c, j) => `<label style="display: block; padding: 4px 0; cursor: pointer;"><input type="radio" name="phase4-q${i}" value="${j}" style="margin-right: 6px;">${c}</label>`).join('')}
+        <div id="phase4-why-${i}" style="display: none; margin-top: 8px; padding: 8px 10px; border-radius: 4px; font-size: 13px;"></div>
+      </fieldset>
+    `).join('');
+  }
+  function check() {
+    let n = 0;
+    Q.forEach((it, i) => {
+      const sel = document.querySelector(`input[name="phase4-q${i}"]:checked`);
+      const why = document.getElementById(`phase4-why-${i}`);
+      why.style.display = 'block';
+      if (sel && parseInt(sel.value) === it.correct) {
+        n++;
+        why.innerHTML = `<strong style="color: var(--accent);">✓ Correct.</strong> ${it.why}`;
+        why.style.background = 'rgba(0,217,160,0.08)';
+      } else {
+        why.innerHTML = `<strong style="color: var(--danger);">✗ Not quite.</strong> Correct: <em>${it.a[it.correct]}</em>. ${it.why}`;
+        why.style.background = 'rgba(255,90,110,0.08)';
+      }
+    });
+    document.getElementById('phase4-quiz-score').textContent = `${n} / ${Q.length} correct`;
+  }
+  function reset() {
+    document.querySelectorAll('input[name^="phase4-q"]').forEach(r => r.checked = false);
+    document.querySelectorAll('[id^="phase4-why-"]').forEach(w => { w.style.display = 'none'; w.innerHTML = ''; });
+    document.getElementById('phase4-quiz-score').textContent = '';
+  }
+  document.getElementById('phase4-quiz-check').onclick = check;
+  document.getElementById('phase4-quiz-reset').onclick = reset;
+  render();
+})();
+</script>
+
+<div class="callout" style="margin-top: 32px;">
+  <strong>Defenses for the attacks above</strong> — see the Phase 8 matrix:
+  <ul style="margin: 6px 0 0; padding-left: 18px; font-size: 13px;">
+    <li><a href="phase-8-defense.html#a=ir-clone">IR remote clone →</a></li>
+    <li><a href="phase-8-defense.html#a=tv-b-gone">TV-B-Gone IR jamming →</a></li>
+    <li><a href="phase-8-defense.html#a=ibutton-clone">iButton DS1990A clone →</a></li>
+    <li><a href="phase-8-defense.html#phase=4">all Phase 4 attacks (filtered matrix) →</a></li>
+  </ul>
+</div>
 
 <p style="margin-top: 48px; color: var(--muted); font-size: 12px;">
   Curriculum source: <span style="opacity:0.55;cursor:default" title="Source lives in the private workspace">04-ir-and-ibutton.md</span> · Back to <a href="index.html">visuals hub</a> · <span style="opacity:0.55;cursor:default" title="Source lives in the private workspace">phase index</span>

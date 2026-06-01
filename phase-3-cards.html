@@ -28,6 +28,7 @@
   p { margin: 8px 0; }
   a { color: var(--accent-2); text-decoration: none; }
   a:hover { text-decoration: underline; }
+  a:focus-visible { outline: 2px dashed var(--accent); outline-offset: 2px; border-radius: 2px; }
   .breadcrumb { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
   .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 20px; margin: 16px 0 32px; }
   .panel-tight { padding: 14px; }
@@ -38,7 +39,8 @@
   .swatch { width: 14px; height: 14px; border-radius: 3px; }
   .controls { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; padding: 10px 12px; background: var(--panel-2); border-radius: 6px; margin-bottom: 12px; font-size: 13px; }
   button { background: var(--panel-2); color: var(--text); border: 1px solid var(--line); padding: 6px 14px; border-radius: 5px; cursor: pointer; font-family: var(--sans); font-size: 13px; transition: all 0.15s; }
-  button:hover { border-color: var(--accent); color: var(--accent); }
+  button:hover, button:focus { border-color: var(--accent); color: var(--accent); outline: none; }
+  button:focus-visible { outline: 2px dashed var(--accent); outline-offset: 2px; }
   button.primary { background: var(--accent); color: #001a14; border-color: var(--accent); font-weight: 600; }
   .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-family: var(--mono); margin: 0 2px; }
   .badge.ok { background: rgba(0,217,160,0.15); color: var(--accent); border: 1px solid var(--accent); }
@@ -68,6 +70,10 @@
     svg, canvas { max-width: 100%; height: auto; }
     nav[aria-label="Phases"] { font-size: 11px; padding: 6px 8px; gap: 4px; }
     nav[aria-label="Phases"] a { padding: 2px 6px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+    .phase-card:hover, button:hover { transform: none !important; }
   }
   .nav-toc { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px 18px; margin-bottom: 24px; font-size: 14px; }
   .nav-toc ol { margin: 6px 0 0; padding-left: 24px; }
@@ -760,6 +766,91 @@
 </section>
 
 
+<section class="panel" style="margin-top: 32px;" aria-label="Understanding check">
+  <h2 style="margin-top: 0;">Understanding check — 5 questions</h2>
+  <p style="color: var(--muted); font-size: 13px; margin-top: 4px;">Self-graded. Pick an answer, then press <em>Check answers</em>.</p>
+  <div id="phase3-quiz-q"></div>
+  <div class="controls" style="margin-top: 14px;">
+    <button id="phase3-quiz-check" class="primary">Check answers</button>
+    <button id="phase3-quiz-reset">Reset</button>
+    <span id="phase3-quiz-score" style="margin-left:auto; font-family: var(--mono); color: var(--muted);"></span>
+  </div>
+</section>
+<script>
+(() => {
+  const Q = [
+    { q: 'Dictionary attack on a MIFARE Classic 1k cracks 11 of 16 sectors. Which attack do you reach for next?',
+      a: ['Hardnested', 'Nested (uses one known key to leak the others)', 'Darkside', 'mfkey32'],
+      correct: 1,
+      why: 'Nested needs ≥1 known key. You have 11. Hardnested is reserved for hardened-Classic where plain nested fails; darkside is for the no-key case; mfkey32 is the reader-side variant.' },
+    { q: 'You have a card and nothing else — no reader, no known keys, no factory defaults. Which Crypto1 attack still works?',
+      a: ['Dictionary', 'Nested', 'Hardnested', 'Darkside'],
+      correct: 3,
+      why: 'Darkside is the "blackbox" case: forces failed auth attempts and exploits the parity-bit leak. Slow, but it gets you the first key. Then chain into nested.' },
+    { q: 'The Flipper reads a contactless EMV card. What can you actually do with the data?',
+      a: ['Replay a purchase at any terminal', 'Display PAN + expiry; cannot reproduce a transaction cryptogram', 'Clone the card to a Magic Mifare', 'Extract the issuer\'s signing key'],
+      correct: 1,
+      why: 'EMV cryptograms require the issuer\'s private key, which never leaves the issuer\'s HSM. Without it, no terminal will authorise the transaction. The Flipper just speaks the read APDUs.' },
+    { q: 'A vendor describes a deployment as "MIFARE Plus — AES, secure." When is this misleading?',
+      a: ['Plus is secure at all Security Levels', 'When the deployment is SL1 (Crypto1-compatible)', 'When the cards are also branded DESFire', 'It\'s never misleading'],
+      correct: 1,
+      why: 'MIFARE Plus has three Security Levels. SL1 is backwards-compatible with Crypto1 and clonable like a Classic. Only SL3 is AES-only and unclonable. The deployment chooses the level — the brand tells you nothing on its own.' },
+    { q: 'How does a "Magic Mifare Gen1a" differ from a "Gen2 / CUID" card?',
+      a: ['Gen1a uses Crypto1; Gen2 uses AES', 'Gen1a uses an undocumented "backdoor" command for UID write; Gen2 accepts normal write commands to block 0', 'Gen1a is 1k; Gen2 is 4k', 'Gen1a is LF (125 kHz); Gen2 is HF (13.56 MHz)'],
+      correct: 1,
+      why: 'Both emulate MIFARE Classic. The difference is how they accept UID writes — Gen1a via a backdoor command pair; Gen2 / CUID via normal MIFARE write to block 0 after auth.' }
+  ];
+  function render() {
+    document.getElementById('phase3-quiz-q').innerHTML = Q.map((it, i) => `
+      <fieldset style="margin: 12px 0; padding: 12px 14px; border: 1px solid var(--line); border-radius: 6px;">
+        <legend style="padding: 0 8px; color: var(--accent-2); font-weight: 600;">Q${i+1}</legend>
+        <div style="margin-bottom: 8px;">${it.q}</div>
+        ${it.a.map((c, j) => `<label style="display: block; padding: 4px 0; cursor: pointer;"><input type="radio" name="phase3-q${i}" value="${j}" style="margin-right: 6px;">${c}</label>`).join('')}
+        <div id="phase3-why-${i}" style="display: none; margin-top: 8px; padding: 8px 10px; border-radius: 4px; font-size: 13px;"></div>
+      </fieldset>
+    `).join('');
+  }
+  function check() {
+    let n = 0;
+    Q.forEach((it, i) => {
+      const sel = document.querySelector(`input[name="phase3-q${i}"]:checked`);
+      const why = document.getElementById(`phase3-why-${i}`);
+      why.style.display = 'block';
+      if (sel && parseInt(sel.value) === it.correct) {
+        n++;
+        why.innerHTML = `<strong style="color: var(--accent);">✓ Correct.</strong> ${it.why}`;
+        why.style.background = 'rgba(0,217,160,0.08)';
+      } else {
+        why.innerHTML = `<strong style="color: var(--danger);">✗ Not quite.</strong> Correct: <em>${it.a[it.correct]}</em>. ${it.why}`;
+        why.style.background = 'rgba(255,90,110,0.08)';
+      }
+    });
+    document.getElementById('phase3-quiz-score').textContent = `${n} / ${Q.length} correct`;
+  }
+  function reset() {
+    document.querySelectorAll('input[name^="phase3-q"]').forEach(r => r.checked = false);
+    document.querySelectorAll('[id^="phase3-why-"]').forEach(w => { w.style.display = 'none'; w.innerHTML = ''; });
+    document.getElementById('phase3-quiz-score').textContent = '';
+  }
+  document.getElementById('phase3-quiz-check').onclick = check;
+  document.getElementById('phase3-quiz-reset').onclick = reset;
+  render();
+})();
+</script>
+
+<div class="callout" style="margin-top: 32px;">
+  <strong>Defenses for the attacks above</strong> — see the Phase 8 matrix for the detection signal + hardening rec + cost tag on each:
+  <ul style="margin: 6px 0 0; padding-left: 18px; font-size: 13px;">
+    <li><a href="phase-8-defense.html#a=em4100-clone">EM4100 / HID Prox 26-bit clone →</a></li>
+    <li><a href="phase-8-defense.html#a=mifare-dict-nested">MIFARE Classic dictionary + nested →</a></li>
+    <li><a href="phase-8-defense.html#a=mifare-hardnested">MIFARE Classic hardnested →</a></li>
+    <li><a href="phase-8-defense.html#a=mfkey32">mfkey32 reader-side attack →</a></li>
+    <li><a href="phase-8-defense.html#a=darkside">Darkside (blackbox case) →</a></li>
+    <li><a href="phase-8-defense.html#a=emv-passive-read">EMV passive PAN harvest →</a></li>
+    <li><a href="phase-8-defense.html#phase=3">all Phase 3 attacks (filtered matrix) →</a></li>
+  </ul>
+</div>
+
 <p style="margin-top: 48px; color: var(--muted); font-size: 12px;">
   Curriculum source: <span style="opacity:0.55;cursor:default" title="Source lives in the private workspace">03-card-technologies.md</span> · Back to <a href="index.html">visuals hub</a> · <span style="opacity:0.55;cursor:default" title="Source lives in the private workspace">phase index</span>
 </p>
@@ -876,7 +967,19 @@ function renderMfGrid() {
     const div = document.createElement('div');
     div.className = 'mfg-sector ' + s.status;
     if (i === selectedSector) div.style.outline = '2px solid var(--accent-2)';
-    div.onclick = () => { selectedSector = i; renderMfGrid(); renderMfSelected(); };
+    div.setAttribute('tabindex', '0');
+    div.setAttribute('role', 'button');
+    div.setAttribute('aria-label', `Sector ${i}, ${s.status}`);
+    const activate = () => { selectedSector = i; renderMfGrid(); renderMfSelected(); document.querySelector(`.mfg-sector:nth-child(${i+1})`)?.focus(); };
+    div.onclick = activate;
+    div.addEventListener('keydown', (e) => {
+      const COLS = 4;
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(); }
+      else if (e.key === 'ArrowRight') { e.preventDefault(); selectedSector = (i + 1) % NUM_SECTORS; renderMfGrid(); renderMfSelected(); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); selectedSector = (i - 1 + NUM_SECTORS) % NUM_SECTORS; renderMfGrid(); renderMfSelected(); }
+      else if (e.key === 'ArrowDown') { e.preventDefault(); selectedSector = (i + COLS) % NUM_SECTORS; renderMfGrid(); renderMfSelected(); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); selectedSector = (i - COLS + NUM_SECTORS) % NUM_SECTORS; renderMfGrid(); renderMfSelected(); }
+    });
 
     let html = `<div style="display:flex; justify-content:space-between; align-items:center;">
       <span style="font-family: var(--mono); font-size: 11px; color: var(--accent-2);">Sector ${i}</span>`;
@@ -897,6 +1000,14 @@ function renderMfGrid() {
 
     div.innerHTML = html;
     grid.appendChild(div);
+  }
+  // Add a focus style via dynamically-applied class
+  const styleId = 'mfg-focus-style';
+  if (!document.getElementById(styleId)) {
+    const st = document.createElement('style');
+    st.id = styleId;
+    st.textContent = '.mfg-sector:focus { outline: 2px dashed var(--accent) !important; outline-offset: -2px; }';
+    document.head.appendChild(st);
   }
   updateMfStatus();
 }
