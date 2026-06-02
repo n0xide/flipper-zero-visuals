@@ -188,13 +188,13 @@
         <td class="mono">STM32WB55RG</td>
         <td>Main MCU. Dual-core (Cortex-M4 application + M0+ radio). 1 MB flash, 256 KB RAM. Runs FuriHAL + the application code. Handles USB, BLE, file system, all UI.</td>
         <td>foundation for everything; specifically BLE in <a href="phase-6-wireless.html">Phase 6</a></td>
-        <td>BLE is host-only on stock (advertising + GATT central). No raw radio access without dev firmware.</td>
+        <td>BLE is peripheral-only on stock (advertising + GATT server: Flipper Mobile pairing and HID-over-GATT). No central / GATT-client APIs; no raw radio access without dev firmware.</td>
       </tr>
       <tr>
         <td class="mono">CC1101</td>
         <td>TI sub-GHz transceiver, SPI-attached to the WB55. 300–348 / 387–464 / 779–928 MHz; ASK/OOK + 2-FSK + 4-FSK + MSK + GFSK.</td>
         <td><a href="phase-2-subghz.html">Phase 2 sub-GHz</a></td>
-        <td>~10 mW TX. Limited by Flipper firmware to the regional ISM allowlist (unlock requires alternate firmware).</td>
+        <td>Up to 20 dBm TX (firmware-capped per region; unlock requires alternate firmware).</td>
       </tr>
       <tr>
         <td class="mono">ST25R3916</td>
@@ -215,8 +215,8 @@
         <td>Open-drain bus; works on owned hardware only by policy.</td>
       </tr>
       <tr>
-        <td class="mono">IR LED + TSOP receiver</td>
-        <td>Front-mounted ~940 nm IR transmit LED and a TSOP-style 38 kHz bandpass receiver. Auto-classifies NEC / RC5 / SIRC; imports Pronto.</td>
+        <td class="mono">3× IR LEDs + TSOP receiver</td>
+        <td>Three front-mounted ~940 nm IR transmit LEDs driven in parallel and a TSOP-style receiver (RX 38 kHz ± 5%; TX configurable per protocol up to ~200 kHz). Auto-classifies NEC / RC5 / SIRC; imports Pronto.</td>
         <td><a href="phase-4-ir-ibutton.html">Phase 4 IR</a></td>
         <td>One-way: TX yes, RX yes, but no protocol-level bidirectional channel. CEC over HDMI is a different beast.</td>
       </tr>
@@ -406,8 +406,8 @@ const COMPONENTS = {
   },
   irTx: {
     view: 'top',
-    name: 'IR transmitter (LED)',
-    body: '~940 nm IR LED on the top edge. Drives the carrier at 30–56 kHz; protocol up to the firmware.',
+    name: 'IR transmitter (3× LEDs)',
+    body: 'Three ~940 nm IR LEDs driven in parallel on the top edge. RX is fixed-tuned at 38 kHz ± 5%; TX carrier is configurable per protocol up to ~200 kHz.',
     phase: 'Phase 4 IR',
     hotspot: { type: 'circle', cx: 140, cy: 20, r: 10 }
   },
@@ -450,7 +450,7 @@ const COMPONENTS = {
   cc1101: {
     view: 'inside',
     name: 'CC1101 (sub-GHz transceiver)',
-    body: 'TI sub-GHz chip on SPI. Supports 300–348 / 387–464 / 779–928 MHz. ASK/OOK + multiple FSK variants. ~10 mW TX power.',
+    body: 'TI sub-GHz chip on SPI. Supports 300–348 / 387–464 / 779–928 MHz. ASK/OOK + multiple FSK variants. Up to 20 dBm TX (firmware-capped per region).',
     phase: 'Phase 2 sub-GHz',
     hotspot: { type: 'rect', x: 60, y: 180, w: 60, h: 50 }
   },

@@ -234,7 +234,8 @@
   <pre id="ducky-script"><span class="comment">REM Stage 1 — open RUN, launch PowerShell reverse shell</span>
 <span class="comment">REM Lab-only; canonical payload, AV catches on default Windows</span>
 
-<span class="keyword">KEYBOARD_LAYOUT</span> <span class="modifier">US</span>          <span class="comment">  ← always first; tells firmware which scan-code map to send</span>
+<span class="comment">REM Layout is set in the Bad USB app's settings menu, NOT in the script</span>
+<span class="comment">REM (stock Flipper firmware has no KEYBOARD_LAYOUT keyword)</span>
 <span class="keyword">DELAY</span> <span class="number">1000</span>                  <span class="comment">  ← let host settle after USB enumerate</span>
 <span class="keyword">GUI</span> <span class="modifier">r</span>                       <span class="comment">  ← Windows-key + R → opens RUN dialog</span>
 <span class="keyword">DELAY</span> <span class="number">500</span>                   <span class="comment">  ← RUN takes ~300ms to appear</span>
@@ -420,7 +421,7 @@
   </table>
 
   <div class="callout warn">
-    <strong>Mitigation:</strong> always put <code>KEYBOARD_LAYOUT US</code> at the top of every script. The Flipper firmware then sends layout-aware scan codes — but only if both the script and the target are aligned. Best practice for engagements where target layout is unknown: use payloads that avoid problem characters (no /, \, @, &) and use Base64-encoded inner commands.
+    <strong>Mitigation:</strong> in the Bad USB app's settings menu, set the keyboard layout to match the target host before running the payload. This is a firmware setting on stock Flipper — there is no in-script <code>KEYBOARD_LAYOUT</code> directive. Layouts live as binary <code>.kl</code> files under <code>/badusb/assets/layouts/</code>. Best practice when target layout is unknown: prefer payloads that avoid problem characters (no /, \, @, &) and use Base64-encoded inner commands.
   </div>
 
   <details>

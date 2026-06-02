@@ -228,7 +228,7 @@
         <td>Pulse width (long burst = 1, short burst = 0)</td>
         <td>2.4 ms lead-in + 7-bit cmd + 5-bit addr (12-bit) or extended 15/20-bit</td>
         <td>~1 kbps</td>
-        <td>Sony — TVs, audio, BluRay; PS2 DVD remote and PS3 BD remote IR receiver (PS1 had no native IR support). Repeats every 45 ms while pressed.</td>
+        <td>Sony — TVs, audio, Blu-ray; PS2 DVD remote (later PS2 models accept SIRC). PS1 and PS3 have no native IR receiver — PS3 BD remotes are Bluetooth. Repeats every 45 ms while pressed.</td>
       </tr>
       <tr>
         <td><strong style="color: var(--purple);">Pronto</strong></td>
@@ -384,7 +384,7 @@
 <!-- ============================================================ -->
 <section id="ibutton-read">
 <h2>5. DS1990A read — what's actually on the wire</h2>
-<p>The whole exchange: master pulses a reset, slave answers with a presence pulse, master sends READ ROM command (0x33), slave clocks out its 64 ROM bits. Total: about 2 ms.</p>
+<p>The whole exchange: master pulses a reset, slave answers with a presence pulse, master sends READ ROM command (0x33), slave clocks out its 64 ROM bits. Total: about 5 ms — dominated by the 3.8 ms ROM readout.</p>
 
 <div class="panel">
   <canvas id="ibutton-canvas" width="1080" height="320"></canvas>

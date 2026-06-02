@@ -132,7 +132,7 @@
     <li><strong>Your own home / your own car / your own IoT device:</strong> full scope; document and treat as a personal training engagement.</li>
     <li><strong>Friend or family\'s home / vehicle:</strong> requires their written permission, naming each surface in scope. Verbal "sure, hack my router" is not sufficient — write it down.</li>
     <li><strong>Office / corporate environment:</strong> needs the legal entity\'s authorization, not just an employee\'s. Statement of work, scope, time window, rollback plan, named SOC contact.</li>
-    <li><strong>Vehicle dealership / manufacturer:</strong> almost certainly out of scope. Bug bounty programs (Tesla, GM, Ford) define what is allowed and how to disclose.</li>
+    <li><strong>Vehicle dealership / manufacturer:</strong> almost certainly out of scope. Vendor disclosure programs (Tesla\'s bug bounty pays via Bugcrowd; Ford, GM, and most other OEMs run unpaid Vulnerability Disclosure Programs — see vendor security.txt) define what is allowed and how to disclose.</li>
     <li><strong>OT / ICS / SCADA:</strong> the strictest tier. Active testing in production is usually never authorized. Lab replicas (with vendor permission), bug bounty programs, or read-only passive observation are the legitimate paths.</li>
   </ul>
   Every surface below is taught fully because <em>defenders need to see what an attacker sees</em>. Active testing only after written authorization that names the surface.
@@ -406,7 +406,7 @@ const SCENARIOS = {
       { x: 175, y: 350, type: 'circle', r: 12, label: 'TPMS (rear-left tire)', phase: 2, phaseLabel: 'Phase 2 sub-GHz', body: '315 / 433 MHz unencrypted broadcast.', defenses: ['rolljam'] },
       { x: 425, y: 350, type: 'circle', r: 12, label: 'TPMS (rear-right tire)', phase: 2, phaseLabel: 'Phase 2 sub-GHz', body: '315 / 433 MHz unencrypted broadcast.', defenses: ['rolljam'] },
       { x: 300, y: 150, type: 'circle', r: 14, label: 'Infotainment (BT + WiFi)', phase: 6, phaseLabel: 'Phase 6 wireless', body: 'BT pairing replay, infotainment WiFi hotspot, app-store SoC. Many surface CVEs over the years.', defenses: ['wpa2-handshake-crack', 'ble-tracking'] },
-      { x: 250, y: 230, type: 'circle', r: 12, label: 'OBD-II port (under steering)', phase: 7, phaseLabel: 'Phase 7 hardware', body: 'CAN bus access. Engine + body controllers reachable. Tuning + diagnostic and (depending on vehicle) lock-control.', defenses: ['uart-leak', 'uboot-shell'] },
+      { x: 250, y: 230, type: 'circle', r: 12, label: 'OBD-II port (under steering)', phase: 7, phaseLabel: 'Phase 7 hardware', body: 'CAN bus access (ISO 11898 / ISO 15765). Engine + body controllers reachable. Tuning + diagnostic and (depending on vehicle) lock-control. No matching Phase 8 row — CAN bus hardening (message authentication, OBD-II/powertrain gateway, port lockout) is taught at concept level only.', defenses: [] },
       { x: 300, y: 220, type: 'circle', r: 12, label: 'NFC unlock (B-pillar / handle)', phase: 3, phaseLabel: 'Phase 3 cards', body: 'Modern vehicles: NFC-as-key for phone-as-key features. Apple/Google CCC standard.', defenses: ['mifare-dict-nested'] },
       { x: 360, y: 350, type: 'circle', r: 12, label: 'Aftermarket dashcam (BLE / WiFi)', phase: 6, phaseLabel: 'Phase 6 wireless', body: 'Cheap dashcams often expose unauthenticated BLE config + a WiFi AP for video review. The WiFi PSK is frequently hardcoded — verify before assuming it isn\'t.', defenses: ['ble-tracking', 'wpa2-handshake-crack'] }
     ]

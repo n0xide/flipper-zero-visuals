@@ -446,7 +446,7 @@
     { q: 'A WPA2 deployment uses a 15-character random PSK. Hashcat speed = 2 Mh/s. Time-to-crack worst case is closest to…',
       a: ['A few days', 'A few years', 'Trillions of years — cryptographic infeasibility', 'Trivial — minutes'],
       correct: 2,
-      why: '62^15 / 2e6 ≈ 1.4e22 seconds ≈ 4 × 10^14 years. Length beats complexity — once you cross the ~12-random-char threshold, attacker compute is not the bottleneck for any realistic adversary.' },
+      why: '62^15 ≈ 7.7 × 10^26; / 2 × 10^6 hashes/sec ≈ 3.9 × 10^20 seconds ≈ 1.2 × 10^13 years (~12 trillion years). Length beats complexity — once you cross the ~12-random-char threshold, attacker compute is not the bottleneck for any realistic adversary.' },
     { q: 'You recommend enabling PMF on every AP. Which attack does this NOT defend against?',
       a: ['Deauth flood', 'Disassociation spoofing', 'Evil-twin / rogue-AP credential capture', 'CSA (Channel Switch Announcement) injection'],
       correct: 2,
@@ -538,7 +538,7 @@ const ATTACKS = [
   { id: 'deauth-flood', phase: 6, attack: 'Deauth flood (PMF off)', detection: 'Burst of deauth frames seen on WIDS', hardening: 'Enable PMF on every AP. WPA3 mandates it.', cost: 'cheap' },
   { id: 'evil-twin', phase: 6, attack: 'Evil-twin AP / captive-portal credential capture', detection: 'WIDS rogue-AP alert (same SSID on attacker-controlled BSSID, higher RSSI than expected)', hardening: 'EAP-TLS (no passwords to phish); user training to recognize captive-portal red flags.', cost: 'med' },
   { id: 'mousejack', phase: 6, attack: 'MouseJack (NRF24 keystroke injection)', detection: 'EDR: HID input arriving with no foreground app focus / off-hour bursts', hardening: 'Replace NRF24 dongles with Bluetooth (encrypted) or wired peripherals.', cost: 'med' },
-  { id: 'krack', phase: 6, attack: 'KRACK (nonce reuse against 4-way handshake)', detection: 'Most clients log KRACK-flag warnings if vulnerable; depends on OS', hardening: 'Patch all clients and APs (most vendors shipped fixes 2017-2018).', cost: 'cheap' },
+  { id: 'krack', phase: 6, attack: 'KRACK (nonce reuse against 4-way handshake)', detection: 'No native client telemetry — run Vanhoef\'s KRACK Detector (passive sniffer) near the AP, or WIDS rule flagging replayed EAPOL message 3 of the 4-way handshake. Track unpatched clients as proxy for residual risk.', hardening: 'Patch all clients and APs (most vendors shipped fixes 2017-2018).', cost: 'cheap' },
 
   // Phase 7 — hardware
   { id: 'uart-leak', phase: 7, attack: 'UART boot-log credential disclosure', detection: 'None on the device — must be physically present', hardening: 'Disable UART output in production firmware; physical tamper-evident seal on case.', cost: 'cheap' },

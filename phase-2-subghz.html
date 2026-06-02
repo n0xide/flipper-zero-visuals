@@ -310,11 +310,11 @@
   <canvas id="nrz-canvas" width="1100" height="100"></canvas>
 
   <h3 style="margin-top: 18px;">Manchester</h3>
-  <p style="font-size: 13px; color: var(--muted); margin-top: 0;">Every bit is a <em>transition</em>: a 1 is high-then-low; a 0 is low-then-high (G.E. Thomas convention — the one almost every RF remote uses). <strong>Self-clocking</strong> — there's always a transition mid-bit. Used by Princeton/PT2240 and most fixed-code remotes. <em>Note</em>: IEEE 802.3 Ethernet defines the opposite mapping; both conventions exist in the wild, always check the datasheet.</p>
+  <p style="font-size: 13px; color: var(--muted); margin-top: 0;">Every bit is a <em>transition</em>: a 1 is high-then-low; a 0 is low-then-high (G.E. Thomas convention). <strong>Self-clocking</strong> — there's always a transition mid-bit. Used by Ethernet (IEEE 802.3 variant — opposite mapping) and some industrial RF protocols. <em>Note</em>: most cheap 433 MHz fixed-code remotes (Princeton, EV1527) are PWM, not Manchester — always check the datasheet.</p>
   <canvas id="manchester-canvas" width="1100" height="100"></canvas>
 
   <h3 style="margin-top: 18px;">PWM — Pulse Width Modulation</h3>
-  <p style="font-size: 13px; color: var(--muted); margin-top: 0;">A 1 is a long pulse + short gap; a 0 is a short pulse + long gap. The "TE" (timing element) is the base unit. Common in OOK remotes.</p>
+  <p style="font-size: 13px; color: var(--muted); margin-top: 0;">A 1 is a long pulse + short gap; a 0 is a short pulse + long gap. The "TE" (timing element) is the base unit. Common in OOK remotes — Princeton PT2262/PT2240, EV1527, and Holtek HT12 all use PWM timing.</p>
   <canvas id="pwm-canvas" width="1100" height="100"></canvas>
 
   <div class="callout warn">
