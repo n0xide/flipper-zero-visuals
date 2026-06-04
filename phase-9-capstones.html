@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<!-- last-verified: 2026-06-02 -->
 <meta charset="UTF-8">
 <title>Phase 9 — Capstone scenarios (visuals)</title>
 <style>
@@ -406,7 +407,7 @@ const SCENARIOS = {
       { x: 175, y: 350, type: 'circle', r: 12, label: 'TPMS (rear-left tire)', phase: 2, phaseLabel: 'Phase 2 sub-GHz', body: '315 / 433 MHz unencrypted broadcast.', defenses: ['rolljam'] },
       { x: 425, y: 350, type: 'circle', r: 12, label: 'TPMS (rear-right tire)', phase: 2, phaseLabel: 'Phase 2 sub-GHz', body: '315 / 433 MHz unencrypted broadcast.', defenses: ['rolljam'] },
       { x: 300, y: 150, type: 'circle', r: 14, label: 'Infotainment (BT + WiFi)', phase: 6, phaseLabel: 'Phase 6 wireless', body: 'BT pairing replay, infotainment WiFi hotspot, app-store SoC. Many surface CVEs over the years.', defenses: ['wpa2-handshake-crack', 'ble-tracking'] },
-      { x: 250, y: 230, type: 'circle', r: 12, label: 'OBD-II port (under steering)', phase: 7, phaseLabel: 'Phase 7 hardware', body: 'CAN bus access (ISO 11898 / ISO 15765). Engine + body controllers reachable. Tuning + diagnostic and (depending on vehicle) lock-control. No matching Phase 8 row — CAN bus hardening (message authentication, OBD-II/powertrain gateway, port lockout) is taught at concept level only.', defenses: [] },
+      { x: 250, y: 230, type: 'circle', r: 12, label: 'OBD-II port (under steering)', phase: 7, phaseLabel: 'Phase 7 hardware', body: 'CAN bus access (ISO 11898 / ISO 15765). Engine + body controllers reachable. Tuning + diagnostic and (depending on vehicle) lock-control. CAN has no native authentication — hardening is gateway isolation + message authentication.', defenses: ['obd-can-access'] },
       { x: 300, y: 220, type: 'circle', r: 12, label: 'NFC unlock (B-pillar / handle)', phase: 3, phaseLabel: 'Phase 3 cards', body: 'Modern vehicles: NFC-as-key for phone-as-key features. Apple/Google CCC standard.', defenses: ['mifare-dict-nested'] },
       { x: 360, y: 350, type: 'circle', r: 12, label: 'Aftermarket dashcam (BLE / WiFi)', phase: 6, phaseLabel: 'Phase 6 wireless', body: 'Cheap dashcams often expose unauthenticated BLE config + a WiFi AP for video review. The WiFi PSK is frequently hardcoded — verify before assuming it isn\'t.', defenses: ['ble-tracking', 'wpa2-handshake-crack'] }
     ]

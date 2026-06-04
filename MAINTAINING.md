@@ -24,8 +24,16 @@ a dim non-link span:
 When you re-mirror a visual from the source, re-run the same rewrite:
 
 ```bash
-sed -i -E 's|<a href="[^"]*\.md">(.*)</a>|<span style="opacity:0.55;cursor:default" title="Source lives in the private workspace">\1</span>|g' *.html
+sed -i -E 's|<a href="[^"]*\.md">([^<]*)</a>|<span style="opacity:0.55;cursor:default" title="Source lives in the private workspace">\1</span>|g' *.html
 ```
+
+> **Note:** the capture group is `([^<]*)`, **not** `(.*)`. `.*` is greedy and,
+> on a line that contains a `.md` link followed by other anchors (e.g. the
+> footer `… README.md</a> · <a href="index.html">hub</a> · …`), it swallows
+> everything up to the *last* `</a>` and corrupts the intermediate links.
+> `[^<]*` stops at the first `<`, so each anchor is rewritten independently.
+> The source-workspace `_publish.js` applies exactly this corrected pattern
+> automatically — prefer it over running the `sed` by hand.
 
 ## Before pushing — integrity checklist
 

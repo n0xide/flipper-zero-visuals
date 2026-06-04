@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<!-- last-verified: 2026-06-02 -->
 <meta charset="UTF-8">
 <title>Phase 8 — Defense (visuals)</title>
 <style>
@@ -547,6 +548,7 @@ const ATTACKS = [
   { id: 'swd-read', phase: 7, attack: 'SWD/JTAG read (RDP 0 chip)', detection: 'None — chip allows the read by design', hardening: 'Set RDP to Level 1 minimum on production silicon; Level 2 for high-value.', cost: 'cheap' },
   { id: 'voltage-glitch', phase: 7, attack: 'Voltage glitch (defeat RDP / secure boot)', detection: 'On-chip glitch detectors (where present)', hardening: 'Use SoCs with hardware glitch detection (e.g. NXP K-series secure variants, STM32 Trust). Defense-in-depth: signed boot + attestation.', cost: 'exp' },
   { id: 'hardcoded-keys', phase: 7, attack: 'Hardcoded creds / keys in firmware', detection: 'binwalk + grep on a copy of firmware (continuous CI test)', hardening: 'Pre-release scan for hardcoded secrets; ship per-device keys provisioned at manufacture.', cost: 'cheap' },
+  { id: 'obd-can-access', phase: 7, attack: 'OBD-II / CAN bus access (ECU read + frame injection)', detection: 'CAN intrusion detection (timing / entropy anomalies on the bus); gateway logs an unexpected diagnostic session', hardening: 'Gateway/firewall between the OBD-II port and the powertrain CAN bus; message authentication (AUTOSAR SecOC); lock or relocate the OBD-II connector; refuse diagnostic services while the vehicle is in motion. Note: ISO 11898 / ISO 15765 define only the data-link and transport layers — CAN has no native authentication.', cost: 'exp' },
 ];
 
 let activeFilter = 'all';
